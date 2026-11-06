@@ -1,0 +1,257 @@
+---
+title: "Chapter1_Temporal_Traitspaces"
+author: "Joe Knox"
+date: "2026-10-24"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+Basically either have the disprity whole assemblage approach to characterise functional uniqueness or the species level approach (which would allow me to tie in the innovation vs elaboration thing).
+
+
+
+Chapter 1: 
+
+a) Do migrants contribute unique functions to ecosystems (i.e. is seasonal functional turnover important for ecosystem functioning)?
+
+Need: 
+- week x gridcell (or ecoregion) x species PC matrix (AVONET x saviTRAITs x Elton Traits)
+- all analysis will be ecoregional (no study has done this yet, all have been grid cell based so there is some novelty there)
+-PCOA- for seasonal PCOAs will need to plot both species that switch their diet between seasons and those that don't- this will be good to see which species switch their niche between seasons also e.g. residents vs migrants 
+
+
+
+Species removal approach (Keyser et al., 2024, Gilbert et al., 2026):
+
+- calculate functional unqiueness for each species within the full seasonal assemblage for each ecoregion, hull.contribution or kernel.contribution (probably less sensitive to outliers; leave-one-in-one-out) in BAT (Mammola and Cardoso, 2020); or 
+funrar(functional disitinctiveness, uniqueness, rarity and geographic restrictedness) as:
+- functional distinctiveness: "the average functional distance from a species to all the other in the given community"; distinctiveness relative to whole community- key; 
+- functional uniqueness: basically nearest neighbour distance, represents isolation. 
+- scarcity requires abundance matrices (but maybe good to weight by this?), 
+- geographic restrictedness measures whether species presence at sites - probably don;t need this as ecoregional specific  but could do temporal restrictedness (number of sites present)
+or whether species lies in non-overlapping non-nested part of ecoregional weekly multi-dimensional trait space (Williams and Curley, 2025) to get weekly functional uniqueness score in trait space (weighted by number of weeks absent in ecoregion (sum of weighted values across each PC axis; control for phylogeny- blomberg's k? as species are then more unique if more transient and abundance-relative; although not comparable across species.) ; would be more a functional importance score?) e.g. Bellve et al., 2026) (o. (Gilbert et al., 2026) could also calculate innovation score!- alternatively for aoh maps, fu score = average monthly score (aggregated across three seasons)
+
+or species' functional rarity = trait distinctiveness + trait uniqueness + temporal restrictedness (number of months/weeks present) + scarcity /3. (similar to Gauzere et al 2026)
+
+Then can model 1. Are migrants more functionally rare than residents and does this depend on season?
+
+migratory status  ~ functional rarity
+or assemblage level prop. of migrants + season + migrants * season ~ assemblage level functional rarity score (sum of all functional rarity scores high = more rare species)
+
+-average for each species across 52 weeks of the year to get average annual functional uniqueness score for each ecoregion (or gridcell)
+-average for each species across weeks of each season to get average annual functional uniqueness score for each ecoregion (or gridcell)
+-get migratory distance: resident vs short vs long distance migrants (mig dist = max extent of range map - min extent of range map)
+- get seasonal diet type (sAVItraits; Murphy et al., 2023) (average diet percentages across seasons, Williams and Curley, 2025), plasiticty score - important for switching idea in chapter 2 e.g. migratory status * plasiticity ~ climate change effect on FD
+
+```{r}
+
+```
+
+
+Models (GLMMs):- may need to control for phylogeny
+
+1. Are migrants more functionally unique than residents?
+
+migratory status ~ average annual functional uniqueness score
+migratory status ~ average annual innovation score (will not change)
+
+2. Are migrants more functionally unique than residents in particular seasons?
+
+migratory status + season  ~average seasonal functional uniqueness score
+
+3. Are long vs short distance migrants more functionally unique than residents in particular seasons? 
+
+migratory status (distance-calculated) + season  ~average seasonal functional uniqueness score
+migratory status + season  ~average seasonal functional uniqueness score
+
+4. Does migratory status and monthly diet type effect functional uniqueness i.e. are migrants/residents with particular diet types more functionally unique than others?- can then make inferences about which functions e.g. seed dispersal if a granivore might be most at risk.
+
+migratory status + monthly diet type  ~average monthly functional uniqueness score
+
+
+Do these effects differ across ecoregions?
+
+migratory status + monthly diet type + ecoregion  ~average monthly functional uniqueness score
+
+
+5. Does transience of migrant species effect functional uniqueness i.e. are functionally unique migrants more likely to be present in only a few weeks of the year
+
+number of weeks present (migrant species) ~ average annual functional uniqueness score (may be biased as migrant species present most of the year will have more weekly uniqueness scores contrubting to average)
+
+could also sequentially remove most transient species and see what proportion of FD is lost (Keyser et al., 2025, loft et al., 2026; Gilbert et al., 2026)? 
+
+b). Alternatively residents may switch their niches, rather than undergoing migrations (another form of cyclical change)? 
+
+monthly diet type (savitraits)- plasticity score (number of different diet types across the year), average for each season?
+
+
+c) Do nocturnal/diurnal species contribute unique functions to ecosystems (i.e. is daily functional turnover important for ecosystem functioning)?
+
+repeat with day/night species + migratory status + diet type- basically models just become more and more complex. FU Weighted by hours of the day present, if data is available or not weighted at all.
+
+
+Chapter 2:
+
+How does this change under climate change (RCP x SSP scenario low, mid, high scenario)?
+
+Either projection to future with SDMs e.g. (Stewart et al., 2022)
+
+1. Which species are lost under climate change from ecosystems? are they functionally unique species? what is their activity period/status? are the most transient functionally unique, innovative species disporortionaly lost from ecosystems?- then would suggest migrants are particualryl at risk of climate change.
+
+If they are and found to belong to the at risk groups ("irreplaceable function" species) identified in chapter 1, this could have real consequences for ecosystems
+
+2. Which species are gained? are they the more plastic resident species? 
+
+If functionally unique transient species are lost but resident species are gained, may balance out effect of climate change on ecosystem functioning, if instead climate change results in a loss of functionally unique species and a loss of plastic resident species, suggests we would be left with a small pool of redundant functions, potentially resulting in a loss of productivity. We can then test this...
+
+
+Models:
+
+Are more transient functionally unique species lost under climate change more likely to be migrants/ diurnal/nocturnal species? i.e. are migrants/nocturnal/diurnal species more at risk from climate change and is this important for ecosystems because they are functionally unique?
+
+prop. of migrants in assemblage at baseline~ prop. of innovative species lost under climate change scenario one etc
+prop. of migrants in assemblage at baseline ~ prop. of functionally unique species lost  under climate change scenario one etc (or prop of FD lost from baseline)
+
+or prop. of functionally unique species (already accounts for transience) * migratory status + niche switchers (plastic diet score) *migratory status  ~ FD lost from baseline to projected climate change
+
+prop. of functionally unique species (already accounts for transience) + niche switchers (plastic diet score) ~ FD gained from baseline to projected climate change
+
+prop. of nocturnal/diurnal species at baseline~ prop. of functionally unique species lost  under climate change scenario one etc (or prop. of FD lost from baseline)
+prop. of nocturnal/diurnal at baseline ~ prop. of innovative species lost  under climate change scenario one etc
+
+Are functionally unique species lost under climate change also more likely to be transient species?- would expect this to be the case because one small change in climate more likely to impact a small part of the annual cycle and thus phenology.
+
+prop. of transient species at baseline ~ prop. of  functionally unique species lost under climate change scenario one etc (or prop. of FD lost from baseline)
+prop. of transient species at baseline ~ prop. of innovative species lost  under climate change scenario one etc
+
+
+
+Therefore is these answers are found to be true- can infer that ecosystems with more migrants/nocturnal/diurnal species and more transient species are likely to lose more innovative traits and more functional uniqueness/diversity so are likely more at risk. Therefore can conclude that migrant/ diurnal/nocturnal species are important for ecosystem functioning and therefore cyclical patterns are very important to incorporate into FD studies and global change modelling.
+
+Could actually confrim this below:
+
+
+Chapter 3: what does this mean for ecosytem services? (leans on productivity and niche partitioning theory)
+
+- productivity (Gilbert et al., 2026) e.g. NDVI layer
+
+Models:
+
+1. are assemblages with more functionally unique species more likely to be productive (because species are not contributing redundant fucntions and likely functions are more even, so not monopoliding resources (Gilbert et al., 2026)? 
+
+
+prop. of functionally unique species + prop. of innovative species  ~ year-round productivity
+
+
+2. Is this due to cyclical species (e.g. providing keystone fucntions to ecosystems)?
+
+prop. of functionally unique species + prop. of innovative species + migratory status + activity period + diet type ~ year-round productivity
+
+3. or alternatively are ecosystems more productive because resident species are switching their niche (captilising on seasonal resources)?
+
+prop. of functionally unique species + prop. of plastic resident species ~ year-round productivity
+
+
+3. How does the gain/loss of plastic resident species vs functionally unique transient species vs innovative species impact ecosystem productivity under different climate change scenarios?
+
+
+Do assemblages with more plastic resident species, fewer transient functionally unique species and fewer innovative species have greater productivity under climate change because they are less reliant on cyclical change for their functioning (if these species are lost), and more reliant on year-round adaptable plastic species that are less vulnerable to changes in their phenology under climate change?
+
+
+prop. of plastic resident species at baseline +  prop. of transient functionally unique species at baseline + prop of innovative species at baseline ~ projected productivity (PREDICTS) 
+e.g. in trees found that fucntionally distinct species increase productivity in harsh cold environments (seasonally extreme?), so when lost likely to be quite irrepleaceable as keystone (Delandre et al., 2022)
+
+I.e. may expect ecosystem productivity to be more greater under climate change if they have more plastic resident species, more transient functionally unique resident species and more innovative species, because that would suggest greater adaptation to climate change?
+
+
+- "ecosystem energetics approach" (Loft et al., 2026) - more directly links to earth systems like carbon and nutrient cycles than trait-based approaches? 
+
+
+
+
+
+Disparity approach:-----------------
+
+Metrics:  migrant vs resident trait space in different ecoregions: (all ses controlled- observed-mean/SD)
+
+a) Do migrants and residents represent different trait combinations? 
+- Distance between group centroids across seasons (weekly aggregates) and ecoregions e.g do migrants and residents differ in position in trait space (on average). compare each migrant seasonal trait space to the year round residents, with the annual ecoregional trait space as the reference. 
+
+repeat with the whole trait space for all birds?- but we are interested in local functional diversity so little justification for this. It would be useful however, if we wanted to look at which species might be able to fill in for these species (species with similar trait combinations) if they were lost.
+
+models:
+- PERMANOVA (euclidean distance matrix)- does distance between migrant and resident centroids differ (see chapter 1 exploration) (units first as average weekly value for each ecoregion, then as seasonal ecoregional trait spaces?) or model season seperately?
+- season ~distance between migrant and resident centroids in full ecoregional annual trait space does season matter? 
+
+beta diversity
+- seasonal beta diversity between migrants vs residents in trait space (Keyser et al., 2024; Williams and Curley, 2025)
+
+
+b) Are migrants more specialist? i.e. non-overlapping niches (first with ecoregional annual trait space as reference; across seasons)?
+- Sum of variances- spread, tells us if migrants/residents are more spread in trait space (seasonal migrant trait space vs residents for each ecoregion). 
+- e.g. if migrants more spread then may represent a greater diversity of functions with more extreme trait combinations (i.e. more specialism and less generalism (clustered in trait space))
+- The additional thing is then to look at  among group distance to centroid (e.g. Carvalho and Cardoso et al., 2025). This would tell us whether the spread is due to lots of species (i.e. more even distribution of trait combinations) or due to a few species with very extreme functions and maybe the rest are clustered)- if this is the case then would need to pinpoint which species these are. 
+
+models:
+- migratory status + season ~sum of variance
+- migratory status + season ~average among group distance to centroid
+
+
+c) Do migrants contribute innovative or elaborative traits?
+- phylogeny-controlled- are migrant species diverging from resident species along major or minor pc axes?
+- if so then, traits may be more irreplaceable as less able to evolve if lost?
+
+models: 
+- PC axis + season ~ distance between migrant and resident species centroids?
+- bigger along smaller (more important) PC axis = diverging on more innovative traits?
+
+cumulative migrant functional uniqueness score for each assemblage?
+cumulative resident functional uniqueness score for each assemblage?
+
+
+species level:
+
+sequentially remove most transient species first from each assemblage (migrants only present in a few weeks/per year), see how much FD is lost, if disproportionate with removing most transient species, suggests removing migrants may disproportionately impact ecosystems?
+
+
+
+d) Savitraits- seasonal diet (Bellve et al., 2026)- what functionally unique traits are migrant species contributing?
+
+migratory status + diet ~ functional uniqueness? in season 1 does diet and migratory status predict FU?
+migratory status + diet ~ functional uniqueness? in season 2
+migratory status + diet ~ functional uniqueness? in season 3
+migratory status + diet ~ functional uniqueness? in season 4
+
+
+
+e) Putting it together:
+- which seasons are migrants most unique in?
+- if migrant species are more positionally unique, more specialist within trait space and more innovative then suggests seasonality is very important to characterise as species may be highly irreplaceable when lost.
+- can repeat for short vs long distant migrants e.g. Bellve et al. (2026) max-min extent of combined range (0 = resident, less = short, larger = long)
+
+
+
+Question 3: Do nocturnal/diurnal migrants contribute unique functions to ecosystems (i.e. is daily functional turnover important for ecosystem functioning)?
+
+repeat analysis for night vs day instead of migratory status
+
+
+Chapter 2:
+
+Question 1: Do assemblages with more functionally unique (and transient) migrant species undergo greater functional losses under climate change?
+
+
+functionally unique migrant species ~ functional loss (FD baseline-FD climate change) in climate change scenario 1 (negative = net gain?)
+
+
+
+either:
+
+sequentially remove most transient species first from each assemblage (only present in a few weeks/per year), see how much FD is lost, if disproportionate with removing most transient species, suggests assemblages will lose more irreplaceable species?
+
+
+

@@ -1,0 +1,1450 @@
+---
+title: "How do cyclical patterns impact avian functional diversity and ecosystem responses to climate change?"
+date: "2026-09-30"
+author: Joe Knox
+output: pdf_document
+ number_sections: true
+bibliography: bibliography.bib
+---
+
+
+##Load libraries
+
+```{r setup, include=FALSE}
+library(readr)
+library(dplyr)
+library(tidyr)
+library(tidyverse)
+library(tibble)
+library(purrr)
+library(stringr)
+library(stringdist)
+library(terra)
+library(tidyterra)
+library(sf)
+library(plotly)
+library(dispRity)
+library(vegan)
+
+
+
+```
+
+# Chapter 1: How do cyclical patterns impact avian functional diversity and niche structure ?
+
+## Intro:
+
+Laymans:
+
+Biodiversity is not a static concept, and this where previous models that seek to understand how humans are impacting species, communities and ecosystems have fallen short. Functional diversity is a particularly informative dimension of biodiversity as, unlike species richness, it directly relates to ecosystem services. Different species have different functions such as seed dispersal, (e.g. pollinators), nutrient cycling (e.g. plants) and waste decomposition (e.g. fungi), and these functions impact carbon cycles, productivity and other crucial earth systems. Thus, at a given site the composition of species present, will effect ecosystem functioning. But, as day turns to night, seasons change and animals migrate and hibernate, species composition will change, and therefore the functional space will shift across time. Many of these functional shifts will be predictable, with cyclical patterns of species turnover.
+
+For example, in the UK, a resident pigeon active during the daytime might help to clean up waste through scavenging. Whilst, a migratory nightjar, active at night might contribute to vital pest control but only during the months of April and May when it is present in the UK. If, under climate change, the night-jar's range shifts so that it no longer migrates to the UK during these months, this function may be lost entirely unless another functionally similar species can fill in the gap. Further, if species that are the most functionally unique and transient also happen to be the most climate-vulnerable, this would have severe consequences, particularly in areas where these species are most concentrated. 
+
+By modelling how functional spaces change across time with species turnover and activity patterns, and how this is impacted by climate change, we can understand:
+1. How climate change will impact ecosystem services
+2. Which sites, seasons, time periods and groups will be most vulnerable to climate change (i.e. experience the greatest functional diversity loss/ loss of functionally unique species compared to present day)
+3. How we can a) mitigate the impacts of climate change to prevent ecosystem degradation by either preventing climate change altogether and thus range shifts, or by targeting conservation efforts towards the most vulnerable species, groups and ecosystems in critical windows. Or b), more sub-optimally, how we can adapt to climate change under range shifts, by introducing new species/ re-introducing locally extinct species to fulfill keystone functions lost.
+
+
+
+
+## Methods and Results
+
+### Pre-analysis 1: Defining the functional trait space
+
+```{r plot different Avonet trait spaces}
+
+#loading traitspaces
+
+avospace_full<- read.csv("~/Desktop/Phd Prep/Data/pc_scores_avobeak_aoh.csv")
+avospace_beak<- read.csv("~/Desktop/Phd Prep/Data/pc_scores_avobeak_aoh.csv")
+
+
+#Plotting PC1:3 with loadings and visualising where different migratory groups sit
+
+#plotting fix for combining plots with patchwork so that they fit
+fix <- list(
+  scale_x_continuous(expand = expansion(mult = 0.1)),
+  scale_y_continuous(expand = expansion(mult = 0.1)),
+  coord_cartesian(clip = "off"),
+  theme(
+    aspect.ratio = NULL,
+    legend.position = "bottom",
+    plot.margin = margin(10, 20, 10, 20)
+  )
+)
+
+
+#pc1v2------
+
+#full traitspace
+p1_full <- autoplot(pca, x = 1, y = 2, data = avospace_full, colour ='mig_status',
+              loadings = TRUE, loadings.colour = 'yellow',
+              loadings.label = TRUE, loadings.label.size = 3, loadings.label.colour = "black")
+
+ggplotly(p1_full) #for labelling species occupying extreme edges of morphospace but can do when global later i.e. using subplot( p1_full , p1_beak, p1_other, nrows = 2, margin = 0.04, heights = c(0.5, 0.5))
+
+#Beak traitspace
+p1_beak <- autoplot(avonet_beak_pca,x = 1, y = 2, data = avospace_beak, colour ='mig_status',
+              loadings = TRUE, loadings.colour = 'yellow',
+              loadings.label = TRUE, loadings.label.size = 3, loadings.label.colour = "black")
+
+ggplotly(p1_beak)
+
+#other traitspace
+p1_other <- autoplot(avonet_other_pca, x = 1, y = 2, data = avospace_other, colour ='mig_status',
+              loadings = TRUE, loadings.colour = "yellow",
+              loadings.label = TRUE, loadings.label.size = 3, loadings.label.colour = "black")
+
+
+
+ggplotly(p1_other) #for identifying extreme species later
+
+
+grid.arrange(p1_full, p1_beak, p1_other, nrow = 2) #combine to view all avonet trait spaces in a single plot
+
+
+g <- gridExtra::arrangeGrob(p1_full + theme(legend.position = "none"),
+                            p1_beak + theme(legend.position = "none"), nrow = 1)
+
+ggsave("~/Desktop/Phd Prep/Outputs/pc1v2_beak_vs_full_space_aoh.png", g, width = 12, height = 6, dpi = 300, bg = "white")
+
+
+
+#PC1 v 3----
+
+p2_full <- autoplot(pca, x = 1, y = 3, data = avospace_full, colour ='mig_status',
+              loadings = TRUE, loadings.colour = 'yellow',
+              loadings.label = TRUE, loadings.label.size = 3, loadings.label.colour = "black")
+
+ggplotly(p2_full)
+
+p2_beak <- autoplot(avonet_beak_pca, x = 1, y = 3, data = avospace_beak, colour ='mig_status',
+              loadings = TRUE, loadings.colour = 'yellow',
+              loadings.label = TRUE, loadings.label.size = 3, loadings.label.colour = "black")
+
+ggplotly(p2_beak)
+
+p2_other <- autoplot(avonet_other_pca, x = 1, y = 3, data = avospace_other, colour ='mig_status',
+              loadings = TRUE, loadings.colour = 'yellow', 
+              loadings.label = TRUE, loadings.label.size = 3, loadings.label.colour = "black")
+
+ggplotly(p2_other)
+
+grid.arrange(p2_full, p2_beak, p2_other, nrow = 2)
+
+#PC2 v 3-----
+
+p3_full <- autoplot(pca, x = 2, y = 3, data = avospace_full, colour ='mig_status',
+              loadings = TRUE, loadings.colour = 'yellow',
+              loadings.label = TRUE, loadings.label.size = 3, loadings.label.colour = "black")
+
+ggplotly(p3_full)
+
+p3_beak <- autoplot(avonet_beak_pca, x = 2, y = 3, data = avospace_beak, colour ='mig_status',
+              loadings = TRUE, loadings.colour = 'yellow',
+              loadings.label = TRUE, loadings.label.size = 3, loadings.label.colour = "black")
+
+ggplotly(p3_beak)
+
+p3_other <- autoplot(avonet_other_pca, x = 2, y = 3, data = avospace_other, colour ='mig_status',
+              loadings = TRUE, loadings.colour = 'yellow',
+              loadings.label = TRUE, loadings.label.size = 3, loadings.label.colour = "black")
+
+ggplotly(p3_other)
+
+grid.arrange(p3_full, p3_beak, p3_other, nrow = 2) 
+
+```
+
+Plot:
+overlap of full AVONET space with AVONET beak space and non-beakspace against PC1 vs PC2 and PC2 vs PC3
+
+Interpretation:
+If AVONET beakspace differs to AVONET non-beakspace, suggests trophic trait space differs to non-trophic space (e.g. locomotion) so full trait space is needed to characterise the full diversity of avian functions
+If beakspace/other space characterises the full trait space suggests only trophic traits (beak traits)/non-trophic traits needed
+
+Interpretation:
+
+
+PC1: Seems to represent overall size in all trait spaces with all traits having quite equal loadings i.e. large and long bodied/beaked species fall at higher values on PC1
+PC2: HWI and tail length have strong influence in both full and other trait space, especially HWI. Species with high HWI fall at higher levels of PC2 i.e. migrants for full and other trait space respectively. In beakspace, beak length and width have strongest influence i.e. long-beaked species fall at higher values of PC2.
+PC3: In full trait space, beak length and tail length seem to have strongest influence. Species with short beak and long tail fall at higher values of PC3. Same for other trait space, with short tarsus length replacing beak length. In beakspace, beak width and mass have strongest influence i.e. small, wide-beaked species fall at highest values of PC3.
+PC4:In full trait space, narrow-beaked, species fall at high values of PC4. In other trait space, small bodied species with short tarsus length fall at high values. In beak space, wide but shallow-beaked species have fall at high values of PC4.
+
+Migrants vs residents:
+
+In PC1 V 2: Hand wing index has strong influence on other and full trait space with migrants with a larger hand wing index falling at higher and lower values of Pc1 respectively and other a full trait spaces thus seem to mirror eachother quite well.
+removing that trait is seems there would likely be less inconsistency between beakspace and other pcs however, seems to be important for migratory status. - could remove as in (keyser et al., 2024) etc
+In beakspace residents vs migrants seem to be seperated more by larger beak depths?
+
+In PC1 v 3: trait spaces seem to be more similar 
+
+In PC2 V 3: Trait spaces differ again but all three show clustering of residents vs migrants. Migrants = larger wing length and HWI for full space but not for other trait space where they are only seperated by HWI. Beak space more seperated by mass, i.e. large species tend to be migrants and occupy low values of PC3.
+
+Next steps: remove HWI and kipps distance and see if traitspaces more similar (Keyser et al., 2024). Also wing traits likely highly correlated with kipps distance etc.
+
+##### Comparing AVONET trait spaces without HWI and kipps distance------
+
+Looking like may need to keep locomotory traits though as will be important for looking at effect of migrants vs residents
+
+```{r comparing AVONET trait spaces without HWI and kipps distance}
+
+
+#PC1 V 2----
+
+p1_full <- autoplot(pca2, data = avospace_full_2, colour ='mig_status',
+              loadings = TRUE, loadings.colour = 'yellow',
+              loadings.label = TRUE, loadings.label.size = 3, loadings.label.colour = "black")
+
+
+ggplotly(p1_full) #for labelling species occupying extreme edges of morphospace but can do when global later i.e. using subplot( p1_full , p1_beak, p1_other, nrows = 2, margin = 0.04, heights = c(0.5, 0.5))
+
+#Beak traitspace
+p1_beak <- autoplot(avonet_beak_pca, data = avospace_beak, colour ='mig_status',
+              loadings = TRUE, loadings.colour = 'yellow',
+              loadings.label = TRUE, loadings.label.size = 3, loadings.label.colour = "black")
+
+ggplotly(p1_beak)
+
+#other traitspace
+p1_other_2 <- autoplot(avonet_other_pca_2, data = avospace_other, colour ='mig_status',
+              loadings = TRUE, loadings.colour = "yellow",
+              loadings.label = TRUE, loadings.label.size = 3, loadings.label.colour = "black")
+
+p1_other_2$layers[[1]]$data$species <- avospace_other_2$species
+p1_other_2$layers[[1]]$mapping <- aes(colour = mig_status, text = species)
+
+ggplotly(p1_other_2, tooltip = "text")
+
+
+
+grid.arrange(p1_full_2, p1_beak, p1_other_2, nrow = 2) #combine to view all avonet trait spaces in a single plot
+
+
+
+#PC1 V 3---
+p2_full_2 <- autoplot(pca2, x = 1, y = 3, data = avospace_full_2, colour ='mig_status',
+              loadings = TRUE, loadings.colour = 'yellow',
+              loadings.label = TRUE, loadings.label.size = 3, loadings.label.colour = "black")
+
+ggplotly(p2_full)
+
+p2_beak <- autoplot(avonet_beak_pca, x = 1, y = 3, data = avospace_beak, colour ='mig_status',
+              loadings = TRUE, loadings.colour = 'yellow',
+              loadings.label = TRUE, loadings.label.size = 3, loadings.label.colour = "black")
+
+ggplotly(p2_beak)
+
+p2_other_2 <- autoplot(avonet_other_pca_2, x = 1, y = 3, data = avospace_other_2, colour ='mig_status',
+              loadings = TRUE, loadings.colour = 'yellow', 
+              loadings.label = TRUE, loadings.label.size = 3, loadings.label.colour = "black")
+
+ggplotly(p2_other)
+
+grid.arrange(p2_full_2, p2_beak, p2_other_2, nrow = 2)
+
+
+#PC2 V 3---
+p3_full_2 <- autoplot(pca2, x = 2, y = 3, data = avospace_full_2, colour ='mig_status',
+              loadings = TRUE, loadings.colour = 'yellow',
+              loadings.label = TRUE, loadings.label.size = 3, loadings.label.colour = "black")
+
+ggplotly(p2_full)
+
+p3_beak <- autoplot(avonet_beak_pca, x = 2, y = 3, data = avospace_beak, colour ='mig_status',
+              loadings = TRUE, loadings.colour = 'yellow',
+              loadings.label = TRUE, loadings.label.size = 3, loadings.label.colour = "black")
+
+ggplotly(p2_beak)
+
+p3_other_2 <- autoplot(avonet_other_pca_2, x = 2, y = 3, data = avospace_other_2, colour ='mig_status',
+              loadings = TRUE, loadings.colour = 'yellow', 
+              loadings.label = TRUE, loadings.label.size = 3, loadings.label.colour = "black")
+
+ggplotly(p2_other)
+
+grid.arrange(p3_full_2, p3_beak, p3_other_2, nrow = 2)
+
+
+
+```
+
+#####Interpretation:
+
+Removing HWI and kipps distance seems to make trait spaces more similar to eachother I.E. removes "wings" of trait space from full and non-beak space but resolves migrants vs residents less? But methodologically probably more sound as traits not so highly correlated.
+
+PC1: Again, all traits have similar contribution, all seem to relate to size, i.e. species with larger/longer/wider traits fall at higher values of PC1. Will interesting to see how removing size changes things.
+PC2: species with longer tails and shorter beaks fall at higher values of PC2 in full trait space. Same for non-beak trait space but with shorter tarsus replacing beak influence. For beak trait space, long and narrow beaked species fall at high values of PC2.
+PC3: for non-beak space tarsus length has strong influence- longer tarsi= higher values of pc3. For beak trait space, small birds fall at higher values of PC3. For full trait space, birds with wide and deep beaks at high values of PC3 (not resolved as much in beak only space). 
+PC4: In full trait space, birds with long tarsi but short tails and beaks fall at high walues of PC4. In beak space, narrow, wide-beaked species fall at high levels of PC4, non-beak space, long-winged birds with short secondary length fall out high values.
+
+PC1 v 2: #Trait spaces more similar but less clustering of species by migratory status. Migrants tend to be long beaked and short-tailed across traitspaces. Beak space seems to reslove migrant vs residents more? 
+PC1 v 3: #same again, mass more influential in beakspace along PC3
+PC2 V 3: PC2 v 3 less similar, and more clustering of migrant vs resident trait space. i.e. residents tend to have shorter narrower beaks, whilst migrants have longer beaks. More migrants with very long wings and this has more influence in non-beak trait space. Denser centre of trait space in non-beak trait space.
+
+Since wing length (especially for migrants), tail length and tarsus important probably should retain the full trait space... 
+
+####B) Sheffield formspace (size + shape) vs AVONET beakspace
+
+
+````{r}
+
+#PC1 V 2----
+
+#sheff formspace
+p1_sheff_beak <- ggplot(sheff_form, aes(x = PC1, y = PC2, colour = mig_status)) +
+  geom_point() +
+  labs(x = "PC1 (91.4%)", y = "PC2 (4.8%)") +
+  theme_classic()
+
+p1_sheff_beak
+
+
+
+#Beak avo traitspace
+p1_avo_beak <- autoplot(avonet_beak_pca, data = avospace_beak, colour ='mig_status',
+              loadings = TRUE, loadings.colour = 'yellow',
+              loadings.label = TRUE, loadings.label.size = 3, loadings.label.colour = "black")
+
+ggplotly(p1_beak)
+
+grid.arrange(p1_sheff_beak, p1_avo_beak) #combine to view all avonet trait spaces in a single plot
+
+
+
+#PC1 V 3---
+
+#sheff formspace
+p2_sheff_beak <- ggplot(sheff_form, aes(x = PC1, y = PC3, colour = mig_status)) +
+  geom_point() +
+  labs(x = "PC1 (91.4%)", y = "PC3 (2.1%)") +
+  theme_classic()
+
+
+p2_avo_beak <- autoplot(avonet_beak_pca, x = 1, y = 3, data = avospace_beak, colour ='mig_status',
+              loadings = TRUE, loadings.colour = 'yellow',
+              loadings.label = TRUE, loadings.label.size = 3, loadings.label.colour = "black")
+
+
+grid.arrange(p2_sheff_beak, p2_avo_beak, nrow = 2)
+
+
+#PC2 V 3---
+p3_sheff_beak <- ggplot(sheff_form, aes(x = PC2, y = PC3, colour = mig_status)) +
+  geom_point() +
+  labs(x = "PC1 (4.8%)", y = "PC3 (2.1%)") +
+  theme_classic()
+
+p3_avo_beak <- autoplot(avonet_beak_pca, x = 2, y = 3, data = avospace_beak, colour ='mig_status',
+              loadings = TRUE, loadings.colour = 'yellow',
+              loadings.label = TRUE, loadings.label.size = 3, loadings.label.colour = "black")
+
+
+grid.arrange(p3_sheff_beak, p3_avo_beak, nrow = 2)
+
+````
+
+
+
+Interpretation:
+
+Beakspaces similar with similar spread but sheffield beakspace seems to be less patchy and more homogenous through trait space?
+trait choice does matter-maybe GMM accounts for allometry and size better than linear morphometrics (e.g. Viacava et al., 2023) by better discriminating species that differ purely based on size differences from those that differ based on shape and attributing less importance to first PCs that are often inflated by size? so maybe large/small species occupy less extreme positions in sheffield beakspace compared to avonet beakspace?
+
+
+#### C) Sheffield formspace vs sheffield shapespace
+
+```{r}
+
+#PC1 V 2---
+
+#sheff formspace
+p1_sheff_form <- ggplot(sheff_form, aes(x = PC1, y = PC2, colour = mig_status)) +
+  geom_point() +
+  labs(x = "PC1 (91.4%)", y = "PC2 (4.8%)") +
+  theme_classic()
+
+
+#Sheff shapespace
+p1_sheff_shape <- ggplot(sheff_shape, aes(x = PC1, y = PC2, colour = mig_status)) +
+  geom_point() +
+  labs(x = "PC1 (91.4%)", y = "PC2 (4.8%)") +
+  theme_classic()
+
+grid.arrange(p1_sheff_form, p1_sheff_shape, nrow = 2)
+
+#PC1 V 3
+p2_sheff_form <- ggplot(sheff_form, aes(x = PC1, y = PC3, colour = mig_status)) +
+  geom_point() +
+  labs(x = "PC1 (91.4%)", y = "PC3 (2.1%)") +
+  theme_classic()
+
+
+p2_sheff_shape <- ggplot(sheff_shape, aes(x = PC1, y = PC3, colour = mig_status)) +
+  geom_point() +
+  labs(x = "PC1 (91.4%)", y = "PC3 (2.1%)") +
+  theme_classic()
+
+grid.arrange(p2_sheff_form, p2_sheff_shape, nrow = 2)
+
+#PC2 V 3
+p3_sheff_form <- ggplot(sheff_form, aes(x = PC2, y = PC3, colour = mig_status)) +
+  geom_point() +
+  labs(x = "PC2 (4.8%)", y = "PC3 (2.1%)") +
+  theme_classic()
+
+
+p3_sheff_shape <- ggplot(sheff_shape, aes(x = PC2, y = PC3, colour = mig_status)) +
+  geom_point() +
+  labs(x = "PC2 (4.8%)", y = "PC3 (2.1%)") +
+  theme_classic()
+
+grid.arrange(p3_sheff_form, p3_sheff_shape, nrow = 2)
+
+```
+
+
+
+Interpretation:
+
+size seems to matter (sorry lads). In general seems to decrease variance and produce denser clustering in trait space. Also landmarking seems to remove this size effect to some extent.
+HOWEVER, AVONET trait still maybe preferred as including non-beak traits seems to do a better job of seperating migrants from residents.
+
+
+#Plots of nine trait AVONET beakspace vs AVONET full space on aoh_range space
+
+- species seem less dispersed from traitspace in beakspace compared to full traitspace
+- both beak and full spaces similar, PC1 explains size mainly- large/long traited or large/wide/deep beaked species full at high values of PC1, whilst for PC2 long tailed, short beaked species fall at high values of PC2, or narrow, long-beaked species (for the beakspace). So species seems to cluster similarly in terms of trait combinations in both trait spaces.
+
+-Trait space quite similar again along PC2 v 3 but mass is a much strong determinant of beakspace with heavy bodied species falling at low values of pc3, whilst beak width and tarsus length have a strong influence for the full space with wide, deep beaked species with short tarsi falling at high levels of PC3.
+
+Trait space quite similar again along PC1 v 3 but with beakspace being more spread along PC3.
+
+
+
+
+
+### Chapter 1. Exploring the temporal structure of the avian functional trait space using dispRity.
+
+#loading in the data
+
+```{r loading in the data}
+mon_presence<- readRDS("~/Desktop/Phd Prep/Outputs/monthly_presence_by_site.rds") #species per 3kmx3km pixel per month
+
+```
+
+Analysis
+
+## A) Testing seasonal patterns on a small scale (Britain and Ireland) with selected and justified trait space
+
+### Preparing the data for the gridcell analysis
+
+Winter season is defined as September-February in line with BTO Winter Bird Survey. Breeding season is defined as April-June in line with BTO Winter Bird Survey. 
+
+
+```{r, echo=FALSE, preparing data }
+
+#defining seasonal presence
+
+#define winter and breeding seasons
+winter <- c("Sep", "Oct", "Nov", "Dec", "Jan", "Feb")
+breeding<- c("Apr", "May", "Jun") #change to summer?
+
+#summarise seasonal presence of each species
+presence.by.season <- function(data, seasons, groups = c("cell", "lon", "lat", "species", "local_status")) {
+  flags <- imap(seasons, ~ expr(if_else(any(month %in% !!.x), "1", "0")))
+  names(flags) <- paste0("present_", names(seasons)) #note that species present in at least 1 month in these seasons will be included in the seasonal trait space so doesn't distinguish between short-stay seasonal migrants and full-season migrants.
+
+  data %>%
+    group_by(across(all_of(groups))) %>%
+    summarise(present_ever = "1", !!!flags, .groups = "drop")
+}
+
+mon_presence2 <- presence.by.season(
+  mon_presence,
+  seasons = list(winter = winter, breeding = breeding)
+)
+
+mon_presence2 <- mon_presence2 %>%
+  mutate(across(c(present_winter, present_breeding), ~ as.integer(.x)))
+
+
+#find species not present in either season at any site but present out of season
+out_of_seasons <- mon_presence2 %>%
+  group_by(species) %>%
+  filter(sum(present_winter) == 0, sum(present_breeding) == 0) %>%
+  distinct(species) %>%
+  pull(species) # none!- means comparing to annual trait space won't work?
+
+#how many species will be in the full seasonal traitspace? #useful for positional change in residents between seasons later on
+n_distinct(mon_presence2$species[mon_presence2$present_winter == 1]) #226 species
+n_distinct(mon_presence2$species[mon_presence2$present_breeding == 1]) #253 species
+
+#11 migrant species present in winter season not present in breeding season these will be key to the niche switching in question 2 as will change the centroid of trait space across seasons.
+setdiff(mon_presence2$species[mon_presence2$present_winter == 1], mon_presence2$species[mon_presence2$present_breeding == 1]) 
+
+#38 migrant species present in breeding season not present in winter season, these will be key to the niche switching in question 2 as will change the centroid of trait space across seasons.
+setdiff(mon_presence2$species[mon_presence2$present_breeding == 1],
+        mon_presence2$species[mon_presence2$present_winter == 1])
+
+
+write.csv(mon_presence2, "~/Desktop/Phd Prep/Outputs/species_site_season_df.csv") 
+
+```
+
+Using dispRity as opposed to mFD (Magneville et al., 2022) which relies on convex hulls that can be sensitive to outliers and insensitive to non-homogenous density distribution and funspace which seems only to handle two dimensional trait spaces and relies on TPD? (Carmona et al., 2024).
+
+#Testing new metrics based on disprity vignette and shifting spaces Guillerme et al. (2020) paper
+
+#Question 1: functional uniqueness: Do seasonal influxes of species introduce unique functions into trait space and therefore should we be taking account of cyclical change in functional diversity studies?--------------------
+
+The inference would be that ecosystem functioning is dependent on these cyclical influxes
+I.e. do migrants (cyclical species) contribute unique functions compared to the annual trait space and the resident trait space (year-round species) and does this change across seasons (winter vs breeding)?
+
+#Mechanism: cyclical change (seasonal)
+process: niche differentation (If they contribute unique functions (little niche overlap) then seasonal influxes of birds maybe key to ecosystem functioning but also this might be driving co-existence across the annual cycle (limiting similarity hypothesis). Alternatively if migrants do not contribute unique functions, and instead their niches overlap, then maybe migrants aren't so key to ecosystem functioning but also temporal partitioning may allow species to co-exist in the same niche (i.e. only when resources have peaked and there is enough to go around, might migrants be able to co-exist with residents). 
+
+#i) Do migrants and residents overlap within annual trait space? (pairwise comparisons between groups) I.e. do migrants contribute unique functions to the annual trait space?- probabalistic hypervolume, ellipsoid volumes?-------------
+
+
+(New) Metric 1a: hypervolume overlap ratio between groups (convex hull or probabilistic hypervolume around each group)?
+- Non-overlapping volume/overlapping volume, larger = less overlap. 
+- ses-controlled (draw random migrant and resident species from full annual species pool and quantify same ratio; does each site/ecoregion differ from what would expected by chance?)
+- ses = observed value- mean value/SD, positive = less overlap than expected by chance, negative = more overlap.
+
+#Plotting basic overlap between groups (ecoregions: migrants in each season vs residents vs annual trait space) in 2D trait space:
+#a) Convex hulls capture size- sensitive to outliers
+#2)ellipsoid and distance between and two group centroids- more sensitive to group orientation in trait space?
+
+```{r}
+
+ #load in species' seasonal presence by ecoregion
+seasonal_presence_eco<- readRDS("~/Desktop/Phd Prep/Outputs/seasonal_ecoregion_pools.rds")
+
+
+
+#load in trait space
+avospace<- read.csv("~/Desktop/Phd Prep/Outputs/full_pca_scores_plus_status_nine_traits.csv")
+
+#join pca data to ecoregional status and season data
+avospace <- avospace %>%
+  filter(species != "Upupa_epops") %>%
+  select(-mig_status) %>%
+  left_join(seasonal_presence_eco, by = "species")
+
+#plotting by ecoregion- doesn't seem to differentiate that well
+plot_eco<- 
+  ggplot(avospace, aes(x = PC1, y = PC2)) +
+  geom_point(aes(colour = ecoregion)) +
+  theme_light()
+plot_eco
+
+#plotting by status- doesn't differentiate that well, probably also because many species are both migrants and residents in different ecoregions
+plot_status <- 
+  ggplot(avospace, aes(x = PC1, y = PC2)) +
+  geom_point(aes(colour = status))+
+  theme_light()
+plot_status
+
+#plot status by ecoregion- doesn't seem to differentiate in trait space much
+ggplot(avospace, aes(x = PC1, y = PC2)) +
+  geom_point(aes(colour = status)) +
+  facet_wrap(~ ecoregion) +
+    theme_light()
+
+#plot status by season- hard to see as only migrants will change
+ggplot(avospace, aes(x = PC1, y = PC2)) +
+  geom_point(aes(colour = status)) +
+  facet_wrap(~ season) +
+    theme_light()
+
+#plot by ecoregion and status- again hard to tell but not obvious patterns in any season or ecoregion in terms of unique migrants. In all ecoregions, seasons and clusters can see a disticnt cluster of species (mixed statuses) in region of trait space at low value of pc1 and high value of pc2 (which represents long tails, but shorter/thinner beaks).
+plot_subset<- ggplot(avospace, aes(x = PC1, y = PC2)) +
+  geom_point(aes(colour = status)) +
+  facet_wrap(~ season + ecoregion) +
+    theme_light()
+
+#grouping by partial migrants- not much to report BUT can see that in European Atlantic Forests, partial migrants make up very small proportion of species. N.b. partial refers to if a species has both migratory and resident range in the same ecoregion, not if a species has resident/migratory range in two different ecoregions (the case for 33 species)
+ggplot(avospace, aes(x = PC1, y = PC2)) +
+  geom_point(aes(colour = partial )) +
+  facet_wrap(~ status + ecoregion + partial) +
+    theme_light()
+
+
+#convex hulls for each migrant status group by ecoregion and season for better visualisation
+pca_hull <- avospace %>%
+  group_by(season, ecoregion, status) %>%
+  slice(chull(PC1, PC2)) %>%
+  ungroup()
+
+
+hull_plot <- ggplot(avospace, aes(PC1, PC2, colour = status)) +
+  geom_polygon(data = pca_hull, aes(fill = status), alpha = 0.2, show.legend = FALSE) +
+  geom_point() +
+  facet_wrap(~ season + ecoregion) +
+  theme_light()
+
+hull_plot
+#ok so this is a bit more exciting, although all in all, migrant space appears a subset of resident space (circle within circle)
+#the migrants occupy unique sections of trait space at low levels of PC2 it seems (short tails and long beaks?), especially unique in european atlantic forests. BUT residents also occupy unique part sof trait space in short beaks and long tails part- residents = ground bird traits?- overlap diet data (Avoniche)? 
+#celtic forest and beech lowland seem to have very similar seasonal trait spaces
+#in celtic and beech lowland forest, winter migrants dissimilar to spring/autumn/summer trait space (i.e. less spread and unique corner of trait space disappears- what is this unique corner?)
+#in caledonian forest, another unique corner of the migrant trait space disappears in winter
+#in european atlantic forest, summer migrants less spread
+
+ggsave("ecoregion_seasonal_status_pca_chulls_plot.png", plot = hull_plot, dpi=300)
+
+
+#what additional information does ellipsoid volume and distance to centroids capture?
+#i.e. better as less sensitive to outliers than convex hulls
+#and enables centroid of groups to be identified to reveal something about relative position within group (i.e. clustered vs spreadout) and between group difference (distance between group centroids)
+
+#ellipses using ggplot2
+ellipse_plot <- ggplot(avospace, aes(PC1, PC2, colour = status)) +
+  stat_ellipse(aes(fill = status), geom = "polygon", alpha = 0.2) +
+  geom_point() +
+  facet_wrap(~ season + ecoregion) +
+  theme_light()
+
+ellipse_plot
+# similar BUT overlap less pronounced- can see now for example that spring and summer are very similar across all ecoregions and so are autumn and winter. 
+#Across ecoregions migrant vs resident overlap and position is quite similar, however, stand out ecoregion is european atlantic forest where migrant trait space occupation is particularly unique at low levels of PC2. 
+
+ggsave("ecoregion_seasonal_status_pca_ellipses_plot.png", plot = ellipse_plot, dpi=300)
+
+
+#using vegan
+
+avospace <- avospace %>% mutate(status = factor(status))
+pal <- setNames(hcl.colors(nlevels(avospace$status), "Dark 3"), levels(avospace$status))
+
+panels <- expand.grid(ecoregion = sort(unique(avospace$ecoregion)),
+                      season = sort(unique(avospace$season)),
+                      stringsAsFactors = FALSE)
+
+par(mfrow = c(n_distinct(avospace$season), n_distinct(avospace$ecoregion)),
+    mar = c(3, 3, 2, 1))
+
+for (i in seq_len(nrow(panels))) {
+  d <- avospace %>% filter(ecoregion == panels$ecoregion[i], season == panels$season[i])
+  plot(range(avospace$PC1), range(avospace$PC2), type = "n", las = 1,
+       main = paste(panels$ecoregion[i], panels$season[i], sep = " | "), cex.main = 0.8)
+  if (nrow(d) == 0) next
+
+  xy <- as.matrix(d[, c("PC1", "PC2")])
+  g  <- droplevels(d$status)
+
+  points(xy, pch = 16, col = adjustcolor(pal[as.character(g)], 0.6))
+  ordiellipse(xy, g, display = "sites", kind = "sd", conf = 0.95,
+              draw = "polygon", col = pal[levels(g)], alpha = 50, label = FALSE)
+  ordispider(xy, g, display = "sites", col = pal[levels(g)], lwd = 1)
+
+  if (i == 1) legend("topright", legend = names(pal), fill = pal, bty = "n", cex = 0.7)
+}
+
+```
+
+Results:
+
+- migrant trait space mostly appears to overlap with resident trait space, with most obvious non-overlapping parts at low levels of PC2, especially for European Atlantic forests. 
+- winter migrants appear to be spread slightly differently in trait space compared to other seasons.
+- ellipsoid volumes probably better at elucidating this
+
+
+#Metric 1b: distance between group centroids of seasonal migrants and resident commnuity in each ecoregion (testing uniqueness of migrant group again using a distance matrix); probably more sensitive to positional changes.
+
+PERMANOVA: do distance between centroids differ between migrants (seasonal) and resident group (year round) within each season and ecoregion so do seasonal migrants contribute (ON AVERAGE) functions that differ from the resident community?
+
+adonis2() tests whether group centroids differ in trait space
+
+# BUT is this driven by heterogeneity of group variance (i.e. must factor in within group distance to group centroid)?
+
+betadisper()  and permutest() tests whether dispersion is similar between groups (if not, then difference between groups more likely to be driven by spread (compare with SOV results) than position, will inform future metrics) 
+
+```{r}
+
+#ecoregionalx seasonalx migratory status presence
+seasonal_presence_eco<- readRDS("~/Desktop/Phd Prep/Outputs/seasonal_ecoregion_pools.rds")
+
+#9-dimensional avonet trait space
+pc_avo<- read.csv("~/Desktop/Phd Prep/Outputs/full_pca_scores_plus_status_nine_traits.csv")
+
+#join species seasonal and status data by ecoregion to pc scores
+eco_pcs<- pc_avo %>%
+  filter(species != "Upupa_epops") %>% #will need to recompute pca with traits for this species removed in future
+  select(-mig_status) %>%
+ select(species, starts_with(paste0("PC"))) %>%
+  left_join(seasonal_presence_eco, by = "species")
+
+#create pc matrix for distance matrix
+avospace_mat<- pc_avo %>%
+column_to_rownames("species") %>%
+as.matrix()
+
+#loop for calculating distance matrix on each ecoregion for each season
+k <- 4 #4-dimensions for distance matrix #repeat on 9 to see if resukts hold
+perm_result <- eco_pcs %>%
+  group_by(ecoregion, season) %>%
+  group_split() %>%
+  map_dfr(function(assemblage) {
+    if (n_distinct(assemblage$status) < 2 || min(table(assemblage$status)) < 4) return(NULL) #ensure all assemblages have at least two statuses and all ecoregions have at least 4 species
+    d <- vegdist(assemblage[paste0("PC", 1:k)], method = "euclidean") #restrict distance matrix to 4 dimensions
+    a <- adonis2(d ~ status, data = assemblage, permutations = 9999) #group distance to centroids
+    b <- permutest(betadisper(d, assemblage$status), permutations = 9999) #controls for heterogeneity of variance between groups (i.e. spread within groups (within group distance to group centroid) needs to be homogenous)
+    #return results in a table
+    tibble(ecoregion = assemblage$ecoregion[1], season = assemblage$season[1], n = nrow(assemblage),
+           R2 = a$R2[1], F_perm = a$F[1], p_perm = a$`Pr(>F)`[1], F_disp = b$tab$F[1], p_disp = b$tab$`Pr(>F)`[1]) #get R2 , F stat and pvalue from adonis2 and get F stat and dispersion p value from multivariate Levene's test 
+  }) %>%
+  mutate(p_adj = p.adjust(p_perm, "holm")) #only 20 pairwise comparisons so don't need BH but holm less conservative than bonferri
+
+
+#plot variance within groups (betadisp)
+disp_df <- eco_pcs %>%
+  group_by(ecoregion, season) %>%
+  group_split() %>%
+  map_dfr(function(assemblage) {
+    if (n_distinct(assemblage$status) < 2 || min(table(assemblage$status)) < 4) return(NULL)
+    d  <- vegdist(assemblage[paste0("PC", 1:k)], method = "euclidean")
+    bd <- betadisper(d, assemblage$status)
+    tibble(ecoregion = assemblage$ecoregion[1], season = assemblage$season[1],
+           species = assemblage$species, status = assemblage$status,
+           dist_centroid = bd$distances)
+  })
+
+disp_boxplot<- ggplot(disp_df, aes(status, dist_centroid, fill = status)) +
+  geom_boxplot(outlier.size = 0.8) +
+  facet_grid(season ~ ecoregion) +
+  labs(y = "Distance to group centroid", x = NULL) +
+  theme_light() +
+  theme(legend.position = "none")
+
+#residents more dispersed than migrants across all ecoregions and seasons, also tracks with sum of variances findings!
+
+ggsave("box_plot_PERMANOVA_within_group_centroid_dist.png", plot = disp_boxplot, dpi=300)
+
+
+#performing on 9 dimensions to be safe------
+
+#loop for calculating distance matrix on each ecoregion for each season
+k <- 9 #4-dimensions for distance matrix #repeat on 9 to see if resukts hold
+perm_result_9 <- eco_pcs %>%
+  group_by(ecoregion, season) %>%
+  group_split() %>%
+  map_dfr(function(assemblage) {
+    if (n_distinct(assemblage$status) < 2 || min(table(assemblage$status)) < 4) return(NULL) #ensure all assemblages have at least two statuses and all ecoregions have at least 4 species
+    d <- vegdist(assemblage[paste0("PC", 1:k)], method = "euclidean") #restrict distance matrix to 4 dimensions
+    a <- adonis2(d ~ status, data = assemblage, permutations = 9999) #group distance to centroids
+    b <- permutest(betadisper(d, assemblage$status), permutations = 9999) #controls for heterogeneity of variance between groups (i.e. spread within groups (within group distance to group centroid) needs to be homogenous)
+    #return results in a table
+    tibble(ecoregion = assemblage$ecoregion[1], season = assemblage$season[1], n = nrow(assemblage),
+           R2 = a$R2[1], F_perm = a$F[1], p_perm = a$`Pr(>F)`[1], F_disp = b$tab$F[1], p_disp = b$tab$`Pr(>F)`[1]) #get R2 , F stat and pvalue from adonis2 and get F stat and dispersion p value from multivariate Levene's test 
+  }) %>%
+  mutate(p_adj = p.adjust(p_perm, "holm")) #only 20 pairwise comparisons so don't need BH but holm less conservative than bonferri
+
+perm_result_9
+
+
+#plot variance within groups (betadisp)
+disp_df_9 <- eco_pcs %>%
+  group_by(ecoregion, season) %>%
+  group_split() %>%
+  map_dfr(function(assemblage) {
+    if (n_distinct(assemblage$status) < 2 || min(table(assemblage$status)) < 4) return(NULL)
+    d  <- vegdist(assemblage[paste0("PC", 1:k)], method = "euclidean")
+    bd <- betadisper(d, assemblage$status)
+    tibble(ecoregion = assemblage$ecoregion[1], season = assemblage$season[1],
+           species = assemblage$species, status = assemblage$status,
+           dist_centroid = bd$distances)
+  })
+
+disp_boxplot_9<- ggplot(disp_df_9, aes(status, dist_centroid, fill = status)) +
+  geom_boxplot(outlier.size = 0.8) +
+  facet_grid(season ~ ecoregion) +
+  labs(y = "Distance to group centroid", x = NULL) +
+  theme_light() +
+  theme(legend.position = "none")
+
+ggsave("box_plot_PERMANOVA_within_group_centroid_dist_all_dims.png", plot = disp_boxplot_9, dpi=300)
+
+#testing with different correction method (BH) just in case---
+
+#loop for calculating distance matrix on each ecoregion for each season
+k <- 4 #4-dimensions for distance matrix #repeat on 9 to see if resukts hold
+perm_result_bh <- eco_pcs %>%
+  group_by(ecoregion, season) %>%
+  group_split() %>%
+  map_dfr(function(assemblage) {
+    if (n_distinct(assemblage$status) < 2 || min(table(assemblage$status)) < 4) return(NULL) #ensure all assemblages have at least two statuses and all ecoregions have at least 4 species
+    d <- vegdist(assemblage[paste0("PC", 1:k)], method = "euclidean") #restrict distance matrix to 4 dimensions
+    a <- adonis2(d ~ status, data = assemblage, permutations = 9999) #group distance to centroids
+    b <- permutest(betadisper(d, assemblage$status), permutations = 9999) #controls for heterogeneity of variance between groups (i.e. spread within groups (within group distance to group centroid) needs to be homogenous)
+    #return results in a table
+    tibble(ecoregion = assemblage$ecoregion[1], season = assemblage$season[1], n = nrow(assemblage),
+           R2 = a$R2[1], F_perm = a$F[1], p_perm = a$`Pr(>F)`[1], F_disp = b$tab$F[1], p_disp = b$tab$`Pr(>F)`[1]) #get R2 , F stat and pvalue from adonis2 and get F stat and dispersion p value from multivariate Levene's test 
+  }) %>%
+  mutate(p_adj = p.adjust(p_perm, "BH")) #only 20 pairwise comparisons so don't need BH but holm less conservative than bonferri
+
+perm_result_bh
+
+#plot variance within groups (betadisp)
+disp_df_bh <- eco_pcs %>%
+  group_by(ecoregion, season) %>%
+  group_split() %>%
+  map_dfr(function(assemblage) {
+    if (n_distinct(assemblage$status) < 2 || min(table(assemblage$status)) < 4) return(NULL)
+    d  <- vegdist(assemblage[paste0("PC", 1:k)], method = "euclidean")
+    bd <- betadisper(d, assemblage$status)
+    tibble(ecoregion = assemblage$ecoregion[1], season = assemblage$season[1],
+           species = assemblage$species, status = assemblage$status,
+           dist_centroid = bd$distances)
+  })
+
+disp_boxplot_bh <- ggplot(disp_df_bh, aes(status, dist_centroid, fill = status)) +
+  geom_boxplot(outlier.size = 0.8) +
+  facet_grid(season ~ ecoregion) +
+  labs(y = "Distance to group centroid", x = NULL) +
+  theme_light() +
+  theme(legend.position = "none")
+
+disp_boxplot_bh
+```
+
+Results:
+
+- Distances between group centroids for migrants and residents vary in summer for celtic broadleaf forests, caledon conifer forests, english lowland beech forests and north atlantic moist mixed forests ,  in spring for caledon conifer forests and north atlantic moist mixed forests ,  and in autumn and winter for european atlantic mixed forests (p<0.05). However effect sizes are low, ranging from R2 = 0.0062 in Caledon conifer forests in autumn to R2 = 0.055 in north atlantic moist mixed forests in summer.
+- Apart from english lowlands beech forests in summer (take group difference above with pinch of salt for this ecoregion), p values for the permutation test are above 0.05 suggesting homogeneity of variance between groups which is good. Residents are also more dispersed than migrants for all ecoregions and sites which tracks with sum of variances findings i.e. that residents are more spread than migrants.- confirm with ses distance to centroids with disprity?
+- However, when performing holm correction, turns out that result is only significant for Caledon conifer forests and north atlantic moist mixed forests in summer (p=<0.05)
+- results are pretty much exactly the same when rerunning on 9 dimensions
+-with BH correction, more results are significant (p<0.05): caledon conifer forests, celtic broadleaf forests, english lowland beech forests, north atlantic beech forests in summer, and european atlantic mixed forests in autumn. But overall, suggests across most ecoregions that summer migrants are probably contributing the most unique trait combinations compared to the resident community.
+
+
+#but which unique parts of trait space are migrants occupying and do any particular dietary groups, families cluster in this part of trait space (or with the migrant vs resident group in general) ?-------------
+
+```{r Avoniche data}
+
+
+
+
+```
+
+
+#ii) Are migrants concentrated at the edges of trait space? (pairwise comparisons between groups) I.e. Do migrants contribute more extreme/isolated functions compared to resident pool?---------
+
+Metric 2a: Average distance to centroid (of annual trait space) for each ecoregional group?  (distance between group and annual trait space pool and distance from edge of group to centroid of trait space)
+- ses-controlled (draw random species from full annual species pool and quantify avg distance to centroids, do values differ from what would be expected by chance?)- must compare to the full Britain and Ireland annual trait space as otherwise annual ecoregional trait space = just resident + migrant trait space (no species unique to march, september and august)
+
+```{r}
+
+```
+
+
+Metric 2b: To capture size/spread in trait space we can also use sum of variances (ses controlled) using disprity package:
+
+
+#gridcells
+
+```{r, testing new metrics with disprity}
+
+
+  #seasonal presence of all species at each site (assemblage)
+  site_seasonal_presence_df<- read.csv("~/Desktop/Phd Prep/Outputs/species_site_season_df.csv")
+    
+  #reading in raw trait space (not by site) 
+  annual_trait_space<- read.csv("~/Desktop/Phd Prep/Outputs/full_pca_scores_plus_status.csv") #means of 9 species traits from AVONET (minus HWI and kipps distance) which are likely correlated and seem to skew trait space, also emulates (Keyser et al., 2024; for example)
+  
+  #converting to matrix for selecting axes
+ annual_traitspace_mat <- annual_trait_space %>% #but maybe don't need to compare to annual traitspace as no out of season species? Ask thomas.
+  column_to_rownames("species") %>%
+  select(starts_with("PC")) %>%
+  as.matrix()
+ 
+#get row numbers of  winter and breeding species to feed into seperate lists so can calculate dimensions for winter vs summer breeding traitspace seperately. Will also be useful for full seasonal trait spaces needed in analysis 2 (resident positional shifting).
+ 
+sp_seasonal <- list(winter   = unique(site_seasonal_presence_df$species[site_seasonal_presence_df$present_winter == "1"]), breeding = unique(site_seasonal_presence_df$species[site_seasonal_presence_df$present_breeding == "1"]))
+
+ season_idx <- lapply(sp_seasonal, \(seaso) which(rownames(annual_traitspace_mat) %in% seaso))
+ 
+ #annual vs winter vs breeding trait space variance
+ selected_season<- select.axes(annual_traitspace_mat, group = season_idx, threshold = 0.95)
+ #4 dimensions needed to explain 95% of variance in all seasonal groups
+ 
+ selected_season$dimensions
+
+#visualise variance of migrant trait space vs resident trait space vs whole trait space in plot
+plot(selected_season) #all trait spaces seem to be vary similar in terms of variance
+
+
+#migrant vs resident vs annual trait space variance
+sp_mig_status <- list(migrant   = unique(site_seasonal_presence_df$species[site_seasonal_presence_df$local_status == "migrant"]), resident = unique(site_seasonal_presence_df$species[site_seasonal_presence_df$local_status == "resident"]))
+
+mig_idx <- lapply(sp_mig_status, \(mig_group) which(rownames(annual_traitspace_mat) %in% mig_group))
+
+selected_mig <- select.axes(annual_traitspace_mat, group = mig_idx, threshold = 0.95)
+#4 dimensions needed to explain 95% of variance in migratory status groups (not sure if need to do this per site-level traitspaces but would take a lot of computational power?)
+
+selected_mig$dimensions
+
+#visualise variance of migrant trait space vs resident trait space vs whole trait space in plot
+plot(selected_mig) #all trait spaces seem to be vary similar in terms of variance
+ 
+ #do I need a trait space boundary i.e. controlling which points are allowed to fall inside the traitspace? apparently v 0.01 or 0.001 (conservative v value) is good for most cases (Carvalho and Cardoseo, 2025).
+
+
+
+site.disp <- function(gridcell_rows, season, space = annual_traitspace_mat, axes = paste0("PC", 1:4)) {
+  traits_per_cell <- space[gridcell_rows$species, axes, drop = FALSE] #get PCs for each species in each grid cell and convert to matrix (elements as rownames, PCs as columns)
+  in_season <- gridcell_rows[[season]] == 1 #get grid cells per season
+  groups <- list(annual   = gridcell_rows$species,
+                 resident = gridcell_rows$species[in_season & gridcell_rows$local_status == "resident"],
+                 migrant  = gridcell_rows$species[in_season & gridcell_rows$local_status == "migrant"]) #define migrant, resident and annual group
+  groups <- groups[lengths(groups) > 3] #need at least three species in each group for calculation
+  summary(dispRity(custom.subsets(traits_per_cell, group = groups), metric = c(sum, variances)))[, c("subsets", "n", "obs")]
+} #calculate disprity metric for each grid cell trait space. Pairwise metric will be calculated between groups (annual vs migrant, annual vs resident and resident vs migrant) if between.groups = TRUE- will need for uniqueness metric.
+
+#N.B. for species that have resident populations at some sites and migrant populations at others (partial migrants), their trait combinations will be the same in both bubbles so will contribute redundant functions. So in a way, the uniqueness of the group, may be a reflection of a lower number of partial migrants at the site.
+
+
+result <- lapply(c(breeding = "present_breeding", winter = "present_winter"), function(season)
+split(site_seasonal_presence_df, site_seasonal_presence_df$cell) %>%
+    lapply(site.disp, season = season) |> #perform calculations per site for the breeding and winter seasons
+    bind_rows(.id = "cell")
+) |> bind_rows(.id = "season")
+
+#create summary table of mean sum of variance per group (resident, annual, migrant) and season
+result_table <- result %>%
+  group_by(season, group = subsets) %>%
+  summarise(mean_sum_var = mean(obs, na.rm = TRUE), 
+            sd = sd(obs, na.rm = TRUE),
+            mean_n_spp = mean(n), #calculate mean species per migrant group and season
+            n_cells = n(), #number of grid cells in each group
+            .groups = "drop") %>%
+  knitr::kable(digits = 3)
+
+
+winter_season<- test.dispRity(result_table[mean_sum_var], test = t.test)
+winter_season<- test.dispRity(mean(groups[breeding]), test = t.test)
+    
+```
+
+Results:
+
+- All cells included in calculations, minimum species number = 4, max = 182
+- Weirdly, for both seasons, resident species tend to occupy more of the annual trait space/ be more spread out than all species (annual trait space)?.
+- In both seasons migrant species tend to occupy less of the annual trait space than residents/be less spread (e.g. Hughes et al., 2022) (to be expected as likely a product of species richness).- but suggests migrants represent a lower diversity of functions.
+- Breeding migrants occupy less of the annual trait space than winter migrants in annual trait space, but likely a product of species richness- will need to control for this (ses).
+
+
+
+# Ecoregions!
+
+```{r}
+
+#Loading data-------------
+
+#load in species' seasonal presence by ecoregion
+seasonal_presence_eco<- readRDS("~/Desktop/Phd Prep/Outputs/seasonal_ecoregion_pools.rds")
+
+#load in trait space
+avospace<- read.csv("~/Desktop/Phd Prep/Outputs/full_pca_scores_plus_status_nine_traits.csv")
+
+#remove upupa epops if decide to 
+avospace<- avospace %>%
+  filter(species != "Upupa_epops")
+
+#variance selection----------------
+#get seasonal species lists
+sp_seasonal <- lapply(
+split(seasonal_presence_eco$species,seasonal_presence_eco$season),unique)
+
+#get row indices for grouping
+season_idx <- lapply(sp_seasonal, function(sp) {
+  which(avospace$species %in% sp)
+})
+
+#get migrant trait spaces start with just resident vs migrant (can introduce partial later?)
+sp_status <- lapply(
+split(seasonal_presence_eco$species,seasonal_presence_eco$status),unique)
+
+mig_idx <- lapply(sp_status, function(stat) {
+  which(avospace$species %in% stat)
+})
+
+# convert traitspace to matrix for disprity
+avospace<- avospace %>%
+column_to_rownames("species") %>%
+select(starts_with("PC")) %>%
+as.matrix()
+
+
+selected_season<- select.axes(avospace, group = season_idx, threshold = 0.95)
+
+#full Britain and Ireland annual trait space
+selected_all <- select.axes(avospace, threshold = 0.95)
+selected_all$dimensions
+
+#Britain and Ireland seasonal trait spaces
+selected_season <- select.axes(avospace, group = season_idx, threshold = 0.95)
+selected_season$dimensions
+#four PCs must be used
+
+#Britain and Ireland migrant and resident trait spaces
+selected_mig <- select.axes(avospace, group = mig_idx, threshold = 0.95)
+selected_mig$dimensions
+#four PCs must be used
+
+plot(selected_mig)
+plot(selected_season)
+#variances pretty much the exact same for all traitspaces for both season and migratory status
+
+#----------Disparity per ecoregion, status group and season----------#
+
+#function calculate disprity calculations per status group, ecoregion and season using 4-dimensional space
+eco.disp <- function(eco_rows, season, space = avospace, axes = paste0("PC", 1:4)) {
+  annual_species   <- unique(eco_rows$species) #all species in ecoregion (all migrants + residents)
+  resident_species <- unique(eco_rows$species[eco_rows$status == "resident"]) #all resident species in ecoregion
+#migrant species in each season in ecoregion
+  migrant_species  <- unique(eco_rows$species[eco_rows$season == season & eco_rows$status == "migrant"])
+
+ #create subsets (migrant vs resident vs annual trait space for each ecoregion). Annual and resident trait spaces will not differ across seasons, but will differ between ecoregions. So we are comparing the difference between each seasonal migrant group to the resident and annual (which includes migrants not present in the focal season) trait spaces in each ecoregion. I.e. the difference between resident and annual will be the same across every season so we are interested in how the migrant space differs.
+groups <- list(annual = annual_species, resident = resident_species, migrant = migrant_species)
+  groups <- groups[lengths(groups) > 3]  # need >= 4 species per group as same as number of dimensions and disp calcs need 3 elements
+  if (length(groups) == 0) return(NULL)
+  
+#PC coords for all species in full annual ecoregional traitspace
+traits_per_eco <- space[annual_species, axes, drop = FALSE]
+
+#calculate sum of variances per status group, season, and ecoregion
+summary(dispRity(custom.subsets(traits_per_eco, group = groups),
+                   metric = c(sum, variances)))[, c("subsets", "n", "obs")]
+}
+
+#define seasons
+seasons <- c(spring = "Spring", summer = "Summer", autumn = "Autumn", winter = "Winter")
+
+#apply disp calc to ecoregions in each season seperately
+result <- lapply(seasons, function(season) {
+  split(seasonal_presence_eco, seasonal_presence_eco$ecoregion) %>%
+    lapply(eco.disp, season = season) %>%
+    bind_rows(.id = "ecoregion")
+}) %>%
+  bind_rows(.id = "season")
+
+
+#Pairwise metric will be calculated between groups (annual vs migrant, annual vs resident and resident vs migrant) if between.groups = TRUE- will need for uniqueness metric.
+
+#remember that partial migrants are treated as residents to avoid redundancy across trait spaces, otherwise differences may be due to a smaller proportion of partial migrants in the ecoregion.
+
+#create summary table of mean sum of variance per group (resident, annual, migrant) and season across all ecoregions
+mean_result <- result %>%
+  group_by(season, group = subsets) %>%
+  summarise(mean_sum_var = mean(obs, na.rm = TRUE),
+            sd = sd(obs, na.rm = TRUE),
+            mean_n_spp = mean(n), #calculate avg n. species per status group and season
+            n_ecos = dplyr::n(),
+            .groups = "drop") #number of eco_regions in each group to check that all calculations were successful
+ 
+ knitr::kable(mean_result, digits = 3)
+
+
+#summarise sum of variances per ecoregion and status group in each season
+per_eco_result <- result %>%
+  transmute(ecoregion, season, group = subsets, n_spp = n, sum_var = obs)
+
+knitr::kable(per_eco_result, digits = 3)
+
+
+
+#get list of species in trait space for species migratory status crosschecks
+ecospace<- avospace %>%
+as.data.frame() %>%
+rownames_to_column("species") %>%
+  pull(species)
+
+writeLine(ecospace)
+
+
+#next step- SES.
+
+#other considerations = ellipsoid volume is sensitive to a small number of extreme points 
+
+
+```
+
+
+Results:
+
+- All 5 ecoregions included in calculations. 
+- Migrants groups have lower species richness than resident groups across all seasons and ecoregions except spring migrants in European Atlantic mixed forests where species richness is roughly equal to that of the resident community.- supports need for SES.  
+- Migrants are less spread than residents and annual trait space across all seasons and ecoregions. This especially the case in summer (avg 15.2% smaller sum of variances), whilst, in spring migrants are more spread (avg 5.8% smaller sum of variances)- This may reflect the number of species (summer migrants = 62 species on average, spring migrants = 85 species on average). 
+- Even where resident and migrant communities are roughly equal in species richness, migrants are less spread in the ecoregional annual trait space (good for local community analysis). Suggests residents encompass a greater diversity of traits and functions with potentially more extreme trait combinations, whilst migrants may be more clustered.
+
+
+
+- So, although it seems that there is a lot of functional overlap with the resident community,there seems to be some non-overlapping parts of trait space that migrants are especially contributing to. 
+- It also looks like summer migrants are less spread in trait space than residents (so seem to be less specialist/diverse) and  represent on average a slightly different trait composition (functions are not that redundant with resident community) (but this may be a product of the fact that a lot of migrant species are present in all seasons except for summer so summer is less functionally diverse). 
+
+
+
+#Testing metrics 1-2 on a refined trait space and seasonal window
+
+Now let's test metrics 1-2 agaiin but this time with obvious summer and winter migrants to see if the results still stand (trying to remove blurriness of partial migrant signal) AND with refined range maps! #210 species
+
+```{r}
+ #load in species' seasonal presence by ecoregion
+seasonal_presence_eco<- readRDS("~/Desktop/Phd Prep/Outputs/seasonal_ecoregion_pools.rds")
+
+
+#load in trait space
+avospace<- read.csv("~/Desktop/Phd Prep/Data/pc_scores_avofull_aoh.csv")
+
+#join pca data to ecoregional status and season data
+avospace <- avospace %>%
+  left_join(seasonal_presence_eco, by = "species") #up to 3 rows per ecoregion (3x5) for each species depending on which seasons they are present in (winter, summer or NA) and which ecoregions.
+
+
+#plot status by ecoregion- doesn't differentiate that well except where migrants are more clustered at the bottom of trait space in European Atlantic Forests
+ggplot(avospace, aes(x = PC1, y = PC2)) +
+  geom_point(aes(colour = status)) +
+  facet_wrap(~ ecoregion) +
+    theme_light()
+
+#plot status by season i.e. winter vs summer vs NA BI-wide pool- hard to see as only migrants will change across seasons; useful for resident switching analysis?
+ggplot(avospace, aes(x = PC1, y = PC2)) +
+  geom_point(aes(colour = status)) +
+  facet_wrap(~ season) +
+    theme_light()
+
+#plot by ecoregion and status- again hard to tell but no obvious patterns in any season or ecoregion. 
+plot_subset<- ggplot(avospace, aes(x = PC1, y = PC2)) +
+  geom_point(aes(colour = status)) +
+  facet_wrap(~ season + ecoregion) +
+    theme_light()
+
+#grouping by partial migrants- not much to report, don't appear to be particularly unique, BUT can see that in European Atlantic Forests, partial migrants much up a very small proportion of species.
+plot_partial<- ggplot(avospace, aes(x = PC1, y = PC2)) +
+  geom_point(aes(colour = partial, shape = status)) +
+  facet_wrap(~ ecoregion) +
+    theme_light()
+
+#in general seem to be quite widely dispersed throughout both status groups which is good!
+plot_partial<- ggplot(avospace, aes(x = PC1, y = PC2)) +
+  geom_point(aes(colour = partial, shape = status)) +
+  facet_wrap(~ ecoregion + season) +
+    theme_light() 
+
+
+#convex hulls for each migrant status group by ecoregion and season for better visualisation
+pca_hull <- avospace %>%
+  group_by(season, ecoregion, status) %>%
+  slice(chull(PC1, PC2)) %>%
+  ungroup()
+
+
+hull_plot_aoh <- ggplot(avospace, aes(PC1, PC2, colour = status)) +
+  geom_polygon(data = pca_hull, aes(fill = status), alpha = 0.2, show.legend = FALSE) +
+  geom_point() +
+  facet_wrap(~ season + ecoregion) +
+  theme_light()
+
+hull_plot
+#ok so similar results to last time with winter, summer and NA migrants occupying quite distinct region of morphospace at low levels of PC2 for European Atlantic forests. However, celtic broadleaf and  english lowland forests have very similar trait spaces across both groups for all seasons!
+#Caledon conifer forests also have a unique region of trait space at the bottom of PC2 across all seasons. 
+ #In general not much change between seasons for any ecoregions.
+
+ggsave("ecoregion_seasonal_status_pca_chulls_plot_aoh.png", plot = hull_plot_aoh, dpi=300)
+
+
+#what additional information does ellipsoid volume and distance to centroids capture?
+#i.e. better as less sensitive to outliers than convex hulls
+#and enables centroid of groups to be identified to reveal something about relative position within group (i.e. clustered vs spreadout) and between group difference (distance between group centroids)
+
+#ellipses using ggplot2
+ellipse_plot_aoh_1 <- ggplot(avospace, aes(PC1, PC2, colour = status)) +
+  stat_ellipse(aes(fill = status), geom = "polygon", alpha = 0.2) +
+  geom_point() +
+  facet_wrap(~ season + ecoregion) +
+  theme_light()
+
+ellipse_plot_aoh_2 <- ggplot(avospace, aes(PC1, PC3, colour = status)) +
+  stat_ellipse(aes(fill = status), geom = "polygon", alpha = 0.2) +
+  geom_point() +
+  facet_wrap(~ season + ecoregion) +
+  theme_light() #a lot more overlap along PC3 vs 1, seems that the uniqueness of migrants tends to come from PC2. 
+
+ellipse_plot_aoh_3 <- ggplot(avospace, aes(PC2, PC3, colour = status)) +
+  stat_ellipse(aes(fill = status), geom = "polygon", alpha = 0.2) +
+  geom_point() +
+  facet_wrap(~ season + ecoregion) +
+  theme_light() #Can clearly see this PC2 contribution in PC2 vs 3 plot very, especially for Eurpoean Atlantic Forests, where migrants occupy much larger part of of trait space across all seasons despite being similar to residents in terms of species richness. Again though, not much seasonal change.
+
+#playing with up to four dimensions to find other parts of uniqueness in migrant group
+ellipse_plot_aoh_4 <- ggplot(avospace, aes(PC1, PC4, colour = status)) +
+  stat_ellipse(aes(fill = status), geom = "polygon", alpha = 0.2) +
+  geom_point() +
+  facet_wrap(~ season + ecoregion) +
+  theme_light() 
+
+ellipse_plot_aoh_4 
+
+ellipse_plot_aoh_5 <- ggplot(avospace, aes(PC2, PC4, colour = status)) +
+  stat_ellipse(aes(fill = status), geom = "polygon", alpha = 0.2) +
+  geom_point() +
+  facet_wrap(~ season + ecoregion) +
+  theme_light() 
+
+ellipse_plot_aoh_5
+
+ellipse_plot_aoh_6 <- ggplot(avospace, aes(PC3, PC4, colour = status)) +
+  stat_ellipse(aes(fill = status), geom = "polygon", alpha = 0.2) +
+  geom_point() +
+  facet_wrap(~ season + ecoregion) +
+  theme_light() 
+
+ellipse_plot_aoh_6
+
+#migrants tend to be more dispersed than residents across PC2 (more variation in tail length and beak length) and 4 (more variation and more unique in tarsus length, tail length, beak length and body mass), residents more dispersed across PC1 (more variation in beak length and mass, and 3 (more variation in  unique along these axes (beak width, length and tarsus length)
+
+ggsave("ecoregion_seasonal_status_pca_ellipses_plot_aoh_1.png", plot = ellipse_plot_aoh_1, dpi=300)
+
+ggsave("ecoregion_seasonal_status_pca_ellipses_plot_aoh_2.png", plot = ellipse_plot_aoh_2, dpi=300)
+
+ggsave("ecoregion_seasonal_status_pca_ellipses_plot_aoh_3.png", plot = ellipse_plot_aoh_3, dpi=300) 
+
+#very similar results to unrefined range maps, i.e. european atlantic forests migrants standout as most unique to residents at low levels of PC2 even after accounting for outlier biases.
+#in fact for all ecoregions and seasons there is more overlap with resident community than not but migrants stand out as most unique at low levels of PC2 (short tails and long beaks). Residents tend to be more dispersed along pc1 (wider range of sizes?)- can see this better with ellipses.
+
+
+```
+
+Result:
+
+- So it seems that as above, there is not much variaition between seasons within or between ecoregions in terms of migrant contribution to/occupation of trait space. 
+- However, european atlantic forests show that migrants are quite unique at low levels of PC2 within all seasons. Further, migrants tend to be more dispersed than residents along dimensions that represent beak length, tail length and tarsus length, whereas residents are more dispersed along dimensions that represent overall trait size, body mass and beak width.- reflecting larger ground birds?
+
+
+- so next steps are to either continue with this analysis or focus on ebird status and trends....
+
+
+#PERMANOVA on refined trait space
+
+```{r}
+
+#loop for calculating distance matrix on each ecoregion for each season
+k <- 4 #4-dimensions for distance matrix #repeat on 9 to see if resukts hold
+perm_result <- avospace %>%
+  group_by(ecoregion, season) %>%
+  group_split() %>%
+  map_dfr(function(assemblage) {
+    if (n_distinct(assemblage$status) < 2 || min(table(assemblage$status)) < 4) return(NULL) #ensure all assemblages have at least two statuses and all ecoregions have at least 4 species
+    d <- vegdist(assemblage[paste0("PC", 1:k)], method = "euclidean") #restrict distance matrix to 4 dimensions
+    a <- adonis2(d ~ status, data = assemblage, permutations = 9999) #group distance to centroids
+    b <- permutest(betadisper(d, assemblage$status), permutations = 9999) #controls for heterogeneity of variance between groups (i.e. spread within groups (within group distance to group centroid) needs to be homogenous)
+    #return results in a table
+    tibble(ecoregion = assemblage$ecoregion[1], season = assemblage$season[1], n = nrow(assemblage),
+           R2 = a$R2[1], F_perm = a$F[1], p_perm = a$`Pr(>F)`[1], F_disp = b$tab$F[1], p_disp = b$tab$`Pr(>F)`[1]) #get R2 , F stat and pvalue from adonis2 and get F stat and dispersion p value from multivariate Levene's test 
+  }) %>%
+  mutate(p_adj = p.adjust(p_perm, "holm")) #only 20 pairwise comparisons so don't need BH but holm less conservative than bonferri
+
+
+#plot variance within groups (betadisp)
+disp_df <- avospace %>%
+  group_by(ecoregion, season) %>%
+  group_split() %>%
+  map_dfr(function(assemblage) {
+    if (n_distinct(assemblage$status) < 2 || min(table(assemblage$status)) < 4) return(NULL)
+    d  <- vegdist(assemblage[paste0("PC", 1:k)], method = "euclidean")
+    bd <- betadisper(d, assemblage$status)
+    tibble(ecoregion = assemblage$ecoregion[1], season = assemblage$season[1],
+           species = assemblage$species, status = assemblage$status,
+           dist_centroid = bd$distances)
+  })
+
+disp_boxplot<- ggplot(disp_df, aes(status, dist_centroid, fill = status)) +
+  geom_boxplot(outlier.size = 0.8) +
+  facet_grid(season ~ ecoregion) +
+  labs(y = "Distance to group centroid", x = NULL) +
+  theme_light() +
+  theme(legend.position = "none")
+
+#residents more dispersed than migrants across all ecoregions and seasons, also tracks with sum of variances findings!
+
+ggsave("box_plot_PERMANOVA_within_group_centroid_dist_aoh.png", plot = disp_boxplot, dpi=300)
+
+
+#performing on 9 dimensions to be safe------
+
+
+#loop for calculating distance matrix on each ecoregion for each season
+k <- 9 #4-dimensions for distance matrix #repeat on 9 to see if resukts hold
+perm_result_9 <-  avospace %>%
+  group_by(ecoregion, season) %>%
+  group_split() %>%
+  map_dfr(function(assemblage) {
+    if (n_distinct(assemblage$status) < 2 || min(table(assemblage$status)) < 4) return(NULL) #ensure all assemblages have at least two statuses and all ecoregions have at least 4 species
+    d <- vegdist(assemblage[paste0("PC", 1:k)], method = "euclidean") #restrict distance matrix to 4 dimensions
+    a <- adonis2(d ~ status, data = assemblage, permutations = 9999) #group distance to centroids
+    b <- permutest(betadisper(d, assemblage$status), permutations = 9999) #controls for heterogeneity of variance between groups (i.e. spread within groups (within group distance to group centroid) needs to be homogenous)
+    #return results in a table
+    tibble(ecoregion = assemblage$ecoregion[1], season = assemblage$season[1], n = nrow(assemblage),
+           R2 = a$R2[1], F_perm = a$F[1], p_perm = a$`Pr(>F)`[1], F_disp = b$tab$F[1], p_disp = b$tab$`Pr(>F)`[1]) #get R2 , F stat and pvalue from adonis2 and get F stat and dispersion p value from multivariate Levene's test 
+  }) %>%
+  mutate(p_adj = p.adjust(p_perm, "holm")) #only 20 pairwise comparisons so don't need BH but holm less conservative than bonferri
+
+perm_result_9
+
+
+#plot variance within groups (betadisp)
+disp_df_9 <- avospace %>%
+  group_by(ecoregion, season) %>%
+  group_split() %>%
+  map_dfr(function(assemblage) {
+    if (n_distinct(assemblage$status) < 2 || min(table(assemblage$status)) < 4) return(NULL)
+    d  <- vegdist(assemblage[paste0("PC", 1:k)], method = "euclidean")
+    bd <- betadisper(d, assemblage$status)
+    tibble(ecoregion = assemblage$ecoregion[1], season = assemblage$season[1],
+           species = assemblage$species, status = assemblage$status,
+           dist_centroid = bd$distances)
+  })
+
+disp_boxplot_9<- ggplot(disp_df_9, aes(status, dist_centroid, fill = status)) +
+  geom_boxplot(outlier.size = 0.8) +
+  facet_grid(season ~ ecoregion) +
+  labs(y = "Distance to group centroid", x = NULL) +
+  theme_light() +
+  theme(legend.position = "none")
+
+ggsave("box_plot_PERMANOVA_within_group_centroid_dist_all_dims_aoh.png", plot = disp_boxplot_9, dpi=300)
+
+#testing with different correction method (BH) just in case---
+
+#loop for calculating distance matrix on each ecoregion for each season
+k <- 4 #4-dimensions for distance matrix #repeat on 9 to see if resukts hold
+perm_result_bh <- avospace%>%
+  group_by(ecoregion, season) %>%
+  group_split() %>%
+  map_dfr(function(assemblage) {
+    if (n_distinct(assemblage$status) < 2 || min(table(assemblage$status)) < 4) return(NULL) #ensure all assemblages have at least two statuses and all ecoregions have at least 4 species
+    d <- vegdist(assemblage[paste0("PC", 1:k)], method = "euclidean") #restrict distance matrix to 4 dimensions
+    a <- adonis2(d ~ status, data = assemblage, permutations = 9999) #group distance to centroids
+    b <- permutest(betadisper(d, assemblage$status), permutations = 9999) #controls for heterogeneity of variance between groups (i.e. spread within groups (within group distance to group centroid) needs to be homogenous)
+    #return results in a table
+    tibble(ecoregion = assemblage$ecoregion[1], season = assemblage$season[1], n = nrow(assemblage),
+           R2 = a$R2[1], F_perm = a$F[1], p_perm = a$`Pr(>F)`[1], F_disp = b$tab$F[1], p_disp = b$tab$`Pr(>F)`[1]) #get R2 , F stat and pvalue from adonis2 and get F stat and dispersion p value from multivariate Levene's test 
+  }) %>%
+  mutate(p_adj = p.adjust(p_perm, "BH")) #only 20 pairwise comparisons so don't need BH but holm less conservative than bonferri
+
+perm_result_bh
+
+#plot variance within groups (betadisp)
+disp_df_bh <- avospace %>%
+  group_by(ecoregion, season) %>%
+  group_split() %>%
+  map_dfr(function(assemblage) {
+    if (n_distinct(assemblage$status) < 2 || min(table(assemblage$status)) < 4) return(NULL)
+    d  <- vegdist(assemblage[paste0("PC", 1:k)], method = "euclidean")
+    bd <- betadisper(d, assemblage$status)
+    tibble(ecoregion = assemblage$ecoregion[1], season = assemblage$season[1],
+           species = assemblage$species, status = assemblage$status,
+           dist_centroid = bd$distances)
+  })
+
+disp_boxplot_bh <- ggplot(disp_df_bh, aes(status, dist_centroid, fill = status)) +
+  geom_boxplot(outlier.size = 0.8) +
+  facet_grid(season ~ ecoregion) +
+  labs(y = "Distance to group centroid", x = NULL) +
+  theme_light() +
+  theme(legend.position = "none")
+
+disp_boxplot_bh
+```
+
+
+Results:
+
+Results have changed!- 
+- permutation test reveals that migrant and resident group cetroids differ in Caledon celtic forests and North Atlantic moist forets in Summer (the only results to be significant after holm correction with unrefined trait spaces), and in Winter in Celtic broadleaf forets and English lowland beech forests and European Atlantic mixed forests, with small effect sizes (low variance explained, R2) ranging from 0.076 to 0.022.  
+- further, in all ecoregions and seasons groups appear to have equal dispersion (among group distance to centroid) so this is good evidence that groups differ in centroid location, not just in spread. In general, for all ecoregions and seasons, residents are more spread than migrants, except for in european atlantic mixed forests (see box plot)
+- However, after holm correction, migrant and resident groups differ in centroid position in european mixed atlantic forests in winter (p<0.05).
+
+- for 9 dimensions, results are the same with only groups in european mixed atlantic forest differing significantly in trait space after holm correction. However, passage seasons (NA) in european atlantic forest also becomes signifcant (p<0.05) after perm test (but not after holm correction). Same results dispersion wise between groups.
+
+- same results with BH (for 4 dims) except nothing is significant, with european atlantic forest groups in winter being just above threshold (p= 0.059). same results dispersion wise. Same results for 9 dimensions. This time european atleantic forests in NA season ("passage") also just significant (p= 0.047), but not after holm correction.
+
+- SO overall european atlantic forest winter migrants seem to differ from residents (also tracks ellipse plots), and aoh proibably more accurate as better accounts for pelagic species which may have erroneous distribution mapped onto ecoregions if not accounted for. However, there are also not many distinct species in winter vs summer in each ecoregion i.e. many species are present in both seasons (mainly because to be counted as a winter or summer migrant, only have to be present in at least one month of that season), and there are more distinct winter than summer species so may be why winter is coming out as more unique.
+- although european atlantic species only has 10 distinct species in summer so these may be particuarly functionally unique- should investigate this!
+
+## test on partial migrants vs migrants and residents?
+
+
+
+
+Lets also take a better look at positional uniqueness between the two groups within trait space. 
+
+#iii) Do migrants and residents occupy unique postiions in trait space compared to the annual pool? (probably better quantifies positional differences)? ---------------
+
+Metric 3a: Distance between annual ecoregional centroid and seasonal migrant and resident centroids  (convex hull or probabilistic hypervolume around each group)?
+
+- ses-controlled (draw random migrant and resident species from full annual species pool and quantify distance; does each site/ecoregion differ from what would expected by chance?)
+
+#But do migrants in one season differ from migrants in another season? 
+
+Metric 3b) seasonal migrant sum of var compared to annual migrant pool sum of var in each ecoregion or distance between seasonal migrant and annual migrant pool centroid.
+
+
+
+#iiii) (Adapted) metric 4: avg distance between resident and migrants along each PC, larger distance along "minor" PCs compared to "more major" PCs  between residents and migrants = more innovative traits?- but then that would just tell us whether both are more innovative not necessarily if migrants are just more innovative?-------------
+
+- ses controlled
+
+
+
+#Question 2: functional plasticity: Do residents switch their niches across seasons?- the inference could be that ecosystem functioning (and co-existence across time) is dependent on species captilising on seasonal resource peaks?--------------------
+
+
+#mechanism: cyclical change (seasonal)
+#process: niche switching (if they do not switch, then suggests residents stick to the same resources/ perform the same functions year round)- which would mean that migrants would likely need to occupy unique, innovative niches (divergent functions) to co-exist (limiting similarity hypothesis) or that temporal paritioning allows migrants to co-exist in the same niches (if there is little niche overlap between migrants and residents)
+
+
+
+Metric 4: Distance between resident centroid in winter trait space and resident centroid in breeding trait space (convex hull or probabilistic hypervolume around each group)?
+- Larger distance = greater functional shift
+- ses-controlled (draw random resident species from full annual species pool and quantify distance; does each site/ecoregion differ from what would expected by chance?)
+
+#But which species are most functionally unique?
+
+Metric 4a:
+species/trait level analysis:
+
+hull.contribution of (bat package; Mammola & Cardoso, 2020)- species relative contribution to trait space (Keyser et al., 2024)- identify top migrant and resident contributors for each ecoregion (could also do this for nocturnal vs diurnal migrants)
+
+1. redundancy idea- removing top contributors, what proportion of functional diversity do we lose? compare migrant vs resident groups.
+
+
+2. removing the most transient species from full resident +migrant ecoregional trait space (e.g. present for 1 number of weeks until get to 51) from trait space, what proportion of functional diversity do we lose? Do we lose greater proportion with most transient species i.e. more functionally unique
+
+
+
+
+#Question 3a: activity period---------------------
+
+#Question 3b: acitvity period
+
+
+
+# Chapter 2: How do cyclical effects impact the response of avian assemblages to climate change?
+
+(Good thing is can use seasonal ranges to predict climate change or PREDICTS database?  or maybe have to use point occurrence data?)
+
+identify ecoregions with most functionally unique daily/seasonal contributors in each season, if we take all species within these assemblages and reproject their distributions under climate change, are the seasonal migrants/nocturnal or diurnal species lost? If so, suggests climate change could result in potentially irreplaceable functional losses. (also add bit about morphological complexity from Matt Wills in discussion?)
+
+
+# Chapter 3: What does this mean for ecosystem services?*
+
+- "ecosystem energetics approach" (Loft et al., 2026) - more directly links to earth systems like carbon and nutrient cycles than trait-based approaches? 
+- or extinction simulation modelling under climate change (e.g. weeks et al., 2025)- niche structure, redundancy vs cmplemtarity.
+
+# Chapter 4: How can we prioritise vulnerable species for conservation to mitigate these declines in future and prevent ecosystem degradation.
+
+Something similar to FUSE metric (Carmona et al., 2021; Pimiento et al., 2020) with a temporal niche aspect added in? 
+

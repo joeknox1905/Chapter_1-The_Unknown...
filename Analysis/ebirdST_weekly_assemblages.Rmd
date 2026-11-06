@@ -1,0 +1,341 @@
+---
+title: "EbirdST_weekly _assemblages"
+author: "Joe Knox"
+date: "2026-10-24"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+#This script derives species assemblages from ebird status and trends using ebirdST package largely based on weekly methods of (Keyser et al., 2024) and (Gilbert et al., 2026) after trialling seasonal aoh-refined range maps which appeared a bit crude in terms of seasonality- This methods seems to allow much finer temporal resolution. 
+#This works with the latest version of the trends products (2022) and status products (2023).
+#It first takes an example for Britain and Ireland.
+#It focuses on Chile, Central America, North America and New Zealand for which there is
+#96%, 90%, 90% and 90% coverage respectively.
+#For each species, its weekly probability of occurrences (according to their year-round or seasonal range maps; thresholded e.g. using ‘pROC'package to create species-specific thresholds (Robin et al. 2011; Williams and Curley 2025)) are used to define their presence in each 27km2 grid cell as these are more comparable across species than relative abundances (Keyser et al., 2024)
+#grid cells are then mapped onto ecoregions to create more biologically meaningful species assemblages ((Dinerstein et al., 2017; 825 terrestrial ecoregions globally- confirm how many in each region))- or could aggregate to hexagonal grid cells with 50km edges, note they also include nearshore species (Williams and Curley, 2025)
+#Migrants are defined as species with more than one range map (each has four species-specific seasonal range maps + a resident map: pre-breeding migration period, post-breeding migration period, non-breeding, breeding), whilst residents have only one year-round range map (Gilbert et al., 2026). Where a migrant is a partial migrant with a resident range map, they will be a resident for that grid cell if they have any resident range, if not then they will be a migrant for that ecoregion.
+#Thus migrants are essentially non-sedentary species, whilst residents are sedentary following Gilbert et al. (2026). 
+#Weekly assemblages are then then created for all 52 weeks of the year (species x week x gridcell (3x3km or smoothed, aggregated to 9km for easy to read boundaries) (aggregated to ecoregion) for each region/continent (days of occupation in region included- good for temporal restrictedness; species present if at least 5% of the region was within species range during the season; define presence as minimum 5% of range touching grid cell in accordance with days of occupation definition by ebird status and trends?). 
+
+#sensitivity analysis- clip weekly occurrences for each species to aoh map. All gridcells with ebird 3km x 3km grid cells with some overlap with aoh map will be retained in ecoregion, if not then will be removed from ecoregion (so instead aoh map is the confirmation of occurrence rather than the basis; removes bias from uneven distribution) (Avistep, 2025).
+
+
+e.g.
+#for each week, season is also added (region/continent-specific e.g. northern summer vs northern winter)- e.g. Gilbert et al., 2026 defined specific dates for non-breeding (1 January), pre-breeding migration (10 May), breeding (28 June), and post-breeding migration (20 September) in US.
+
+
+
+#load packages
+
+```{r}
+library(dplyr)
+library(ebirdst)
+library(here)
+```
+
+
+#ebird access key
+
+```{r}
+ebirdst::set_ebirdst_access_key("doqg0vgkn82h", overwrite = TRUE)
+```
+
+
+```{r}
+
+#species list for loop
+sp_list <- ebirdst::ebirdst_runs |> 
+  dplyr::pull(species_code) #downloading data for all species with ebirdST data
+
+#download point occurrence data for each species
+for(i in 1:length(sp_list)){
+  ebirdst::ebirdst_download_status( species = sp_list[i],
+                                    path = here::here("Data/species_occurrences"), #path to extract occurrences to
+                                    download_abundance = FALSE, #set to TRUE if also want abundance
+                                    download_occurrence = TRUE, 
+                                    download_count = FALSE,
+                                    download_ranges = FALSE,
+                                    download_regional = FALSE,
+                                    download_pis = FALSE,
+                                    download_ppms = FALSE,
+                                    download_all = FALSE,
+                                    pattern = "_27km_") #should be fine as resolution of most ecoregions is >1000km2 so will be at least 30 grid cells/ecoregion, if not can aggregate to grid cells?, or try grid cells for all species globally with whatever species are present?
+  print(paste0("Finished ", i, " of ", length(sp_list) )) 
+}
+
+#download range maps for each species
+for(i in 1:length(sp_list)){
+  ebirdst::ebirdst_download_status( species = sp_list[i],
+                                    path = here::here("Data/species_ranges"), #path to extract ranges to
+                                    download_abundance = FALSE,
+                                    download_occurrence = FALSE,
+                                    download_count = FALSE,
+                                    download_ranges = TRUE,
+                                    download_regional = FALSE,
+                                    download_pis = FALSE,
+                                    download_ppms = FALSE,
+                                    download_all = FALSE,
+                                    pattern = "_27km_")
+  print(paste0("Finished ", i, " of ", length(sp_list) ))
+}
+
+```
+
+
+Get occurrence data- need to change as from gilbert et al (2026) again
+
+```{r}
+
+
+sp_list <- ebirdst::ebirdst_runs |> 
+  dplyr::pull(species_code)
+
+ncell <- list(list())
+for( i in 1:length(sp_list)){
+  tmp <- ebirdst::load_raster(sp_list[i],
+                              product = "abundance", 
+                              period = "weekly", 
+                              resolution = "27km",
+                              path = here::here("data"))
+  
+  conus <- rnaturalearth::ne_states(iso_a2 = "US") |> 
+    dplyr::filter(!name %in% c("Alaska", "Hawaii")) |> 
+    sf::st_transform( sf::st_crs(tmp))
+  
+  tmp_mask_crop <- terra::mask( terra::crop(tmp, conus), conus )
+  
+  # skip species that never have abundance > 0 in CONUS
+  if( max( terra::values(tmp_mask_crop), na.rm = TRUE) == 0) {next}
+  
+  ncell[[i]] <- terra::values(tmp_mask_crop) |> 
+    tibble::as_tibble(rownames = "cell") |> 
+    tidyr::pivot_longer(`2022-01-04`:`2022-12-27`, names_to = "week", values_to = "n") |> 
+    dplyr::filter(!is.na(n) & n > 0) |> 
+    tibble::add_column(species_code = sp_list[i])
+  
+  print(paste0("Finished ", i, " of ", length(sp_list)))
+}
+
+ab <- dplyr::bind_rows(ncell)
+
+setwd(here::here("data"))
+save( ab, file = "all_species_abundance_conus.RData")
+
+```
+
+
+
+
+Defining resident vs migrant-need to change as this code from (Gilbert et al., 2026)- maybe functionalise
+
+
+```{r}
+
+
+# calculate migrant & nonresident status of species for each cell and week based on 
+# range maps
+library(here)
+library(ebirdst)
+library(tidyverse)
+library(sf)
+library(rnaturalearth)
+library(terra)
+
+# table with relative abundances for cells
+load( here::here("data/all_species_abundance_conus.RData"))
+
+sp_list <- sort(unique(ab$species_code))
+
+# which seasons a species has range maps for
+sp_seasons <- list(list())
+for(i in 1:length(sp_list)){
+  range <- ebirdst::load_ranges(
+    species = sp_list[i],
+    resolution = "27km", 
+    smoothed = TRUE, 
+    path = here::here("data/ranges")
+  )
+  
+  sp_seasons[[i]] <- tibble(season = range$season) |> 
+    tibble::add_column(sp = sp_list[i])
+  print(paste0("finished ", i, " of ", length(sp_list)))
+}
+
+# look to see what seasons each species has
+dplyr::bind_rows(sp_seasons)
+
+# conus shapefile
+conus84 <- rnaturalearth::ne_states(iso_a2 = "US") |> 
+  dplyr::filter(!name %in% c("Alaska", "Hawaii")) |> 
+  dplyr::summarise(geometry = sf::st_union(geometry))
+
+# sample raster
+tmp <- terra::rast(here::here("data/2022/abetow/weekly/abetow_abundance_median_27km_2022.tif"))
+
+# transform to match crs of ebird data
+conus <- rnaturalearth::ne_states(iso_a2 = "US") |> 
+  dplyr::filter(!name %in% c("Alaska", "Hawaii")) |> 
+  sf::st_transform( sf::st_crs(tmp))
+
+tmp_mask_crop <- terra::mask( terra::crop(tmp, conus), conus )
+
+xy <- terra::xyFromCell(tmp_mask_crop, 1:(ncol(tmp_mask_crop)*nrow(tmp_mask_crop)))
+
+cell_key <- cbind(cell = 1:nrow(xy), xy) |> 
+  tibble::as_tibble()
+
+ab <- ab |> 
+  dplyr::left_join(cell_key)
+
+res <- list(list())
+for(i in 1:length(sp_list)){
+  test <- ab |>
+    dplyr::filter(species_code == sp_list[i]) |> 
+    dplyr::select(sp = species_code, cell, week, x, y) |> 
+    dplyr::distinct() |> 
+    sf::st_as_sf(
+      coords = c("x", "y"), 
+      crs = sf::st_crs(tmp_mask_crop))
+  
+  ran <- ebirdst::load_ranges(
+    species = sp_list[i],
+    resolution = "27km", 
+    smoothed = TRUE, 
+    path = here::here("data/ranges")) |> 
+    sf::st_transform( crs = sf::st_crs(tmp_mask_crop)) |> 
+    dplyr::select(season, start_date, end_date, geom)
+  
+  # buffer range boundary a little bit
+  ran_buf <- sf::st_buffer( ran, dist = 10*1000)
+  
+  # wtf did i name this joe
+  joe <- sf::st_join(test, dplyr::filter(ran_buf, season %in% c("resident", "breeding", "nonbreeding"))) |> 
+    sf::st_drop_geometry() |>
+    # indicator variables
+    # breeding: within breeding polygon AND during breeding window
+    # breeding2: within breeding polygon
+    # nonbreeding: within nonbreeding polygon AND during nonbreeding window
+    # nonbreeding: within nonbreeding polygon
+    # resident: sedentary species
+    dplyr::mutate( breeding = ifelse( season == "breeding" & week >= start_date & week <= end_date, 1, 0),
+                   breeding2 = ifelse(season == "breeding", 1, 0),
+                   nonbreeding = ifelse( season == "nonbreeding" & ( week <= end_date | week >= start_date), 1, 0),
+                   nonbreeding2 = ifelse(season == "nonbreeding", 1, 0),
+                   resident = ifelse(season == "resident", 1, 0)) |> 
+    dplyr::group_by(sp, cell, week) |> 
+    dplyr::summarise(breeding = max(breeding, na.rm = TRUE), 
+                     breeding2 = max(breeding2, na.rm = TRUE),
+                     nonbreeding = max(nonbreeding, na.rm = TRUE),
+                     nonbreeding2 = max(nonbreeding2, na.rm = TRUE),
+                     resident = max(resident, na.rm = TRUE)) |> 
+    dplyr::ungroup() |> 
+    dplyr::mutate(across(c(breeding, breeding2, nonbreeding, nonbreeding2, resident), function(x) ifelse(x == -Inf, NA, x))) |> 
+    # calculate migration indicators
+    # migrate: narrower definition (not a resident, not a breeder, not a nonbreeder; latter two reference seasonal windows)
+    # migrate2: broader definition (no seasonal aspect)
+    dplyr::mutate(migrate = ifelse( ( resident == 0 | is.na(resident)) &
+                                      (breeding == 0 | is.na(breeding)) &
+                                      (nonbreeding == 0 | is.na(nonbreeding)), 1, 0),
+                  
+                  migrate2 = ifelse( (resident == 0 | is.na(resident)) &
+                                       (breeding2 == 0 | is.na(breeding2)) &
+                                       ( nonbreeding2 == 0 | is.na(nonbreeding2)), 1, 0)) |> 
+    dplyr::mutate( across(c(resident, breeding, breeding2, nonbreeding, nonbreeding2, 
+                            migrate, migrate2), function(x) tidyr::replace_na(x, 0)))
+  
+  res[[i]] <- joe
+  
+  print(paste0("finished ", i, " of ", length(sp_list)))
+  
+}
+
+status <- bind_rows(res)
+
+setwd(here::here("data"))
+save(status, file = "species_cell_status.RData")
+
+```
+
+#if want productivity also crop ndvi layer to shp files, then project back to extent of ebird tif abundances:
+
+```{r}
+# aggregate NDVI modis data for eBird grid and write out to a raster stack
+
+library(terra)
+library(here)
+
+# calculate aggregation factor - specifically for NDVI sd
+# load one NDVI file
+ndvi <- terra::rast(here::here("data/MOD13C1_061-20250312_235437/MOD13C1.A2022017.061.2022035084930.hdf"))[[1]]
+ndvi_ref <- terra::crs(ndvi)
+
+# load usa boundary for clipping extent
+usa <- terra::vect(here::here("data/spatial_miscellany/usa_clip.shp"))
+
+# reproject usa to ndvi projection
+usa <- terra::project(usa, terra::crs(ndvi))
+
+# crop ndvi to usa
+ndvi <- terra::crop(ndvi, usa)
+
+# load ebird data
+ebird <- terra::rast(here::here("data/2022/abetow/weekly/abetow_abundance_median_27km_2022.tif"))
+
+# project ndvi into ebird crs 
+ndvi <- terra::project(ndvi, terra::crs(ebird))
+
+# find ratio of ndvi and ebird resolutions
+agg_factor <- floor(res(ebird)/res(ndvi))[1]
+
+# list all NDVI files
+ndvi_list <- list.files(here::here("data/MOD13C1_061-20250312_235437/"), pattern='.hdf$',full.names=T)
+
+# initialize mean and sd raster stacks
+ndvi_mean_stack <-rast()
+
+# aggregate and resample each NDVI date to ebird crs and extent
+for (ndvi_file in ndvi_list){
+  usa <- terra::project(usa, ndvi_ref)
+  
+  # load ndvi band from MODIS data
+  ndvi <- terra::rast(ndvi_file)[["\"CMG 0.05 Deg 16 days NDVI\""]]
+  
+  # convert to -1 to 1 range using MODIS NDVI scale factor
+  ndvi <- ndvi*.00000001
+  
+  # crop ndvi to usa extent
+  ndvi <- terra::crop(ndvi, usa)
+  
+  # reformat date information
+  date <- strsplit(strsplit(ndvi_file,'.A')[[1]][2],'.061')[[1]][1]
+  date <- format(as.Date(date,'%Y%j'),'%Y%m%d')
+  
+  # resample NDVI to eBird grid using method "average"
+  ndvi_mean <- resample(project(ndvi, crs(ebird)), ebird, method='average')
+  
+  # checking cropped boundary with more "readable" projection
+  ndvi_mean <- mask(crop(project(ndvi_mean, ndvi_ref),usa),usa)
+  
+  ndvi <- c(ndvi_mean)
+  names(ndvi)<-c('ndvi_mean')
+  names(ndvi)<- paste0(date, '_', names(ndvi))
+  
+  # project back to ebird crs
+  ndvi <- project(ndvi, ebird)
+  
+  # crop back to usa extent
+  usa <- project(usa, crs(ebird))
+  ndvi <- crop(ndvi,usa)
+  
+  # stack ndvi
+  ndvi_mean_stack <- c(ndvi_mean_stack, ndvi[[1]])
+}
+
+# write files
+writeRaster(ndvi_mean_stack, filename=here::here("data/ndvi_mean_stack.tif"))
+
+```

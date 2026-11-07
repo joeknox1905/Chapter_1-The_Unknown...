@@ -14,25 +14,21 @@ Chapter 1:
 
 To do:
 
-[X] Create a better file structure
-[] Write out chapters, add methodsy plan- slowly does it
-[] continue with making metrics- func ellipsoid bootstrap species-level contribution and look at betapart metric for nestedness vs turnover
-[X] do advanced r stats
-[] Version control- upload code edits to github
+[] Start report, add methodsy plan 
+[] sort out eduroam
+[] plot traits against body mass (Williams and Curley, 2025)
+[] make detect.migrants.binary and .monthly functions (ecoregional loop), get lists (matrices) of group to feed into disprity, metrics with custom subsets
+[] continue with making metrics- func ellipsoid bootstrap (full ellipsoid volume vs ellipsoid with each species removed, loop through) species-level contribution and look at betapart metric for nestedness vs turnover
 [] Update README
 [] mendeley reference list, export as bib. file
-[X] Finish aoh pipeline to get species list for annual trait space (and seasonal/monthly(in rds files)). 
 []remove unnessecary stuff from aoh pipeline i.e. eco_long
-[] Run PCOA (avoniche (32 foraging traits weighted) x avonet, better for locomotor traits (Oliveria et al., 2023; Williams and Curley, 2025) with groups as subsets of annual traitspace, then seasonal (select.axes again),  monthly (select.axes again) Gawdis (e.g. Oliveria et al., 2023))
-[x] Put functions in functions folder
-[] make detect.migrants function (ecoregional loop)
 [] xtable- like this idea, repurposable tables when updating analysis/results
-[] migration analysis as ecoregional status (not taking account of transienece)- disprity (distance between centroids, sum of variance (Guillerme, 2018) or nestedness (controls for group simply being a redundant subset of the residents/annual traitspace)/turnover (beta diversity with betapart e.g. Oliveria et al., 2023, or beta.temp- seasonal overlap; but would want to do with ellipsoid not convex hulls?) or summed kernel contribution of status for each migrant grouped within the annual/seasonal/monthly (maybe omit monthly?) trait space.
-[] migration as a monthly status (scale), resident (and partial migrants) = present year round, migrants = successive (present in one month of year, present in two ect). I.e. how granular do we need to go, if group/species is funcitonally unique in annual trait space but also only present 1 week of the year could lose entire function if lost (but not neccesarily important- would need produtivity analysis or something for that) and they are also more likely to be lost as a small change in phenology/distribution could eradaicate their range from the region. Need species-level functional contribution with BAT/species richness or something for this as too few species per monthly category otherwise in some seasons/ecoregions
-beta.part metrics seem to be very species richness, not volume/position in/of traitspace based. Use something else? distance to centroids, point.dist?
-[] migratory distance analysis- nestedness vs turnover or hull/kernel contribution (jacknived)
+[] migration analysis as ecoregional present year-round vs not status (not taking account of transienece)- disprity (distance between centroids, sum of variance (Guillerme, 2018) or nestedness (controls for group simply being a redundant subset of the residents/annual traitspace)/turnover (beta diversity with betapart e.g. Oliveria et al., 2023, or beta.temp- seasonal overlap; but would want to do with ellipsoid not convex hulls?) or summed kernel contribution of status for each migrant grouped within the annual/seasonal/monthly (maybe omit monthly?) trait space.
+[] migration as a monthly status (scale)
+[] migratory distance analysis
 [] dietary analysis- migratory status by diet type i.e. models/ plot overlap
 [] other continents- need to change seasons again!
+[] activity period collation
 
 
 Git hub id:

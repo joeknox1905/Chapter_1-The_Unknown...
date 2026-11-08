@@ -153,7 +153,7 @@ group.distance.to.annual.centroid <- function(matrix1, matrix2) {
   dispRity(annual_trait_space, groups = mig_groups_binary, resident, metric = group.distance.to.annual.centroid, between.groups = TRUE)
   
   
-# metric for calculating species-level contribution to trait space using ellipsoid volume, based on leave one out approach of Cardoso et al. (2026) but using ellipsoid volumes as less sensitive to outliers (Guillerme et al., 2026)-----------------------------
+#------------------------metric for calculating species-level contribution to trait space using ellipsoid volume, based on leave one out approach of Cardoso et al. (2026) but using ellipsoid volumes as less sensitive to outliers (Guillerme et al., 2026)-----------------------------
   
 #Are migrants locally (ecoregionally) functionally unique or redundant?
 #tells us more about the species-level contribution (redundancy vs complementarity) to trait space and its removal shifts functional richness, less volume loss = less unique
@@ -186,11 +186,6 @@ group.distance.to.annual.centroid <- function(matrix1, matrix2) {
   
   
 #for ellipsoid.contribution metric will need to do some stats to look at whether migrant vs resident contribution differs in each ecoregional trait space
-
-
-
-
-
 
 
 library(dplyr); library(purrr); library(tibble); library(dispRity)

@@ -1,8 +1,0 @@
-\contentsline {section}{\numberline {1}Introduction}{2}{section.0.1}%
-\contentsline {subsection}{\numberline {1.1}Background}{2}{subsection.0.1.1}%
-\contentsline {section}{\numberline {2}Aims and Objectives}{2}{section.0.2}%
-\contentsline {subsection}{\numberline {2.1}Aims}{3}{subsection.0.2.1}%
-\contentsline {subsection}{\numberline {2.2}Hypotheses}{3}{subsection.0.2.2}%
-\contentsline {subsection}{\numberline {2.3}Research Objectives}{5}{subsection.0.2.3}%
-\contentsline {section}{\numberline {3}Initial research plan}{6}{section.0.3}%
-\contentsline {section}{\numberline {4}References}{6}{section.0.4}%

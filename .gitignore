@@ -7,3 +7,11 @@ Data/Raw/
 .httr-oauth
 .DS_Store
 .quarto
+.log
+.aux
+.fdb_latexmk
+.fls
+.out
+.synctex.gz
+.toc
+

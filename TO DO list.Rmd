@@ -14,9 +14,9 @@ Chapter 1:
 
 To do:
 
-[] Start report, add methodsy plan 
+[] Work on report
 [] sort out eduroam
-[] plot traits against body mass (Williams and Curley, 2025)
+[] plot traits against body mass (Williams and Curley, 2025) to ensure that body mass correlations are removed- also plot loadings (chapter 1.rmd file)
 [] make detect.migrants.binary and .monthly functions (ecoregional loop), get lists (matrices) of group to feed into disprity, metrics with custom subsets
 [] continue with making metrics- func ellipsoid bootstrap (full ellipsoid volume vs ellipsoid with each species removed, loop through) species-level contribution and look at betapart metric for nestedness vs turnover
 [] Update README

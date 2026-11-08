@@ -7,8 +7,12 @@
 
 #pre-requisites-----
 
-eco_region_traitspace<- ("") # full or beak-only AVONET PCA/PCOA scores, status and species (columns) by ecoregion (rows)- can either use PCOA or PCA
+BI_traitspace<- ("") # full Britain and Ireland trait space or beak-only AVONET PCA/PCOA scores, status and species (columns) by ecoregion (rows)- can either use PCOA or PCA
 
+#will also need seasonal trait space for seasonal comparisons (e.g. winter/summer/autumn migrants unique compared to residents 
+season_eco_region_traitspace<- ("")
+
+#JK to TG: (PC scores are created from the full traitspace for Britain and Ireland) so for each ecoregion, migrant and resident group centroids will be relative to the full Britain and Ireland species traitspace- is this ok if I am focusing on local (ecoregional) functional diversity?
 
 #------------function to get migratory status for each ecoregion based on binary definition------------------
 
@@ -23,7 +27,7 @@ detect.migrants.binary <- function(traitspace, eco) {
     
     out[[i]] <- list(
       migrant  = d %>% filter(status == "migrant")  %>% select(-ecoregion, -status) %>% column_to_rownames("species"),
-      resident = d %>% filter(n_year_month == "resident")  %>% select(-ecoregion, -status) %>% column_to_rownames("species"))
+      resident = d %>% filter(status == "resident")  %>% select(-ecoregion, -status) %>% column_to_rownames("species"))
   } 
   out 
 }
@@ -31,8 +35,8 @@ detect.migrants.binary <- function(traitspace, eco) {
 
 #call function for each ecoregion
 mig_groups_binary <- detect.migrants.binary(
-  traitspace = eco_region_traitspace,
-  eco = unique(eco_region_traitspace$ecoregion) #get lists for each ecoregion and assign to object for disprity
+  traitspace = BI_traitspace,
+  eco = unique(BI_traitspace$ecoregion) #get lists for each ecoregion and assign to object for disprity
 )
 
 
@@ -66,8 +70,8 @@ out <- setNames(vector("list", length(eco)), eco) #list of rows of migrant by mo
 
 #call function
 mig_groups_monthly <- detect.migrants.monthly(
-  traitspace = eco_region_traitspace,
-  eco = unique(eco_region_traitspace$ecoregion)
+  traitspace = BI_traitspace,
+  eco = unique(BI_traitspace$ecoregion)
 ) # #get lists for each ecoregion and assign to object for disprity
 
 
@@ -157,7 +161,13 @@ group.distance.to.annual.centroid <- function(matrix1, matrix2) {
 
   ellipse.contribution <- function (matrix1) { #requires matrix1 (ecoregional annual trait space), matrix2 (ecoregional annual trait space-1)
   
-    For (i in 1:nrow(matrix1)) { #for each species row in ecoregional annual trait space
+  for (i in eco) {
+    matrix1 <- traitspace %>%
+      filter(ecoregion == i) %>%
+      distinct(species, .keep_all = TRUE) 
+
+
+    for (i in 1:nrow(matrix1)) { #for each species row in ecoregional annual trait space
       species_row <- matrix1[i, ]
       matrix2 <- matrix1[-i, ] #remove species from trait space 
       # Calculate ellipsoid volume for each species
@@ -166,9 +176,63 @@ group.distance.to.annual.centroid <- function(matrix1, matrix2) {
 
   }
 
+ 
+#test that metric works as expected
   make.metric(ellipse.contribution) #will be level 1 (one output) and not between groups as species-level
   
   #call function, will be compared to ecoregional annual trait space
-  dispRity(metric = ellipse.contribution (ecoregional_annual_trait_space)) #will be eigen as matrix is distance like for both PCOA and PCA
+  dispRity(metric = ellipse.contribution(traitspace = BI_traitspace,
+  eco = unique(BI_traitspace$ecoregion))) #will be eigen as matrix is distance like for both PCOA and PCA
   
-  #for ellipsoid.contribution metric will need to do some stats to look at whether migrant vs resident contribution differs in each ecoregional trait space
+  
+#for ellipsoid.contribution metric will need to do some stats to look at whether migrant vs resident contribution differs in each ecoregional trait space
+
+
+
+
+
+
+
+library(dplyr); library(purrr); library(tibble); library(dispRity)
+
+by_eco <- eco_region_traitspace %>%
+  distinct(ecoregion, species, .keep_all = TRUE) %>%
+  split(.$ecoregion)
+
+mat_of <- function(d) d %>% select(species, where(is.numeric), -n_year_month) %>%
+  column_to_rownames("species") %>% as.matrix()
+
+grp_binary  <- function(d) split(d$species, d$status)
+grp_monthly <- function(d) split(d$species, d$n_year_month)  # assumes 12 = resident
+
+cent_dist <- function(m1, m2, ...) sqrt(sum((colMeans(m1) - colMeans(m2))^2))
+dist_to_annual <- function(m, annual, ...) mean(sqrt(rowSums(sweep(m, 2, annual)^2)))
+
+run_eco <- function(d, grp_fun, metric, between, min_n = 5) {
+  m <- mat_of(d)
+  g <- keep(grp_fun(d), ~ length(.x) >= min_n)
+  bs <- custom.subsets(m, group = g) %>%
+    boot.matrix(bootstraps = 100, rarefaction = min(lengths(g)))
+  dispRity(bs, metric = metric, between.groups = between, annual = colMeans(m)) %>%
+    summary()
+}
+
+# metric 1: migrant vs resident centroid distance
+tab_centroid <- map(by_eco, run_eco, grp_fun = grp_binary,
+                    metric = cent_dist, between = TRUE) %>% bind_rows(.id = "ecoregion")
+
+# metric 2: group distance to annual centroid (swap in grp_monthly for the monthly run)
+tab_unique <- map(by_eco, run_eco, grp_fun = grp_binary,
+                  metric = dist_to_annual, between = FALSE) %>% bind_rows(.id = "ecoregion")
+
+# metric 3: leave-one-out ellipsoid contribution per species
+loo_vol <- function(d) {
+  m <- mat_of(d); full <- ellipsoid.volume(m)
+  tibble(species = rownames(m), status = d$status,
+         contrib = map_dbl(seq_len(nrow(m)),
+                           ~ full - ellipsoid.volume(m[-.x, , drop = FALSE])))
+}
+contrib <- map(by_eco, loo_vol) %>% bind_rows(.id = "ecoregion")
+
+contrib %>% group_by(ecoregion) %>%
+  summarise(p = wilcox.test(contrib ~ status)$p.value)

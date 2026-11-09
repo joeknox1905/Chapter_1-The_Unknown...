@@ -145,7 +145,7 @@ rel_morph_traits <- morph_traits %>%
 ggcorrplot(cor(rel_morph_traits[, 1:11]), hc.order = TRUE) # note that body mass only correlates with HWI as it is a raw ratio, so mass has a small influence on traitspace.
 
 # Perform PCA--------------
-pca <- prcomp(rel_morph_traits, scale. = TRUE)
+pca <- prcomp(rel_morph_traits, scale. = TRUE) # scale
 
 select.axes(pca, threshold = 0.95, inc.threshold = TRUE) # select axes using disprity
 # 6 dimensions needed

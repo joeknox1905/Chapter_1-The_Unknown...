@@ -12,7 +12,10 @@ BI_traitspace<- ("") # full Britain and Ireland trait space or beak-only AVONET 
 #will also need seasonal trait space for seasonal comparisons (e.g. winter/summer/autumn migrants unique compared to residents 
 season_eco_region_traitspace<- ("")
 
-#JK to TG: (PC scores are created from the full traitspace for Britain and Ireland) so for each ecoregion, migrant and resident group centroids will be relative to the full Britain and Ireland species traitspace- is this ok if I am focusing on local (ecoregional) functional diversity?
+#@@@JK to TG: (PC scores are created from the full traitspace for Britain and Ireland) so for each ecoregion, migrant and resident group centroids will be relative to the full Britain and Ireland species traitspace- is this ok if I am focusing on local (ecoregional) functional diversity?
+
+
+
 
 #------------function to get migratory status for each ecoregion based on binary definition------------------
 
@@ -40,7 +43,7 @@ mig_groups_binary <- detect.migrants.binary(
 )
 
 
-#---------------function for identifying migrants based on number of months present in ecoregion------------------------
+#---------------function for identifying migrants based on number of months present in each ecoregion------------------------
 
 detect.migrants.monthly <- function(traitspace, eco) {
 out <- setNames(vector("list", length(eco)), eco) #list of rows of migrant by monthly status and residents for each ecoregion
@@ -75,6 +78,36 @@ mig_groups_monthly <- detect.migrants.monthly(
 ) # #get lists for each ecoregion and assign to object for disprity
 
 
+#function for running disprity metrics by ecoregion--------------------------------
+
+#get pc scores as matrix from britain and ireldand traitspace
+make.matrix<- function(d) { d %>% select(species, where(is.numeric), -n_year_month) %>%
+  column_to_rownames("species") %>% 
+  as.matrix()
+}
+
+run.eco_binary <- function(d, grp_fun, metric, between, min_n = 6) {
+  m <- mat_of(d)
+  g <- keep(grp_mig(d), ~ length(.x) >= min_n) # needs at least as many species as number of dimensions (6 for pca) to run, this shoudlnt drop any species
+  bs <- custom.subsets(m, group = g) %>%
+    boot.matrix(bootstraps = 100, rarefaction = min(lengths(migrant_group_binary))) #rarefy by the group with the lowest number of species
+  dispRity(bs, metric = metric, between.groups = between %>%
+  summary()
+}
+
+#adjust for monthly migratory status definition
+run.eco_monthly <- function(d, grp_fun, metric, between, min_n = 6) {
+  m <- mat_of(d)
+  g <- keep(grp_fun(d), ~ length(.x) >= min_n) # needs at least as many species as number of dimensions (6 for pca) to run
+  bs <- custom.subsets(m, group = g) %>%
+    boot.matrix(bootstraps = 100, rarefaction = min(lengths(migrant_group_monthly))) 
+  dispRity(bs, metric = metric, between.groups = between %>%
+  summary()
+}
+
+
+
+#disprity metrics---------------------------------------
 
 
 ##------------Create metric for calcualting distance between resident and migrant centroids, two arguments (matrix 1 = res, matrix 2 = mig)------------
@@ -85,48 +118,23 @@ mig_groups_monthly <- detect.migrants.monthly(
 
 pairwise.distance.between.centroids <- function(matrix1, matrix2) {
     ## calculate the centroid of the matrices of n-dimensional traitspace
-    centroid1 <- colMeans(matrix1) #centroid of res
-    centroid2 <- colMeans(matrix2) #centroid of mig
-    ## measuring the distances between them
-    return(sum(sqrt(centroid1^2-centroid2^2))) #euclidean distance
-}
+   sqrt(sum((colMeans(matrix1) - colMeans(matrix2))^2))
+} #sum of the euclidean distance between migrant group and resident centroids across multidimensional traitspace
 
 
 ## Test if disprity understands it
 make.metric(pairwise.distance.between.centroids) #in this case should be level 1 (only one output) and between.groups
+
+#call function (in conjuction with detect migrant function above)
+run.eco.binary(metric = pairwise.distance.between.centroids, between.groups = TRUE, grp_mig = mig_group_binary) #change for monthly
+
+
 
 
 #boot matrix to correct for sample size (species richness)
 mig_boots_eco1 <- boot.matrix(, mig_groups_binary[eco1] = 100, # call, for each ecoregion, needs to be 130 for binary analysis as migrant groups contain up to 122 species in some ecoregions, but for monthly analysis will need to be 75 as species richness as high as 72. #Annual as reference?
                          
                           rarefaction = TRUE) #replace all elements for a sample each time
-
-disparity(mig_boots_eco1,  metric = pairwise.distance.between.centroids, between.groups = TRUE) #or SES?
-
-# repeat for each ecoregion
-
-mig_boots_eco2 <- boot.matrix(, mig_groups_binary[eco2] = 100, 
-                         
-                          rarefaction = TRUE)
-
-disparity(mig_boots_eco2,  metric = pairwise.distance.between.centroids, between.groups = TRUE) 
-
-mig_boots_eco3 <- boot.matrix(, mig_groups_binary[eco3] = 100,
-                         
-                          rarefaction = TRUE) 
-
-disparity(mig_boots_eco3,  metric = pairwise.distance.between.centroids, between.groups = TRUE) 
-
-mig_boots_eco4 <- boot.matrix(, mig_groups_binary[eco4] = 100, 
-                          rarefaction = TRUE) 
-
-disparity(mig_boots_eco4,  metric = pairwise.distance.between.centroids, between.groups = TRUE) 
-
-mig_boots_eco5 <- boot.matrix(, mig_groups_binary[eco5] = 100, 
-                         
-                          rarefaction = TRUE) 
-
-disparity(mig_boots_eco5,  metric = pairwise.distance.between.centroids, between.groups = TRUE) 
 
 
 
@@ -186,3 +194,8 @@ group.distance.to.annual.centroid <- function(matrix1, matrix2) {
   
   
 #for ellipsoid.contribution metric will need to do some stats to look at whether migrant vs resident contribution differs in each ecoregional trait space
+
+
+
+#------------------putting it together-------------------------------------------------
+

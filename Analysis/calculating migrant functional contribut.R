@@ -8,7 +8,7 @@
 ##############################################################################################################################################
 
 
-BI_traitspace<- ("Data/Processed/eco_region_traitspace__PCA.csv") # full Britain and Ireland trait space or beak-only AVONET PCA/PCOA scores, status and species (columns) by ecoregion (rows)- can either use PCOA or PCA
+BI_traitspace<- read.csv("Data/Processed/eco_region_traitspace__PCA_BI.csv") # full Britain and Ireland trait space or beak-only AVONET PCA/PCOA scores, status and species (columns) by ecoregion (rows)- can either use PCOA or PCA
 
 #specificy trait columns from trait space
 trait_cols <- grep("^PC", names(BI_traitspace), value = TRUE)
@@ -169,5 +169,5 @@ result_monthly <- calculate.disprity.by.ecoregion(BI_traitspace, group = "n_year
 # for this analysis, the monthly migrant group pairs would also be compared against eachother which is what we want
 
 
-
+#@@@ JK will need to update for seasons e.g. group by several variables but can do later
 

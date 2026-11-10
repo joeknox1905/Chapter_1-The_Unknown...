@@ -456,7 +456,7 @@ saveRDS(wide_aoh, paste0(out_dir, "seasonal_ecoregion_wide_aoh.rds")) # every mo
 ```{r}
 # Analysis 1 checks: (migratory status based on binary present year-round (12 months; resident) or <12 months; migrant)
 
-pools <- readRDS("/Data/Processed/seasonal_ecoregion_pools_aoh")
+pools <- readRDS("Data/Processed/seasonal_ecoregion_pools_aoh")
 
 
 # check that residents are present in all months and migrants are present only in some months for each ecoregion

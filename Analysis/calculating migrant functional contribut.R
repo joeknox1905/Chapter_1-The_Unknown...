@@ -13,8 +13,8 @@ BI_traitspace<- read.csv("Data/Processed/eco_region_traitspace__PCA_BI.csv") # f
 #specificy trait columns from trait space
 trait_cols <- grep("^PC", names(BI_traitspace), value = TRUE)
 
-#will also need seasonal trait space for seasonal comparisons (e.g. winter/summer/autumn migrants unique compared to residents 
-season_eco_region_traitspace<- ("")
+#Also need seasonal trait space for seasonal comparisons (e.g. winter/summer/autumn migrants unique compared to residents 
+season_eco_region_traitspace<- read.csv("Data/Processed/eco_region_season_traitspace_PCA_BI.csv")
 
 #@@@JK to TG: (PC scores are created from the full traitspace for Britain and Ireland) so for each ecoregion, migrant and resident group centroids will be relative to the full Britain and Ireland species traitspace- is this ok if I am focusing on local (ecoregional) functional diversity?
 
@@ -156,10 +156,19 @@ calculate.disprity.by.migrant.group <- function(d, group, metric, trait_cols, be
 }
 #n.b. bootstrapping ensures greater confidence in metric for the group i.e. metric is due to a real biological difference, not just an artefact of sampling variance
 
+#for yearly analysis
 calculate.disprity.by.ecoregion <- function(traitspace, site = "ecoregion", ...) {
   split(traitspace, traitspace[[site]]) %>% #list of pc score dataframes split by ecoregion
     map(calculate.disprity.by.migrant.group , ...) %>% #apply disprity by migrant and resident group to each ecoregion dataframe and return list of results
     bind_rows(.id = site) #bind rows of results from list so that disprity is summarised for all ecoregions and pairs in a dataframe
+}
+
+
+#for seasonal analysis
+calculate.disprity.by.ecoregion.and.season <- function(traitspace, site = "ecoregion", ...) {
+  split(traitspace, traitspace[[site, season]]) %>% #list of pc score dataframes split by ecoregion
+    map(calculate.disprity.by.migrant.group , ...) %>% #apply disprity by migrant and resident group to each ecoregion dataframe and return list of results
+    bind_rows(.id = site, season) #bind rows of results from list so that disprity is summarised for all ecoregions and pairs in a dataframe
 }
 
 

@@ -172,8 +172,15 @@ eco_pca <- assemb %>%
   distinct(ecoregion, species, status, n_month_year) %>%
   inner_join(avospace, by = "species")
 
-# save full traitspace
+# save full traitspace with metadata (ecoregion, mig status, months present)
 write.csv(eco_pca, "eco_region_traitspace_PCA_BI.csv")
+
+eco_season_pca <- assemb %>%
+  distinct(ecoregion, species, status, season, n_month_year, n_month_season) %>%
+  inner_join(avospace, by = "species")
+
+# save full traitspace with seasonal metadata (ecoregion, season, mig status, months present, months present in each season)
+write.csv(eco_season_pca, "eco_region_season_traitspace_PCA_BI.csv")
 
 
 # 2. AVONET beakspace only (+size)---------

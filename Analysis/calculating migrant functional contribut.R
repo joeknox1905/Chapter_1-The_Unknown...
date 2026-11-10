@@ -65,6 +65,8 @@ result_binary  <- calculate.disprity.by.ecoregion(BI_traitspace, group = "status
 
 
 #----------------metric for calculating distribution of species within each group around centroid----------------
+
+
 #i.e. "functional" arrangement within each group- niche packing vs expansion in each group
 #if normal, means species are tend to be within their group (whatever trait combinations represent the centroid)
 #if uneven, suggests clumpiness/dispersion from centroid
@@ -76,7 +78,7 @@ species_row <- matrix[i, ]#get pc score for each dimension for each pc
 
 sqrt(sum((species_row - colMeans(matrix2))^2)) #distance from group centroid of each species
 
-##@@@JK- then will need to plot histogram of distribution function
+##@@@JK- then will need to plot histogram of distribution function and test difference using t test (not permutation as already have done bootstrapping to account for null tests)
 
 
 
@@ -152,6 +154,7 @@ calculate.disprity.by.migrant.group <- function(d, group, metric, trait_cols, be
     disparity<- dispRity(metric = metric, between.groups = between) %>% in the group with the fewest species
     disp_result<- summary(disparity) #summarise disprity metric, (50, 95%) quantiles, median boostrap value)
 }
+#n.b. bootstrapping ensures greater confidence in metric for the group i.e. metric is due to a real biological difference, not just an artefact of sampling variance
 
 calculate.disprity.by.ecoregion <- function(traitspace, site = "ecoregion", ...) {
   split(traitspace, traitspace[[site]]) %>% #list of pc score dataframes split by ecoregion

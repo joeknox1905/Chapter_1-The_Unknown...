@@ -146,14 +146,14 @@ range_sf <- filter(
 
 # get extant species that lose their polygons due to origin and seasonal filters (i.e. introduced, vagrant and uncertain season species)
 dropped_by_codes <- range_raw %>%
-  st_drop_geometry() %>%
+  st_drop_geometry() %>% #transforms spatial geometry into dataframe
   filter(presence %in% presence_keep) %>%
   distinct(sisid, sci_name) %>%
   anti_join(distinct(st_drop_geometry(range_sf), sisid), by = "sisid")
 dropped_by_codes # 13 introduced/vagrant species are lost: monk and rose-ringed parakeets, ruddy, mandarin and muscovy ducks,  common, golden and reeve's pheasants; geese (canada, black swan, bar-headed, egyptian and snow). Otherwise would be dropped by aoh maps as can't be verified. WIll re-run analysis with species range maps as fallbacks later on.
 
-# range types by origin
-count(st_drop_geometry(range_sf), seasonal, origin)
+# range types by origin- note will not be the final number, but can repurpose
+range_type by_season_and_origin <- count(st_drop_geometry(range_sf), seasonal, origin)
 # 156 species with native, resident range
 # 2 species with re-introduced, resident range
 # 142 species with native breeding range
@@ -163,7 +163,21 @@ count(st_drop_geometry(range_sf), seasonal, origin)
 # 1 species with reintroduced passage range
 # no assisted colonisation species
 
-# TG: You could render this as table so we can check it regularly without having to run the whole code. Either simply by saving the summary in a csv file or, if you want more fancy, check the kable package.
+# render in latex
+
+range_type_by_season_and_origin %>%
+  kable(
+    format = "latex",
+    booktabs = TRUE,
+    caption = "Range Types by Origin and Season",
+    align = c("l", "c", "r")
+  ) %>%
+  kable_styling(
+    latex_options = c("striped", "hold_position"),
+    full_width = FALSE
+  )
+
+# TG:done You could render this as table so we can check it regularly without having to run the whole code. Either simply by saving the summary in a csv file or, if you want more fancy, check the kable package.
 
 
 # get area of each species' range type intersecting each ecoregion
@@ -515,7 +529,6 @@ status_counts_seas_eco <- pools %>%
   group_by(status, ecoregion, season) %>%
   distinct(species) %>%
   count() # not bad, but migrant pool greater than resident pool so need to use SES,
-
 ```
 
 # Analysis 2 checks : migratory status as a graded scale, (i.e. months present)

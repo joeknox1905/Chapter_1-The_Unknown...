@@ -150,7 +150,9 @@ pca <- prcomp(rel_morph_traits, scale. = TRUE) # scale
 
 select.axes(pca, threshold = 0.95, inc.threshold = TRUE) # select axes using disprity
 # 6 dimensions needed
-#TG: might be good to run this one with your groups. e.g. pca <- custom.subsets(...) so that we can check if 6D is enough for each group.
+# TG: might be good to run this one with your groups. e.g. pca <- custom.subsets(...) so that we can check if 6D is enough for each group.
+# JK:TG: per ecoregion or just mig vs residents for whole of Britain?
+
 
 
 avospace <- as_tibble(pca$x, rownames = "species") %>%
@@ -184,6 +186,10 @@ eco_season_pca <- assemb %>%
 
 # save full traitspace with seasonal metadata (ecoregion, season, mig status, months present, months present in each season)
 write.csv(eco_season_pca, "eco_region_season_traitspace_PCA_BI.csv")
+
+# check that dimensions are ok for groups:
+
+pca <- custom.subsets()
 
 
 # 2. AVONET beakspace only (+size)---------
@@ -231,6 +237,7 @@ eco_beak_pca <- assemb %>%
 write.csv(eco_beak_pca, "eco_region_traitspace_PCA_beak_BI.csv")
 
 
+
 # Check trait loadings-----------------
 
 # full traitspace
@@ -250,7 +257,7 @@ beak_loadings <- as.data.frame(beak_pca$rotation)[1:4] # loadings for PCs 1-4 # 
 
 # @@@JK to TG: does this make sense? I think given this, I will use the full trait space, or I could use the sheffield beak space but I think I may get the new dataset from Gavin later
 # TG: it's worth checking how you're going to the loading thingy together. Are you just measuring the correlation between your input variables and the output PC axes? I think in general loadings can be useful for exploring the traitspace and having a vague understanding but in effect, to demonstrate properly it requires much more work. TL:DR; PCA ranks the correlations between your variables hierachically, it doesn't try to understand what variable explains what. E.g. PC5 is the major axes of variance-covariance in your dataset once you've removed the 4 first major axes of variance-covariance.
-
+# yes just looking at correlation between variable and PC axes
 
 # plot loadings for full traitspace---------------------
 

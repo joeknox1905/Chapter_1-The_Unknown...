@@ -13,7 +13,7 @@ Chapter 1:
 
 
 To do:
-
+[] go through comments and enact
 [] finish r stats
 [] visualise groups in traitspace and interpret (with a pinch of salt)
 [] visualise as seasons (join from assemb/seasonal pool.aoh)

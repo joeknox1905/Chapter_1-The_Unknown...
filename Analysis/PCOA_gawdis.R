@@ -86,7 +86,7 @@ morph_traits <- avonet_traits %>%
 
 
 # Log absolute traits (excluding HWI which is a ratio? or excluding completely?)
-  # TG: In general I would avoid ratios, especially if they are based on some variables already present. E.g. if HWI = BeakWidth/BeakDepth you're effectively counting these two variables twice compared to the other ones not in a ratio. Also, logging is probably not a problem here but it should not be an automatic thing (e.g. why do you need to log the data? If the answer is "because that's just what people do", you probably should not log the data).
+# TG: In general I would avoid ratios, especially if they are based on some variables already present. E.g. if HWI = BeakWidth/BeakDepth you're effectively counting these two variables twice compared to the other ones not in a ratio. Also, logging is probably not a problem here but it should not be an automatic thing (e.g. why do you need to log the data? If the answer is "because that's just what people do", you probably should not log the data).
 morph_traits <- morph_traits %>%
   mutate(
     LogBodyMass = log(Mass),
@@ -228,7 +228,9 @@ biplot(pcoa3, rel_morph_traits) # seems like HWI and body mass have large influe
 eig_percent <- round(pcoa3$values$Relative_eig * 100, 2) # @@@JK to TG: variance explains adds to more than 100? # TG: hehehe, that's probably not what it should be doing ;) but we can see where it's going wrong. Maybe because of some correction steps above?
 
 
-# TG: dispRi-tip if you plot them through dispRity you get the dimensions stuff automatically ( plot.dispRity(pcoa_axes, type = "preview") ).
+# TG:done dispRi-tip if you plot them through dispRity you get the dimensions stuff automatically ( plot.dispRity(pcoa_axes, type = "preview") ).
+
+
 
 ggplot(pcoa_axes, aes(x = Axis.1, y = Axis.2, colour = species)) +
   geom_point(size = 3, alpha = 0.8) +
@@ -238,3 +240,38 @@ ggplot(pcoa_axes, aes(x = Axis.1, y = Axis.2, colour = species)) +
     title = "Ordination axes 1 v 2"
   ) +
   theme(legend.position = "none") # need to add loadings if decide to use rather than pca, not sure how to do this with ggplot yet.
+
+
+# plot with disprity---------------
+
+pcoa_axes <- pcoa_axes %>%
+column_to_rownames("species") %>%
+  as.matrix() 
+
+
+plot.dispRity(pcoa_axes, type = "preview") # PC1 v 2
+plot.dispRity(pcoa_axes, type = "preview", specific.args = list(dimensions = c(2, 4))) # PC2 V 4 etc
+
+
+#get specific subsets--------------
+
+mig_mat <- eco_pcoa  %>%
+distinct(species) %>%
+select(paste0("PC"[]) %in% status = "migrant") %>%
+column_to_rownames("species") %>%
+as.matrix() 
+
+res_mat <- eco_pcoa  %>%
+distinct(species) %>%
+select(paste0("PC"[]) %in% status = "resident") %>%
+column_to_rownames("species") %>%
+as.matrix() 
+
+#check that dimensions are enough per group
+
+
+select.axes(pcoa3$vectors<- custom.subsets(groups = c(mig_res, mig_mat), threshold = 0.95, inc.threshold = TRUE))
+
+#would i need to select axes per ecoregion?
+
+plot.dispRity(pcoa_axes, type = "preview", specific.args = list(dimensions = c(2, 4), matrix= c(mig_mat, res_mat))) #? for subsets

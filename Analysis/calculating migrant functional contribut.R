@@ -131,7 +131,8 @@ disparity_result<- disparity_result %>% #need disparity summary from calculate.d
 group_by(group =group) %>%
 summarise(mean_ellips_cont = mean(disparity_result$obs))  #get mean ellipse contribution (bootstrapped and rarefied) of each group
 
-t.test((mean_ellips_cont ~ group, data = disparity_result )) # welches t test accounts for unequal variance of groups
+t.test((mean_ellips_cont ~ group, data = disparity_result )) # welches t test accounts for unequal variance of groups, 
+#data points are independent so satisfies assumption as different species in each migrant group per ecoseason (partial migrants are residents)
 
 }
 

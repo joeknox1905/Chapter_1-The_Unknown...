@@ -13,13 +13,17 @@ BI_traitspace<- ("") # full Britain and Ireland trait space or beak-only AVONET 
 season_eco_region_traitspace<- ("")
 
 #JK to TG: (PC scores are created from the full traitspace for Britain and Ireland) so for each ecoregion, migrant and resident group centroids will be relative to the full Britain and Ireland species traitspace- is this ok if I am focusing on local (ecoregional) functional diversity?
+#TG: I think so. I have the feeling (not sure about it) that using full traitspaces and focusing on regions of the full traitspace leads to better results (but might be wrong there).
 
 #------------function to get migratory status for each ecoregion based on binary definition------------------
 
 
 detect.migrants.binary <- function(traitspace, eco) {
   out <- setNames(vector("list", length(eco)), eco)  #return list of rows of migrants and residents by binary year-round vs not-year-round defintion for each ecoregion
+  #TG: nice trick of predifining ouputs. You'll want to do it for the d variable as well though. Or better yet, we can have a chat on how to make it not into a for loop.
   
+  #TG: pro-tip for future Joe. It'll make your code much easier to read if you avoid one letter objects. E.g. d can become filtered_space or something like that. And i can become one_ecoregion. Also, you can try to avoid generic names like "out", might be better to call it what it is: filtered_list or something like that,
+
   for (i in eco) {
     d <- traitspace %>%
       filter(ecoregion == i) %>%
@@ -30,6 +34,7 @@ detect.migrants.binary <- function(traitspace, eco) {
       resident = d %>% filter(status == "resident")  %>% select(-ecoregion, -status) %>% column_to_rownames("species"))
   } 
   out 
+  #TG: for consistency, I would suggest you explicitly call the return to a function (e.g. here: return(out)). This is so that when the function becomes more complex, it's still clear what is/are the returns.
 }
 
 
@@ -65,6 +70,8 @@ out <- setNames(vector("list", length(eco)), eco) #list of rows of migrant by mo
       resident = d %>% filter(n_year_month == 1 %>% select(-ecoregion, -status) %>% column_to_rownames("species"),
     )
   } 
+  #TG: this probably needs to be automatised in another way. I'm assuming your taking one month out at the time? We can chat about it at some point.
+
   out #returns list of PC scores by ecoregion and monthly migratory status
 }
 

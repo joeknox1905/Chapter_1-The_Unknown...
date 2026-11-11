@@ -86,6 +86,7 @@ morph_traits <- avonet_traits %>%
 
 
 # Log absolute traits (excluding HWI which is a ratio? or excluding completely?)
+  # TG: In general I would avoid ratios, especially if they are based on some variables already present. E.g. if HWI = BeakWidth/BeakDepth you're effectively counting these two variables twice compared to the other ones not in a ratio. Also, logging is probably not a problem here but it should not be an automatic thing (e.g. why do you need to log the data? If the answer is "because that's just what people do", you probably should not log the data).
 morph_traits <- morph_traits %>%
   mutate(
     LogBodyMass = log(Mass),
@@ -174,6 +175,7 @@ attr(dist_mat, "weights") # get weights of each group
 
 # pcoa on gawdis distance matrix using base r,
 # @@@ JK to TG: hopefully this is the right approach; 23 dimensions seems like quite a lot, 175 is way too many no?
+# TG: we can walk through the whole procedure on our meeting on Friday. It's not clear to me why you go through all these steps here (residuals and shit). Not saying it's the wrong way but as my comment above for the logs, it needs to be justified for you and done in consciousness ;). But otherwise, no, 23 dimensions is totally fine. With PCoA, you tend to have $number_of_elements - 2$ dimensions because the distance step tend to spread the variance more evenly.
 
 pcoa1 <- wcmdscale(d = dist_mat, eig = TRUE)
 
@@ -223,8 +225,10 @@ barplot(pcoa3$values$Relative_eig[1:23]) # seems like first 5  or at least first
 biplot(pcoa3, rel_morph_traits) # seems like HWI and body mass have large influence on pc1 v 2
 
 # getting variance explained by eigen values
-eig_percent <- round(pcoa3$values$Relative_eig * 100, 2) # @@@JK to TG: variance explains adds to more than 100?
+eig_percent <- round(pcoa3$values$Relative_eig * 100, 2) # @@@JK to TG: variance explains adds to more than 100? # TG: hehehe, that's probably not what it should be doing ;) but we can see where it's going wrong. Maybe because of some correction steps above?
 
+
+# TG: dispRi-tip if you plot them through dispRity you get the dimensions stuff automatically ( plot.dispRity(pcoa_axes, type = "preview") ).
 
 ggplot(pcoa_axes, aes(x = Axis.1, y = Axis.2, colour = species)) +
   geom_point(size = 3, alpha = 0.8) +

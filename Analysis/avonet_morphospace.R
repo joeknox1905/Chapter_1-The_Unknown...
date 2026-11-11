@@ -84,7 +84,6 @@ morph_traits <- avonet_traits %>%
     Tarsus.Length, Wing.Length, Secondary1, Tail.Length, Mass, Kipps.Distance, Hand.Wing.Index
   )
 
-
 # Log absolute traits (excluding HWI which is a ratio? or excluding completely?)
 morph_traits <- morph_traits %>%
   mutate(
@@ -140,6 +139,8 @@ rel_morph_traits <- morph_traits %>%
   ) %>%
   column_to_rownames("species")
 
+# TG: Note that the two bits above can probably be functionalised. Like using something like my_residual_data <- apply(my_data, 2, get.residuals)
+
 
 # Check correlations among morphological traits
 ggcorrplot(cor(rel_morph_traits[, 1:11]), hc.order = TRUE) # note that body mass only correlates with HWI as it is a raw ratio, so mass has a small influence on traitspace.
@@ -149,6 +150,7 @@ pca <- prcomp(rel_morph_traits, scale. = TRUE) # scale
 
 select.axes(pca, threshold = 0.95, inc.threshold = TRUE) # select axes using disprity
 # 6 dimensions needed
+#TG: might be good to run this one with your groups. e.g. pca <- custom.subsets(...) so that we can check if 6D is enough for each group.
 
 
 avospace <- as_tibble(pca$x, rownames = "species") %>%
@@ -163,7 +165,8 @@ pca_variance <- summary(pca)$importance %>%
   rename(
     SD = `Standard deviation`, Proportion_of_Variance = `Proportion of Variance`,
     Cumulative_Proportion = `Cumulative Proportion`
-  ) # PC1-6 explain 95.1% of variance (>95% threshold); PC1 less dominant than when body mass is not controlled for (26.3% of variance)
+  ) # PC1-6 explain 95.1% of variance (>95% threshold); PC1 less dominant than when body mass is not controlled for (26.3% of variance) #TG: classic! Nice one though
+
 
 kable(pca_variance, align = rep("c", ncol(pca_variance)))
 
@@ -246,6 +249,7 @@ beak_loadings <- as.data.frame(beak_pca$rotation)[1:4] # loadings for PCs 1-4 # 
 # but this is not ideal as HWI is known to be an important migratory trait.
 
 # @@@JK to TG: does this make sense? I think given this, I will use the full trait space, or I could use the sheffield beak space but I think I may get the new dataset from Gavin later
+# TG: it's worth checking how you're going to the loading thingy together. Are you just measuring the correlation between your input variables and the output PC axes? I think in general loadings can be useful for exploring the traitspace and having a vague understanding but in effect, to demonstrate properly it requires much more work. TL:DR; PCA ranks the correlations between your variables hierachically, it doesn't try to understand what variable explains what. E.g. PC5 is the major axes of variance-covariance in your dataset once you've removed the 4 first major axes of variance-covariance.
 
 
 # plot loadings for full traitspace---------------------

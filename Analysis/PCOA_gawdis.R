@@ -184,21 +184,6 @@ select.axes(eco_pcoa_groups, threshold = 0.95, inc.threshold = TRUE) # get dimen
 
 # check that dimesnsions are ok for groups in seasonal migrant contribution analysis:
 
-# join metadata (migratory status, monthly presence)
-eco_pcoa_season <- assemb %>% avospace() <- as_tibble(pcoa3$vectors, rownames = "species") %>%
-  select(species, all_of(paste0("Axis")))
-distinct(ecoregion, season, species, status, n_month_year, n_month_season) %>%
-  inner_join(avospace, by = "species")
-
-eco_season_mig_group <- eco_pcoa_season %>%
-  distinct(ecoregion, season, species, status) %>%
-  {
-    split(.$species, paste(.$ecoregion, .$status, sep = "_"))
-  } # create migrant groups by species, ecoregion and status (1 row)
-
-
-eco_season_pca_groups <- custom.subsets(pcoa3$vectors, group = eco_season_mig_group) # split pca by ecoregion and status to keep relative to full BI traitspace
-select.axes(eco_season_pca_groups, threshold = 0.95, inc.threshold = TRUE) # get dimensions necessary for each group
 
 
 pcoa_axes <- pcoa3$vectors[, 1:23] # save pcoa points for axes with positive eigen values

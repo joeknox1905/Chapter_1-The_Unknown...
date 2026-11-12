@@ -129,7 +129,7 @@ dev.off()
 avospace <- as_tibble(pca$x, rownames = "species") %>%
   select(species, starts_with(paste0("PC")))
 
-# check that dimensions are ok for groups in yearly migrant contribution analysis:
+# check that dimensions are ok for groups in yearly migrant contribution analysis---
 
 # join metadata (migratory status, monthly presence)
 eco_pca <- assemb %>%
@@ -145,7 +145,6 @@ eco_mig_group <- eco_pca %>%
 lengths(eco_mig_group) # 15 to 119 species per group
 
 # select.axes on subsetted ecoregional migrant group matrices
-
 year_eco_mig_axes <- select.axes(pca, group = eco_mig_group, threshold = 0.95, inc.threshold = TRUE)
 # get dimensions necessary for each group
 
@@ -159,7 +158,7 @@ pdf("PCA_axes_variance_explained_by_ecoregion_status_year_group.pdf", width = 14
 plot(year_eco_mig_axes)
 dev.off()
 
-# check that dimesnsions are ok for groups in seasonal migrant contribution analysis:
+# check that dimesnsions are ok for groups in seasonal migrant contribution analysis-----
 
 # join metadata (migratory status, monthly presence)
 

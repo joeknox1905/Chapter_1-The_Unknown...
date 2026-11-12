@@ -179,7 +179,7 @@ group.distance.to.annual.centroid <- function(matrix1, matrix2) {
       matrix2 <- matrix1[-i, ] #remove species from trait space 
       # Calculate ellipsoid volume for each species
     }
-    return(ellipsoid.volume(matrix1)-(ellipsoid.volume(matrix2)) = #ellipsoid volume contribution of each species return ellipsoid volume of species trait space occupation i.e. their functional diversity- larger = more unique/ less redundant contribution as species will become more clustered, suggesting the species is further from other species in trait space
+    return(ellipsoid.volume(matrix1)-(ellipsoid.volume(matrix2)) #= #ellipsoid volume contribution of each species return ellipsoid volume of species trait space occupation i.e. their functional diversity- larger = more unique/ less redundant contribution as species will become more clustered, suggesting the species is further from other species in trait space
 
   }
 

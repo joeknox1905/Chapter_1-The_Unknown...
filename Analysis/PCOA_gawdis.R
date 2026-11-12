@@ -54,12 +54,12 @@ avonet_lookup <- c(
   Luscinia_svecica = "Cyanecula_svecica"
 )
 
-# join all eleven traits to all species in British Isles,
+# join all ten traits to all species in British Isles, excluding HWI which is a ratio of kipps distance/wing length x100
 avonet_traits <- tibble(species = spp_name, ) %>%
   mutate(lookup_name = coalesce(avonet_lookup[species], species)) %>%
   left_join(avonet %>% select(
     species, Beak.Length_Culmen, Beak.Length_Nares, Beak.Width, Beak.Depth,
-    Tarsus.Length, Wing.Length, Secondary1, Tail.Length, Mass, Kipps.Distance, Hand.Wing.Index
+    Tarsus.Length, Wing.Length, Secondary1, Tail.Length, Mass, Kipps.Distance
   ), by = c("lookup_name" = "species")) %>%
   dplyr::select(-lookup_name)
 
@@ -70,9 +70,6 @@ avonet_na_any <- avonet_traits %>%
 avonet_na_all <- avonet_traits %>%
   filter(if_all(-species, is.na)) %>%
   print()
-
-# save trait matrix yearly
-write.csv(avonet_traits, "avonet_traits_BI_avg_raw_yearly.csv")
 
 
 # control for size in morphological traits (Williams and CUrley, 2025 residuals method)------------------
@@ -106,8 +103,8 @@ ggcorrplot(cor(my_residual_data[, 1:10]), hc.order = TRUE) # correlated variable
 # get groups for gawdis as allows for grouping of traits (i.e. HWI correlated with body mass, beak length traits correlated, wing traits correlated, wing and tail traits correlated)
 
 my_residual_data <- rel_morph_traits %>%
-  select(1:11) %>%
-  scale() # scale traits
+  select(1:10) %>%
+  scale() # scale traits JK:TG:new<- not sure if I need to scale if scaling by weights with gawdis below?
 
 
 # Create distance matrix of species using functional traits (WIlliams and Curley, 2025) based on trait correlations
@@ -130,7 +127,7 @@ attr(dist_mat, "weights") # get weights of each group
 # fairly even, beak shape given most weight (0.22), followed by body mass, beak length, wing length, tarsus length and wing/tail length (0.15)
 
 
-# Perform PCOA-----------
+# Perform PCOA--------------
 
 # pcoa on gawdis distance matrix using base r,
 # @@@ JK to TG: hopefully this is the right approach; 23 dimensions seems like quite a lot, 175 is way too many no?
@@ -152,19 +149,28 @@ pcoa3 <- ape::pcoa(dist_mat) # without correction
 
 select.axes(pcoa1$points, threshold = 0.95, inc.threshold = TRUE) # 23 dimensions?-
 select.axes(pcoa2$points, threshold = 0.95, inc.threshold = TRUE) # 175 dimensions? WHAT??
-select.axes(pcoa3$vectors, threshold = 0.95, inc.threshold = TRUE) # 23 dimensions are needed? #note that this gets the axes with positive eigenvalues
+full_space_axes <- select.axes(pcoa3$vectors, threshold = 0.95, inc.threshold = TRUE) # 23 dimensions are needed? #note that this gets the axes with positive eigenvalues
 
 
-# so both ape::pcoa and vegan::wmdscale() perform similarly
+# Both ape::pcoa and vegan::wmdscale() perform similarly so using ape-------------
 
-# using ape---------------
+pca <- prcomp(my_residual_data, scale. = TRUE) # scale
+
+full_space_axes <- select.axes(pcoa3$vectors, threshold = 0.95, inc.threshold = TRUE) # select axes using disprity
+
+
+summary(full_space_axes) # PCs1:7 explain 97.7% of variance
+
+pdf("PCOA_axes_variance_explained_full_BI_space", width = 14, height = 10)
+plot(full_space_axes)
+dev.off()
 
 
 # create dataframe with tibble for joining metadata
 avospace <- as_tibble(pcoa3$vectors, rownames = "species") %>%
-  select(species, all_of(paste0("Axis")))
+  select(species, starts_with(paste0("PC")))
 
-# check that dimensions are ok for groups in yearly migrant contribution analysis:
+# check that dimensions are ok for groups in yearly migrant contribution analysis-------
 
 # join metadata (migratory status, monthly presence)
 eco_pcoa <- assemb %>%
@@ -175,16 +181,85 @@ eco_mig_group <- eco_pcoa %>%
   distinct(ecoregion, species, status) %>%
   {
     split(.$species, paste(.$ecoregion, .$status, sep = "_"))
-  } # create migrant groups by species, ecoregion and status (1 row)
+  } # list of species in each migrant group by ecoregion
+
+lengths(eco_mig_group) # 15 to 119 species per group
+
+# select.axes on subsetted ecoregional migrant group matrices
+year_eco_mig_axes <- select.axes(pcoa3$vectors, group = eco_mig_group, threshold = 0.95, inc.threshold = TRUE)
+# get dimensions necessary for each group
+
+# 7 dimensions ok!
+
+plot(year_eco_mig_axes) # JK:TG:new<-this is cool- can see that PC3 explains most variance in european atlantic forest residents but not migrants and that PC2 explains most variance in caledon confifer forest migrants but not residents!
+
+summary(year_eco_mig_axes) # explains 95.5 to 98.1% of variance across ecoregions and migrant groups
+
+pdf("PCOA_axes_variance_explained_by_ecoregion_status_year_group.pdf", width = 14, height = 10)
+plot(year_eco_mig_axes)
+dev.off()
+
+# check that dimesnsions are ok for groups in seasonal migrant contribution analysis-----
+
+# join metadata (migratory status, monthly presence)
+
+eco_season_pcoa <- assemb %>%
+  distinct(ecoregion, species, season, status, n_month_year, n_month_season) %>%
+  inner_join(avospace, by = "species")
+
+eco_season_mig_group <- eco_season_pcoa %>%
+  distinct(ecoregion, season, species, status) %>%
+  {
+    split(.$species, paste(.$ecoregion, .$status, .$season, sep = "_"))
+  } # list of species in each migrant group by ecoregion and season
+
+lengths(eco_season_mig_group) # 15 to 102 species per group
+
+# select.axes on subsetted ecoregional migrant group matrices
+
+season_eco_mig_axes <- select.axes(pcoa3$vectors, group = eco_season_mig_group, threshold = 0.95, inc.threshold = TRUE)
+# get dimensions necessary for each group
+
+# 7 dimensions ok!
+
+plot(season_eco_mig_axes)
+
+summary(season_eco_mig_axes) # explains 95.5 to 98.2% of variance
+
+pdf("PCOA_axes_variance_explained_by_ecoregion_status_season_group.pdf", width = 14, height = 10)
+plot(season_eco_mig_axes)
+dev.off()
+
+# JK to JK:TG:new<- can see from this crap plot (too many groups) that actually season does not seem to have much of an effect on the variance of trait space across any ecoregion. BUT for European Atlantic forests, residents are much more spread across PC3 than migrants.
 
 
-eco_pcoa_groups <- custom.subsets(pcoa3$vectors, group = eco_mig_group) # split pca by ecoregion and status to keep relative to full BI traitspace
-select.axes(eco_pcoa_groups, threshold = 0.95, inc.threshold = TRUE) # get dimensions necessary for each group
+# checking monthly migrant defintion groups for the yearly analysis------------------
 
 
-# check that dimesnsions are ok for groups in seasonal migrant contribution analysis:
+eco_month_mig_group <- eco_pcoa %>%
+  distinct(ecoregion, n_month_year, species) %>%
+  {
+    split(.$species, paste(.$ecoregion, .$n_month_year, sep = "_"))
+  } # list of species in each group by ecoregion and number of months present (more granular migratory status definition)
+
+lengths(eco_month_mig_group) # JK:TG:new<- only one ecoregion (Caledon conifer forests) has migrant present in only one month of the year
+# 1 to 72 species per group- this why the species-level ellpisoid.contribution metric I made will work better than metrics that work between groups for this monthly analysis
+
+# select.axes on subsetted ecoregional migrant group matrices
+
+# 7 dimensions again fine
+
+eco_month_axes <- select.axes(pcoa3$vectors, group = eco_month_mig_group, threshold = 0.95, inc.threshold = TRUE)
+# get dimensions necessary for each group
+
+summary(eco_month_axes) # PC7 explains 95.8 to 98.9% of variance in all groups (apart from migrant_month1 where is NA)
+
+pdf("PCOA_axes_variance_explained_by_ecoregion_mon_present_group.pdf", width = 14, height = 10)
+plot(eco_month_axes)
+dev.off() # JK:TG:new<-cannot plot due to lack of species present in only 1 month of year
 
 
+# save trait space with required dimension number------------------
 
 pcoa_axes <- pcoa3$vectors[, 1:23] # save pcoa points for axes with positive eigen values
 
@@ -201,18 +276,17 @@ eco_pcoa <- assemb %>%
 write_csv(eco_pcoa, "eco_region_traitspace_PCOA_BI.csv")
 
 
-# plot PCOA pc1 v 2 and compare to pca-----------------
+#-----------------get "loadings"---------------
 
 
-# getting variance explained by eigen values
+# getting variance explained by eigen values?
 eig_percent <- round(pcoa3$values$Relative_eig * 100, 2) # @@@JK to TG: variance explains adds to more than 100? # TG: hehehe, that's probably not what it should be doing ;) but we can see where it's going wrong. Maybe because of some correction steps above?
-
-
-# TG:done dispRi-tip if you plot them through dispRity you get the dimensions stuff automatically ( plot.dispRity(pcoa_axes, type = "preview") ).
 
 
 # plot with disprity---------------
 
+# create yearly ecoregion x migratory status subsets
+eco_year_subsets <- custom.subsets(pcoa3$vectors, group = eco_mig_group)
 
 plot.dispRity(pcoa_axes, type = "preview") # PC1 v 2
 plot.dispRity(pcoa_axes, type = "preview", specific.args = list(dimensions = c(2, 4))) # PC2 V 4 etc

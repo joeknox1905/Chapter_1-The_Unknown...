@@ -13,7 +13,8 @@ Chapter 1:
 
 
 To do:
-[] go through comments and enact
+[] go through comments and enact (wait till meeting)
+[] Run PCOA script
 [] finish r stats
 [] visualise groups in traitspace and interpret (with a pinch of salt)
 [] visualise as seasons (join from assemb/seasonal pool.aoh)

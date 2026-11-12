@@ -5,7 +5,7 @@
 # HWI may also be useful for calculating dispersal buffers later (Stewart et al., 2022).
 # Then, following Williams and Curley (2025), to control for size, it takes the residuals of the averaged and logged PC traits against
 # logged body mass to control for the strong correlation of body mass with size and better distinguish between species with similar body masses but different
-# traits (Weeks et al., 2026). These size-relative traits are used for all except HWI which is a ratio.
+# traits (Weeks et al., 2026). These size-relative traits are used for all traits except body mass (for obvious reasons).
 # It a beak only traitspace and a non-beak only trait space to assess which traits are important in characterising the avian trait space and the migrant vs resident traitspace.
 # These comparisons are repeated excluding HWI and kipps distance (as in Keyser et al., 2022) as likely highly correlated and shown to skew PC1 and 2 comapred to non-beak traitspace.
 # see chapter 1 script)
@@ -57,12 +57,12 @@ avonet_lookup <- c(
   Luscinia_svecica = "Cyanecula_svecica"
 )
 
-# join all eleven traits to all species in British Isles,
+# join all ten traits to all species in British Isles,
 avonet_traits <- tibble(species = spp_name, ) %>%
   mutate(lookup_name = coalesce(avonet_lookup[species], species)) %>%
   left_join(avonet %>% select(
     species, Beak.Length_Culmen, Beak.Length_Nares, Beak.Width, Beak.Depth,
-    Tarsus.Length, Wing.Length, Secondary1, Tail.Length, Mass, Kipps.Distance, Hand.Wing.Index
+    Tarsus.Length, Wing.Length, Secondary1, Tail.Length, Mass, Kipps.Distance
   ), by = c("lookup_name" = "species")) %>%
   dplyr::select(-lookup_name)
 
@@ -77,89 +77,139 @@ avonet_na_all <- avonet_traits %>%
 
 # control for size in morphological traits (Williams and CUrley, 2025 residuals method)------------------
 
-# AVONET morphological traits
+# AVONET morphological traits- removing HWI as it is a ratio
 morph_traits <- avonet_traits %>%
   select(
     species, Beak.Length_Culmen, Beak.Length_Nares, Beak.Width, Beak.Depth,
-    Tarsus.Length, Wing.Length, Secondary1, Tail.Length, Mass, Kipps.Distance, Hand.Wing.Index
-  )
-
-# Log absolute traits (excluding HWI which is a ratio? or excluding completely?)
-morph_traits <- morph_traits %>%
-  mutate(
-    LogBodyMass = log(Mass),
-    LogBeakLengthCulmen = log(Beak.Length_Culmen),
-    LogBeakLengthNares = log(Beak.Length_Nares),
-    LogBeakWidth = log(Beak.Width),
-    LogBeakDepth = log(Beak.Depth),
-    LogTarsusLength = log(Tarsus.Length),
-    LogKippsDistance = log(Kipps.Distance),
-    LogWingLength = log(Wing.Length),
-    LogSecondary1 = log(Secondary1),
-    LogTailLength = log(Tail.Length)
-  )
-
-# Calculate morphological traits relative to body mass, not HWI which is a ratio
-
-rel_morph_traits <- morph_traits %>%
-  mutate(
-    RelBeakLengthCulmen = lm(LogBeakLengthCulmen ~ LogBodyMass,
-      data = morph_traits
-    )$residuals,
-    RelBeakLengthNares = lm(LogBeakLengthNares ~ LogBodyMass,
-      data = morph_traits
-    )$residuals,
-    RelBeakWidth = lm(LogBeakWidth ~ LogBodyMass,
-      data = morph_traits
-    )$residuals,
-    RelBeakDepth = lm(LogBeakDepth ~ LogBodyMass,
-      data = morph_traits
-    )$residuals,
-    RelTarsusLength = lm(LogTarsusLength ~ LogBodyMass,
-      data = morph_traits
-    )$residuals,
-    RelKippsDistance = lm(LogKippsDistance ~ LogBodyMass,
-      data = morph_traits
-    )$residuals,
-    RelWingLength = lm(LogWingLength ~ LogBodyMass,
-      data = morph_traits
-    )$residuals,
-    RelSecondary1 = lm(LogSecondary1 ~ LogBodyMass,
-      data = morph_traits
-    )$residuals,
-    RelTailLength = lm(LogTailLength ~ LogBodyMass,
-      data = morph_traits
-    )$residuals
-  ) %>%
-  select(
-    species, LogBodyMass, RelBeakLengthCulmen,
-    RelBeakLengthNares, RelBeakWidth, RelBeakDepth,
-    RelTarsusLength, RelKippsDistance, Hand.Wing.Index,
-    RelWingLength, RelSecondary1, RelTailLength
+    Tarsus.Length, Wing.Length, Secondary1, Tail.Length, Mass, Kipps.Distance
   ) %>%
   column_to_rownames("species")
 
-# TG: Note that the two bits above can probably be functionalised. Like using something like my_residual_data <- apply(my_data, 2, get.residuals)
+# Log body mass for function call
+LogMass <- log(morph_traits$Mass)
+
+# Log and transform morphological traits relative to body mass (residuals)
+get.residuals <- function(x) {
+  LogTrait <- log(x)
+  ResTrait <- lm(LogTrait ~ LogMass)$residuals
+}
+
+res_traits <- apply(morph_traits[, -9], 2, get.residuals) # apply to all columns except body mass
+colnames(res_traits) <- paste0("Res", colnames(res_traits)) # rename to reflective relative trait values
+my_residual_data <- cbind(res_traits, LogMass)
+
+# TG:done Note that the two bits above can probably be functionalised. Like using something like my_residual_data <- apply(my_data, 2, get.residuals)
 
 
-# Check correlations among morphological traits
-ggcorrplot(cor(rel_morph_traits[, 1:11]), hc.order = TRUE) # note that body mass only correlates with HWI as it is a raw ratio, so mass has a small influence on traitspace.
+# Check correlations among logged morphological traits
+ggcorrplot(cor(my_residual_data[, 1:10]), hc.order = TRUE)
+
+# body mass not correlated with anything so effectively removes allometry
+# main correlations (can use for PCOA groups):
+# beak length traits
+# beak shape traits (width +depth)
+# wing length and pointiness (kipps distance)
+# tail length and first flight feather (secondary 1)
 
 # Perform PCA--------------
-pca <- prcomp(rel_morph_traits, scale. = TRUE) # scale
+pca <- prcomp(my_residual_data, scale. = TRUE) # scale
 
 select.axes(pca, threshold = 0.95, inc.threshold = TRUE) # select axes using disprity
-# 6 dimensions needed
-# TG: might be good to run this one with your groups. e.g. pca <- custom.subsets(...) so that we can check if 6D is enough for each group.
-# JK:TG: per ecoregion or just mig vs residents for whole of Britain?
+# 7 dimensions needed
+# TG:done might be good to run this one with your groups. e.g. pca <- custom.subsets(...) so that we can check if 6D is enough for each group.
 
-
-
+# create dataframe with tibble for joining metadata
 avospace <- as_tibble(pca$x, rownames = "species") %>%
-  select(species, all_of(paste0("PC", 1:6)))
+  select(species, starts_with(paste0("PC")))
+
+# check that dimensions are ok for groups in yearly migrant contribution analysis:
+
+# join metadata (migratory status, monthly presence)
+eco_pca <- assemb %>%
+  distinct(ecoregion, species, status, n_month_year) %>%
+  inner_join(avospace, by = "species")
+
+eco_mig_group <- eco_pca %>%
+  distinct(ecoregion, species, status) %>%
+  {
+    split(.$species, paste(.$ecoregion, .$status, sep = "_"))
+  } # list of species in each migrant group by ecoregion
 
 
-# explore variance visually---------
+# select.axes on subsetted ecoregional migrant group matrices
+
+year_eco_mig_axes <- select.axes(pca, group = eco_mig_group, threshold = 0.95, inc.threshold = TRUE)
+# get dimensions necessary for each group
+
+# 7 dimensions ok!
+
+plot(year_eco_mig_axes) # JK:TG<- this is cool- can see that PC3 explains most variance in european atlantic forest residents but not migrants and that PC2 explains most variance in caledon confifer forest migrants but not residents!
+
+summary(year_eco_mig_axes) # explains 95.5 to 98.1% of variance across ecoregions and migrant groups
+
+pdf("PCA_axes_variance_explained_by_ecoregion_status_year_group.pdf", width = 14, height = 10)
+plot(year_eco_mig_axes)
+dev.off()
+
+# check that dimesnsions are ok for groups in seasonal migrant contribution analysis:
+
+# join metadata (migratory status, monthly presence)
+
+eco_season_pca <- assemb %>%
+  distinct(ecoregion, species, season, status, n_month_year, n_month_season) %>%
+  inner_join(avospace, by = "species")
+
+eco_season_mig_group <- eco_season_pca %>%
+  distinct(ecoregion, season, species, status) %>%
+  {
+    split(.$species, paste(.$ecoregion, .$status, .$season, sep = "_"))
+  } # list of species in each migrant group by ecoregion and season
+
+
+# select.axes on subsetted ecoregional migrant group matrices
+
+season_eco_mig_axes <- select.axes(pca, group = eco_season_mig_group, threshold = 0.95, inc.threshold = TRUE)
+# get dimensions necessary for each group
+
+# 7 dimensions ok!
+
+plot(season_eco_mig_axes)
+
+summary(season_eco_mig_axes) # explains 95.5 to 98.2% of variance
+
+pdf("PCA_axes_variance_explained_by_ecoregion_status_season_group.pdf", width = 14, height = 10)
+plot(season_eco_mig_axes)
+dev.off()
+
+# JK:TG<- can see from this crap plot (too many groups) that actually season does not seem to have much of an effect on the variance of trait space across any ecoregion. BUT for European Atlantic forests, residents are much more spread across PC3 than migrants.
+
+
+# checking monthly migrant defintion groups for the yearly analysis------------------
+
+
+eco_month_mig_group <- eco_pca %>%
+  distinct(ecoregion, n_month_year, species) %>%
+  {
+    split(.$species, paste(.$ecoregion, .$n_month_year, sep = "_"))
+  } # list of species in each group by ecoregion and number of months present (more granular migratory status definition)
+
+lengths(eco_month_mig_group) # only one ecoregion (Caledon conifer forests) has migrant present in only one month of the year
+
+# select.axes on subsetted ecoregional migrant group matrices
+
+# 7 dimensions again fine
+
+eco_month_axes <- select.axes(pca, group = eco_month_mig_group, threshold = 0.95, inc.threshold = TRUE)
+# get dimensions necessary for each group
+
+summary(eco_month_axes) # PC7 explains 95.8 to 98.9% of variance in all groups (apart from migrant_month1 where is NA)
+
+pdf("PCA_axes_variance_explained_by_ecoregion_mon_present_group.pdf", width = 14, height = 10)
+plot(eco_month_axes)
+dev.off() # TG:JK<- cannot plot due to lack of species present in only 1 month of year
+
+
+# variance as a kable (whole space, no groups)---------
 
 pca_variance <- summary(pca)$importance %>%
   t() %>%
@@ -170,26 +220,21 @@ pca_variance <- summary(pca)$importance %>%
   ) # PC1-6 explain 95.1% of variance (>95% threshold); PC1 less dominant than when body mass is not controlled for (26.3% of variance) #TG: classic! Nice one though
 
 
-kable(pca_variance, align = rep("c", ncol(pca_variance)))
+kable(pca_variance, align = rep("c", ncol(pca_variance))) # save in table
+
+# save 7 axes with metadata----------------------
 
 
-eco_pca <- assemb %>%
-  distinct(ecoregion, species, status, n_month_year) %>%
+avospace_7 <- as_tibble(pca$x, rownames = "species") %>%
+  select(species, any_of(paste0("PC", 1:7)))
+
+
+eco_season_pca_7 <- assemb %>%
+  distinct(ecoregion, species, season, status, n_month_year, n_month_season) %>%
   inner_join(avospace, by = "species")
 
-# save full traitspace with metadata (ecoregion, mig status, months present)
-write.csv(eco_pca, "eco_region_traitspace_PCA_BI.csv")
-
-eco_season_pca <- assemb %>%
-  distinct(ecoregion, species, status, season, n_month_year, n_month_season) %>%
-  inner_join(avospace, by = "species")
-
-# save full traitspace with seasonal metadata (ecoregion, season, mig status, months present, months present in each season)
-write.csv(eco_season_pca, "eco_region_season_traitspace_PCA_BI.csv")
-
-# check that dimensions are ok for groups:
-
-pca <- custom.subsets()
+# save full traitspace with metadata (ecoregion, season, mig status, annual months present, seasonal month present)
+write.csv(eco_season_pca_7, "eco_region_traitspace_PCA_BI.csv")
 
 
 # 2. AVONET beakspace only (+size)---------

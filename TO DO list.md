@@ -19,7 +19,6 @@ To do:
 [] visualise as seasons (join from assemb/seasonal pool.aoh)
 [] run first analysis
 [] Work on report
-[] sort out eduroam
 [] Update README
 [] TNA/PDP
 [] mendeley reference list, export as bib. file

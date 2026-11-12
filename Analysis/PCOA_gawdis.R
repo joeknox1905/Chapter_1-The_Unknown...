@@ -77,91 +77,50 @@ write.csv(avonet_traits, "avonet_traits_BI_avg_raw_yearly.csv")
 
 # control for size in morphological traits (Williams and CUrley, 2025 residuals method)------------------
 
-# AVONET morphological traits
+# 10 AVONET morphological traits (excluding HWI as this = Kipps.Distance/Wing.Length x100; so would just describe variables already considered)
 morph_traits <- avonet_traits %>%
   select(
     species, Beak.Length_Culmen, Beak.Length_Nares, Beak.Width, Beak.Depth,
-    Tarsus.Length, Wing.Length, Secondary1, Tail.Length, Mass, Kipps.Distance, Hand.Wing.Index
+    Tarsus.Length, Wing.Length, Secondary1, Tail.Length, Mass, Kipps.Distance
   )
 
 
-# Log absolute traits (excluding HWI which is a ratio? or excluding completely?)
-# TG: In general I would avoid ratios, especially if they are based on some variables already present. E.g. if HWI = BeakWidth/BeakDepth you're effectively counting these two variables twice compared to the other ones not in a ratio. Also, logging is probably not a problem here but it should not be an automatic thing (e.g. why do you need to log the data? If the answer is "because that's just what people do", you probably should not log the data).
-morph_traits <- morph_traits %>%
-  mutate(
-    LogBodyMass = log(Mass),
-    LogBeakLengthCulmen = log(Beak.Length_Culmen),
-    LogBeakLengthNares = log(Beak.Length_Nares),
-    LogBeakWidth = log(Beak.Width),
-    LogBeakDepth = log(Beak.Depth),
-    LogTarsusLength = log(Tarsus.Length),
-    LogKippsDistance = log(Kipps.Distance),
-    LogWingLength = log(Wing.Length),
-    LogSecondary1 = log(Secondary1),
-    LogTailLength = log(Tail.Length)
-  )
+# TG:done In general I would avoid ratios, especially if they are based on some variables already present. E.g. if HWI = BeakWidth/BeakDepth you're effectively counting these two variables twice compared to the other ones not in a ratio. Also, logging is probably not a problem here but it should not be an automatic thing (e.g. why do you need to log the data? If the answer is "because that's just what people do", you probably should not log the data).
 
-# Calculate morphological traits relative to body mass, not HWI which is a ratio
+# Log body mass for function call
+LogMass <- log(morph_traits$Mass)
 
-rel_morph_traits <- morph_traits %>%
-  mutate(
-    RelBeakLengthCulmen = lm(LogBeakLengthCulmen ~ LogBodyMass,
-      data = morph_traits
-    )$residuals,
-    RelBeakLengthNares = lm(LogBeakLengthNares ~ LogBodyMass,
-      data = morph_traits
-    )$residuals,
-    RelBeakWidth = lm(LogBeakWidth ~ LogBodyMass,
-      data = morph_traits
-    )$residuals,
-    RelBeakDepth = lm(LogBeakDepth ~ LogBodyMass,
-      data = morph_traits
-    )$residuals,
-    RelTarsusLength = lm(LogTarsusLength ~ LogBodyMass,
-      data = morph_traits
-    )$residuals,
-    RelKippsDistance = lm(LogKippsDistance ~ LogBodyMass,
-      data = morph_traits
-    )$residuals,
-    RelWingLength = lm(LogWingLength ~ LogBodyMass,
-      data = morph_traits
-    )$residuals,
-    RelSecondary1 = lm(LogSecondary1 ~ LogBodyMass,
-      data = morph_traits
-    )$residuals,
-    RelTailLength = lm(LogTailLength ~ LogBodyMass,
-      data = morph_traits
-    )$residuals
-  ) %>%
-  select(
-    species, LogBodyMass, RelBeakLengthCulmen,
-    RelBeakLengthNares, RelBeakWidth, RelBeakDepth,
-    RelTarsusLength, RelKippsDistance, Hand.Wing.Index,
-    RelWingLength, RelSecondary1, RelTailLength
-  )
+# Log and transform morphological traits relative to body mass (residuals)
+get.residuals <- function(x) {
+  LogTrait <- log(x)
+  ResTrait<- lm(LogTrait ~ LogMass)$residuals
+}
+
+res_traits <- apply(morph_traits[, -9], 2, get.residuals) # apply to all columns except body mass
+colnames(res_traits) <- paste0("Res", colnames(res_traits))  #rename to reflective relative trait values
+my_residual_data <- cbind(res_traits, LogMass)
 
 
 # Check correlations among morphological traits
-ggcorrplot(cor(rel_morph_traits[, 2:12]), hc.order = TRUE) # correlated variables ordered together
+ggcorrplot(cor(my_residual_data[, 1:10]), hc.order = TRUE) # correlated variables ordered together
 # get groups for gawdis as allows for grouping of traits (i.e. HWI correlated with body mass, beak length traits correlated, wing traits correlated, wing and tail traits correlated)
 
-rel_morph_traits <- rel_morph_traits %>%
-  column_to_rownames("species") %>%
+my_residual_data <- rel_morph_traits %>%
   select(1:11) %>%
   scale() # scale traits
 
 
-# Create distance matrix of species using functional traits (WIlliams and Curley, 2025)
-dist_mat <- gawdis(rel_morph_traits,
+# Create distance matrix of species using functional traits (WIlliams and Curley, 2025) based on trait correlations
+dist_mat <- gawdis(my_residual_data,
   w.type = "analytic", # weights optimised by mathematical algorithm
   groups = c(
-    1, # Body mass # also correlates with HWI but makes sense as larger species tend to have a smaller HWI (as well as sedentary species)
+    1, # Body mass 
     2, 2, # Beak length
     3, 3, # Beak shape (beak depth and width)
     4, # Tarsus length
-    5, 5, # Wing shape (HWI, kipps distance) # hard to differentiate groups here as kipps distance also correlated with wing length but chose based on logic of Williams and Curley 2025 as both measure pointiness of wing. Doesn't change weights much anyway.
-    6, 6, 6
-  ), # Wing/tail length (wing length, tail length and secondary 1)
+    5, 5, # Wing length and pointiness (kipps distance, wing length) # hard to differentiate groups here as kipps distance also correlated with wing length but chose based on logic of Williams and Curley 2025 as both measure pointiness of wing. Doesn't change weights much anyway.
+    6, 6 # Wing width (first secondary length) and tail length
+  ), 
   groups.weight = TRUE
 ) # traits will have different weights within groups as well as between groups
 attr(dist_mat, "weights") # get weights of each group
@@ -193,18 +152,60 @@ pcoa3 <- ape::pcoa(dist_mat) # without correction
 
 select.axes(pcoa1$points, threshold = 0.95, inc.threshold = TRUE) # 23 dimensions?-
 select.axes(pcoa2$points, threshold = 0.95, inc.threshold = TRUE) # 175 dimensions? WHAT??
-select.axes(pcoa3$vectors, threshold = 0.95, inc.threshold = TRUE) # 23 dimensions are needed?
+select.axes(pcoa3$vectors, threshold = 0.95, inc.threshold = TRUE) # 23 dimensions are needed? #note that this gets the axes with positive eigenvalues
 
 
 # so both ape::pcoa and vegan::wmdscale() perform similarly
 
 # using ape---------------
 
+
+# create dataframe with tibble for joining metadata
+avospace <- as_tibble(pcoa3$vectors, rownames = "species") %>%
+  select(species, all_of(paste0("Axis"))) 
+
+# check that dimensions are ok for groups in yearly migrant contribution analysis:
+
+# join metadata (migratory status, monthly presence)
+eco_pcoa <- assemb %>%
+  distinct(ecoregion, species, status, n_month_year) %>%
+  inner_join(avospace, by = "species")
+
+eco_mig_group <- eco_pcoa %>%
+  distinct(ecoregion, species, status) %>%
+  {
+    split(.$species, paste(.$ecoregion, .$status, sep = "_"))
+  } # create migrant groups by species, ecoregion and status (1 row)
+
+
+eco_pcoa_groups <- custom.subsets(pcoa3$vectors, group = eco_mig_group) # split pca by ecoregion and status to keep relative to full BI traitspace
+select.axes(eco_pcoa_groups, threshold = 0.95, inc.threshold = TRUE) # get dimensions necessary for each group
+
+
+# check that dimesnsions are ok for groups in seasonal migrant contribution analysis:
+
+# join metadata (migratory status, monthly presence)
+eco_pcoa_season <- assemb %>%avospace <- as_tibble(pcoa3$vectors, rownames = "species") %>%
+  select(species, all_of(paste0("Axis"))) 
+  distinct(ecoregion, season, species, status, n_month_year, n_month_season) %>%
+  inner_join(avospace, by = "species")
+
+eco_season_mig_group <- eco_pcoa_season %>%
+  distinct(ecoregion, season, species, status) %>%
+  {
+    split(.$species, paste(.$ecoregion, .$status, sep = "_"))
+  } # create migrant groups by species, ecoregion and status (1 row)
+
+
+eco_season_pca_groups <- custom.subsets(pcoa3$vectors, group = eco_season_mig_group) # split pca by ecoregion and status to keep relative to full BI traitspace
+select.axes(eco_season_pca_groups, threshold = 0.95, inc.threshold = TRUE) # get dimensions necessary for each group
+
+
 pcoa_axes <- pcoa3$vectors[, 1:23] # save pcoa points for axes with positive eigen values
 
-rownames(pcoa_axes) <- labels(dist_mat)
 
-pcoa_axes <- pcoa_axes %>%
+
+pcoa_axes_df <- pcoa_axes %>%
   as.data.frame() %>%
   rownames_to_column("species")
 
@@ -218,11 +219,6 @@ write_csv(eco_pcoa, "eco_region_traitspace_PCOA_BI.csv")
 
 # plot PCOA pc1 v 2 and compare to pca-----------------
 
-barplot(pcoa3$values$Relative_eig[1:23]) # seems like first 5  or at least first 10 would be anough to retain?
-
-
-# quick visualisation of PC1 v 2
-biplot(pcoa3, rel_morph_traits) # seems like HWI and body mass have large influence on pc1 v 2
 
 # getting variance explained by eigen values
 eig_percent <- round(pcoa3$values$Relative_eig * 100, 2) # @@@JK to TG: variance explains adds to more than 100? # TG: hehehe, that's probably not what it should be doing ;) but we can see where it's going wrong. Maybe because of some correction steps above?
@@ -232,22 +228,8 @@ eig_percent <- round(pcoa3$values$Relative_eig * 100, 2) # @@@JK to TG: variance
 
 
 
-ggplot(pcoa_axes, aes(x = Axis.1, y = Axis.2, colour = species)) +
-  geom_point(size = 3, alpha = 0.8) +
-  labs(
-    x = paste0("Axis 1 [", eig_percent[1], "%]"),
-    y = paste0("Axis 2 [", eig_percent[2], "%]"),
-    title = "Ordination axes 1 v 2"
-  ) +
-  theme(legend.position = "none") # need to add loadings if decide to use rather than pca, not sure how to do this with ggplot yet.
-
-
 # plot with disprity---------------
-
-pcoa_axes <- pcoa_axes %>%
-column_to_rownames("species") %>%
-  as.matrix() 
-
+ 
 
 plot.dispRity(pcoa_axes, type = "preview") # PC1 v 2
 plot.dispRity(pcoa_axes, type = "preview", specific.args = list(dimensions = c(2, 4))) # PC2 V 4 etc

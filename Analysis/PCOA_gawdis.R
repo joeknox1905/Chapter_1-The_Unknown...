@@ -93,11 +93,11 @@ LogMass <- log(morph_traits$Mass)
 # Log and transform morphological traits relative to body mass (residuals)
 get.residuals <- function(x) {
   LogTrait <- log(x)
-  ResTrait<- lm(LogTrait ~ LogMass)$residuals
+  ResTrait <- lm(LogTrait ~ LogMass)$residuals
 }
 
 res_traits <- apply(morph_traits[, -9], 2, get.residuals) # apply to all columns except body mass
-colnames(res_traits) <- paste0("Res", colnames(res_traits))  #rename to reflective relative trait values
+colnames(res_traits) <- paste0("Res", colnames(res_traits)) # rename to reflective relative trait values
 my_residual_data <- cbind(res_traits, LogMass)
 
 
@@ -114,13 +114,13 @@ my_residual_data <- rel_morph_traits %>%
 dist_mat <- gawdis(my_residual_data,
   w.type = "analytic", # weights optimised by mathematical algorithm
   groups = c(
-    1, # Body mass 
+    1, # Body mass
     2, 2, # Beak length
     3, 3, # Beak shape (beak depth and width)
     4, # Tarsus length
     5, 5, # Wing length and pointiness (kipps distance, wing length) # hard to differentiate groups here as kipps distance also correlated with wing length but chose based on logic of Williams and Curley 2025 as both measure pointiness of wing. Doesn't change weights much anyway.
     6, 6 # Wing width (first secondary length) and tail length
-  ), 
+  ),
   groups.weight = TRUE
 ) # traits will have different weights within groups as well as between groups
 attr(dist_mat, "weights") # get weights of each group
@@ -162,7 +162,7 @@ select.axes(pcoa3$vectors, threshold = 0.95, inc.threshold = TRUE) # 23 dimensio
 
 # create dataframe with tibble for joining metadata
 avospace <- as_tibble(pcoa3$vectors, rownames = "species") %>%
-  select(species, all_of(paste0("Axis"))) 
+  select(species, all_of(paste0("Axis")))
 
 # check that dimensions are ok for groups in yearly migrant contribution analysis:
 
@@ -185,9 +185,9 @@ select.axes(eco_pcoa_groups, threshold = 0.95, inc.threshold = TRUE) # get dimen
 # check that dimesnsions are ok for groups in seasonal migrant contribution analysis:
 
 # join metadata (migratory status, monthly presence)
-eco_pcoa_season <- assemb %>%avospace <- as_tibble(pcoa3$vectors, rownames = "species") %>%
-  select(species, all_of(paste0("Axis"))) 
-  distinct(ecoregion, season, species, status, n_month_year, n_month_season) %>%
+eco_pcoa_season <- assemb %>% avospace() <- as_tibble(pcoa3$vectors, rownames = "species") %>%
+  select(species, all_of(paste0("Axis")))
+distinct(ecoregion, season, species, status, n_month_year, n_month_season) %>%
   inner_join(avospace, by = "species")
 
 eco_season_mig_group <- eco_pcoa_season %>%
@@ -202,7 +202,6 @@ select.axes(eco_season_pca_groups, threshold = 0.95, inc.threshold = TRUE) # get
 
 
 pcoa_axes <- pcoa3$vectors[, 1:23] # save pcoa points for axes with positive eigen values
-
 
 
 pcoa_axes_df <- pcoa_axes %>%
@@ -227,33 +226,8 @@ eig_percent <- round(pcoa3$values$Relative_eig * 100, 2) # @@@JK to TG: variance
 # TG:done dispRi-tip if you plot them through dispRity you get the dimensions stuff automatically ( plot.dispRity(pcoa_axes, type = "preview") ).
 
 
-
 # plot with disprity---------------
- 
+
 
 plot.dispRity(pcoa_axes, type = "preview") # PC1 v 2
 plot.dispRity(pcoa_axes, type = "preview", specific.args = list(dimensions = c(2, 4))) # PC2 V 4 etc
-
-
-#get specific subsets--------------
-
-mig_mat <- eco_pcoa  %>%
-distinct(species) %>%
-select(paste0("PC"[]) %in% status = "migrant") %>%
-column_to_rownames("species") %>%
-as.matrix() 
-
-res_mat <- eco_pcoa  %>%
-distinct(species) %>%
-select(paste0("PC"[]) %in% status = "resident") %>%
-column_to_rownames("species") %>%
-as.matrix() 
-
-#check that dimensions are enough per group
-
-
-select.axes(pcoa3$vectors<- custom.subsets(groups = c(mig_res, mig_mat), threshold = 0.95, inc.threshold = TRUE))
-
-#would i need to select axes per ecoregion?
-
-plot.dispRity(pcoa_axes, type = "preview", specific.args = list(dimensions = c(2, 4), matrix= c(mig_mat, res_mat))) #? for subsets

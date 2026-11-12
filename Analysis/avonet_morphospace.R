@@ -111,12 +111,19 @@ ggcorrplot(cor(my_residual_data[, 1:10]), hc.order = TRUE)
 # wing length and pointiness (kipps distance)
 # tail length and first flight feather (secondary 1)
 
-# Perform PCA--------------
+#-----------------------Perform PCA on full trait space--------------------------------
 pca <- prcomp(my_residual_data, scale. = TRUE) # scale
 
-select.axes(pca, threshold = 0.95, inc.threshold = TRUE) # select axes using disprity
+full_space_axes <- select.axes(pca, threshold = 0.95, inc.threshold = TRUE) # select axes using disprity
 # 7 dimensions needed
 # TG:done might be good to run this one with your groups. e.g. pca <- custom.subsets(...) so that we can check if 6D is enough for each group.
+
+summary(full_space_axes) # PCs1:7 explain 97.7% of variance
+
+pdf("PCA_axes_variance_explained_full_BI_space", width = 14, height = 10)
+plot(full_space_axes)
+dev.off()
+
 
 # create dataframe with tibble for joining metadata
 avospace <- as_tibble(pca$x, rownames = "species") %>%
@@ -135,6 +142,7 @@ eco_mig_group <- eco_pca %>%
     split(.$species, paste(.$ecoregion, .$status, sep = "_"))
   } # list of species in each migrant group by ecoregion
 
+lengths(eco_mig_group) # 15 to 119 species per group
 
 # select.axes on subsetted ecoregional migrant group matrices
 
@@ -143,7 +151,7 @@ year_eco_mig_axes <- select.axes(pca, group = eco_mig_group, threshold = 0.95, i
 
 # 7 dimensions ok!
 
-plot(year_eco_mig_axes) # JK:TG<- this is cool- can see that PC3 explains most variance in european atlantic forest residents but not migrants and that PC2 explains most variance in caledon confifer forest migrants but not residents!
+plot(year_eco_mig_axes) # JK:TG:new<-this is cool- can see that PC3 explains most variance in european atlantic forest residents but not migrants and that PC2 explains most variance in caledon confifer forest migrants but not residents!
 
 summary(year_eco_mig_axes) # explains 95.5 to 98.1% of variance across ecoregions and migrant groups
 
@@ -165,6 +173,7 @@ eco_season_mig_group <- eco_season_pca %>%
     split(.$species, paste(.$ecoregion, .$status, .$season, sep = "_"))
   } # list of species in each migrant group by ecoregion and season
 
+lengths(eco_season_mig_group) # 15 to 102 species per group
 
 # select.axes on subsetted ecoregional migrant group matrices
 
@@ -181,7 +190,7 @@ pdf("PCA_axes_variance_explained_by_ecoregion_status_season_group.pdf", width = 
 plot(season_eco_mig_axes)
 dev.off()
 
-# JK:TG<- can see from this crap plot (too many groups) that actually season does not seem to have much of an effect on the variance of trait space across any ecoregion. BUT for European Atlantic forests, residents are much more spread across PC3 than migrants.
+# JK to JK:TG:new<- can see from this crap plot (too many groups) that actually season does not seem to have much of an effect on the variance of trait space across any ecoregion. BUT for European Atlantic forests, residents are much more spread across PC3 than migrants.
 
 
 # checking monthly migrant defintion groups for the yearly analysis------------------
@@ -193,7 +202,8 @@ eco_month_mig_group <- eco_pca %>%
     split(.$species, paste(.$ecoregion, .$n_month_year, sep = "_"))
   } # list of species in each group by ecoregion and number of months present (more granular migratory status definition)
 
-lengths(eco_month_mig_group) # only one ecoregion (Caledon conifer forests) has migrant present in only one month of the year
+lengths(eco_month_mig_group) # JK:TG:new<- only one ecoregion (Caledon conifer forests) has migrant present in only one month of the year
+# 1 to 72 species per group- this why the species-level ellpisoid.contribution metric I made will work better than metrics that work between groups for this monthly analysis
 
 # select.axes on subsetted ecoregional migrant group matrices
 
@@ -206,7 +216,7 @@ summary(eco_month_axes) # PC7 explains 95.8 to 98.9% of variance in all groups (
 
 pdf("PCA_axes_variance_explained_by_ecoregion_mon_present_group.pdf", width = 14, height = 10)
 plot(eco_month_axes)
-dev.off() # TG:JK<- cannot plot due to lack of species present in only 1 month of year
+dev.off() # JK:TG:new<-cannot plot due to lack of species present in only 1 month of year
 
 
 # variance as a kable (whole space, no groups)---------
@@ -237,107 +247,208 @@ eco_season_pca_7 <- assemb %>%
 write.csv(eco_season_pca_7, "eco_region_traitspace_PCA_BI.csv")
 
 
-# 2. AVONET beakspace only (+size)---------
+#----------------------------perform PCA on beakspace only---------------------------
 
-rel_beak_traits <- rel_morph_traits %>%
-  select(
-    species, LogBodyMass, RelBeakLengthCulmen,
-    RelBeakLengthNares, RelBeakWidth, RelBeakDepth
-  ) %>%
-  column_to_rownames("species")
+my_residual_beak_data <- my_residual_data[, c(
+  "LogMass", "ResBeak.Length_Culmen",
+  "ResBeak.Length_Nares", "ResBeak.Width", "ResBeak.Depth"
+)] # select size-relative beak traits
 
 
 # Check correlations among morphological traits
-ggcorrplot(cor(rel_beak_traits[, 1:5]), hc.order = TRUE) # beak depth and width vs beak length  traits correlated, can group using gawdis if decide to use beak-only space and pcoa
+ggcorrplot(cor(my_residual_beak_data), hc.order = TRUE) # beak depth and width and beak length  traits correlated, body mass not correlated with anything as for full space so allometry removed
 
 # Perform PCA--------------
-beak_pca <- prcomp(rel_beak_traits, scale. = TRUE)
+beak_pca <- prcomp(my_residual_beak_data, scale. = TRUE) # pca with scaling
 
-select.axes(beak_pca, threshold = 0.95, inc.threshold = TRUE) # select axes using disprity
-# 4 dimensions needed
+full_beak_axes <- select.axes(beak_pca, threshold = 0.95, inc.threshold = TRUE) # select axes using disprity
+# 4 dimensions needed, explain 98.8% of variance
 
-# explore variance visually
-beak_pca_variance <- summary(beak_pca)$importance %>%
-  t() %>%
-  as_tibble(rownames = "PC") %>%
-  rename(
-    SD = `Standard deviation`, Proportion_of_Variance = `Proportion of Variance`,
-    Cumulative_Proportion = `Cumulative Proportion`
-  ) # PC1-4 explain 98.8% of variance (>95% threshold), again body mass is now less dominant, with PC1 explaining 39.1% of variance
+summary(full_beak_axes)
 
-kable(beak_pca_variance, align = rep("c", ncol(beak_pca_variance)))
+# save full beak trait space variance explained
+pdf("Beak_PCA_axes_variance_explained_full_BI_space", width = 14, height = 10)
+plot(full_beak_axes)
+dev.off()
 
-
+# beak avospace as dataframe
 beak_avospace <- as_tibble(beak_pca$x, rownames = "species") %>%
-  select(species, all_of(paste0("PC", 1:4)))
+  select(species, starts_with(paste0("PC")))
 
-eco_beak_pca
-# join ecoregional presence to PC scores
-eco_beak_pca <- assemb %>%
+
+# check that 4 dimensions is ok across all ecoregional migrant subsets for yearly analysis-------------------------
+
+eco_pca_beak <- assemb %>%
   distinct(ecoregion, species, status, n_month_year) %>%
   inner_join(beak_avospace, by = "species")
 
+eco_beak_mig_group <- eco_pca_beak %>%
+  distinct(ecoregion, species, status) %>%
+  {
+    split(.$species, paste(.$ecoregion, .$status, sep = "_"))
+  } # list of species in each migrant group by ecoregion
 
-# save beakspace
-write.csv(eco_beak_pca, "eco_region_traitspace_PCA_beak_BI.csv")
+
+# select.axes on subsetted ecoregional migrant group matrices
+year_eco_beak_mig_axes <- select.axes(beak_pca, group = eco_beak_mig_group, threshold = 0.95, inc.threshold = TRUE)
+# get dimensions necessary for each group
+
+# 4 dimensions ok!
+# JK to JK:TG:new<-  this is cool- can see that PC3 explains most variance in european atlantic forest residents but not migrants and that PC2 explains most variance in caledon confifer forest migrants but not residents!
+
+summary(year_eco_beak_mig_axes) # explains 98.4 to 99.1% of variance across ecoregions and migrant groups
+
+pdf("Beak_PCA_axes_variance_explained_by_ecoregion_status_year_group.pdf", width = 14, height = 10)
+plot(year_eco_beak_mig_axes)
+dev.off() # PC2 explains much more variance in most ecoregions compared to PC1, especially for Caledon conifer forests and European Atlantic Mixed forests
+# again there is a discrepancy between migrants and residents, mainly it seems with the variance explained along PC2.
+
+# #check that 4 dimensions is ok across all ecoregional migrant subsets for seasonal analysis---:
+
+# join metadata (migratory status, monthly presence)
+
+eco_beak_season_pca <- assemb %>%
+  distinct(ecoregion, species, season, status, n_month_year, n_month_season) %>%
+  inner_join(beak_avospace, by = "species")
+
+eco_beak_season_mig_group <- eco_beak_season_pca %>%
+  distinct(ecoregion, season, species, status) %>%
+  {
+    split(.$species, paste(.$ecoregion, .$status, .$season, sep = "_"))
+  } # list of species in each migrant group by ecoregion and season
 
 
+# select.axes on subsetted seasonal ecoregional migrant group matrices
+beak_season_eco_mig_axes <- select.axes(beak_pca, group = eco_beak_season_mig_group, threshold = 0.95, inc.threshold = TRUE)
+# get dimensions necessary for each group
 
-# Check trait loadings-----------------
+# 4 dimensions ok!
+
+
+summary(beak_season_eco_mig_axes) # PCs1:4 explain 97.9 to 99.3% of variance
+
+pdf("Beak_PCA_axes_variance_explained_by_ecoregion_status_season_group.pdf", width = 14, height = 10)
+plot(beak_season_eco_mig_axes)
+dev.off()
+
+# JK to JK:TG:new<-  again as for full space, very little difference in variance explained across seasons, but PC2 especially explanatory for European Atlantic mixed forest residents, will be interesting to look at what traits these species represent
+
+
+# checking monthly migrant defintion groups for the yearly analysis------------------
+
+
+eco_beak_month_mig_group <- eco_pca_beak %>%
+  distinct(ecoregion, n_month_year, species) %>%
+  {
+    split(.$species, paste(.$ecoregion, .$n_month_year, sep = "_"))
+  } # list of species in each group by ecoregion and number of months present (more granular migratory status definition)
+
+lengths(eco_beak_month_mig_group) # only one ecoregion (Caledon conifer forests) has migrant present in only one month of the year
+
+# select.axes on subsetted ecoregional migrant group matrices
+
+
+beak_eco_month_axes <- select.axes(beak_pca, group = eco_beak_month_mig_group, threshold = 0.95, inc.threshold = TRUE)
+# get dimensions necessary for each group
+
+# this time 5 dimensions would be needed as for English lowland forest migrants present for 2 months of the year explains only 94.9% of variance (bit silly but will save 5 dims)
+
+summary(beak_eco_month_axes) # PC7 explains 95.8 to 98.9% of variance in all groups (apart from migrant_month1 where is NA)
+
+pdf("Beak_PCA_axes_variance_explained_by_ecoregion_mon_present_group.pdf", width = 14, height = 10)
+plot(beak_eco_month_axes)
+dev.off() # cant save due to same issue as before
+
+
+beak_avospace_5 <- as_tibble(pca$x, rownames = "species") %>%
+  select(species, any_of(paste0("PC", 1:5))) # save 5 dimensions
+
+
+eco_beak_season_pca_5 <- assemb %>%
+  distinct(ecoregion, species, season, status, n_month_year, n_month_season) %>%
+  inner_join(beak_avospace_5, by = "species")
+
+# save full traitspace with metadata (ecoregion, season, mig status, annual months present, seasonal month present)
+write.csv(eco_beak_season_pca_5, "eco_region_traitspace_PCA_beak_BI.csv")
+
+
+#------------------Plotting interesting patterns that have spotted with variance plots earlier with plot.dispRity----------------------
+
+# create yearly ecoregionxmigratory status subsets
+eco_year_subsets <- custom.subsets(pca$x, group = eco_mig_group)
+
+# Can we spot the Caledon forest migrant spread along PC2?
+
+
+plot(eco_year_subsets, type = "preview") # PC1 V2- can't see an obvious spread of caledon forest residents along PC2, but hard to tell with colours
+
+plot(eco_year_subsets, type = "preview", specific.args = list(dimensions = c(2, 3))) # maybe in PC2 V3? #slightly, seems like the Caledon resdients group could be skewed by an outlier along PC2, so probably not good to use convex hulls!
+
+# what about the European Atlantic mixed forest migrants?
+
+# yep, quite spread along PC3 but not massively obvious
+
+plot(eco_year_subsets, type = "preview", specific.args = list(dimensions = c(3, 4)))
+
+
+#------------------------------Checking loadings--------------------------------------------
 
 # full traitspace
-full_loadings <- as.data.frame(pca$rotation)[1:6] # loadings for PCs 1-6 #for full loadings, body mass has a small influence on trait space as it only correlates with HWI (which is expected), so traitspace is largely independent of allometry
+full_loadings <- as.data.frame(pca$rotation)[1:7] # loadings for PCs 1-6 #for full loadings, body mass has a small influence on trait space as it only correlates with HWI (which is expected), so traitspace is largely independent of allometry
 
-# all traits show positive correlation
-# PC1: mainly explained by wing length/pointiness
-# PC2: mainly explained by wing length/pointiness and beak length and width
-# PC3: mainly explained by beak length and shape and tarsus length
-# PC4: mainly explained by beak shape
-# PC5: mainly explained by body mass
-# PC6: mainly explained by beak depth and tarsus length
-
-# beak traitspace
-beak_loadings <- as.data.frame(beak_pca$rotation)[1:4] # loadings for PCs 1-4 # for beak loadings body mass has no influence on PC1, 2 or 4 but complete influence on PC3 as there is no HWI included in the trait space, if want to use beakspace will need to rerun, removing size component,
-# but this is not ideal as HWI is known to be an important migratory trait.
 
 # @@@JK to TG: does this make sense? I think given this, I will use the full trait space, or I could use the sheffield beak space but I think I may get the new dataset from Gavin later
 # TG: it's worth checking how you're going to the loading thingy together. Are you just measuring the correlation between your input variables and the output PC axes? I think in general loadings can be useful for exploring the traitspace and having a vague understanding but in effect, to demonstrate properly it requires much more work. TL:DR; PCA ranks the correlations between your variables hierachically, it doesn't try to understand what variable explains what. E.g. PC5 is the major axes of variance-covariance in your dataset once you've removed the 4 first major axes of variance-covariance.
-# yes just looking at correlation between variable and PC axes
+# JK:TG:new<- yes just looking at correlation between variable and PC axes. Also not sure if i would have to plot loadings for each subset or just the whole trait space, I am assuming just the full space as PC scores are relative to the full space?
 
 # plot loadings for full traitspace---------------------
 
 p1_full <- autoplot(pca,
-  x = 1, y = 2, data = avospace, colour = "species",
+  x = 1, y = 2, data = avospace_7, colour = "species",
   loadings = TRUE, loadings.colour = "red",
   loadings.label = TRUE, loadings.label.size = 3, loadings.label.colour = "black"
 ) +
   theme(legend.position = "none")
 
-# high values of PC1 = long wings and tails
-# high values of PC2 = pointy wings and long beaks
+# PC1 is about wing and tail length
+# PC2 is essentially beak length vs beak depth and width- so Caledon residents may have unusual/a wide diversity of beaks?
 
 
 p2_full <- autoplot(pca,
-  x = 3, y = 4, data = avospace, colour = "species",
+  x = 3, y = 4, data = avospace_7, colour = "species",
   loadings = TRUE, loadings.colour = "red",
   loadings.label = TRUE, loadings.label.size = 3, loadings.label.colour = "black"
 ) +
   theme(legend.position = "none")
 
-# high values of PC3= large bodied species with short tarsus and beak length
-# high values of PC4= wide and deep beaks
+# PC3 is about tarsus and secondary length vs wing pointiness, so European Atlantic forest migrants likely have a diversity of/unusual wing shape/tarsi traits?
+# PC4 is about wing length vs all other traits (but not paritcuarly strong loading)
 
 p3_full <- autoplot(pca,
-  x = 5, y = 6, data = avospace, colour = "species",
+  x = 5, y = 6, data = avospace_7, colour = "species",
   loadings = TRUE, loadings.colour = "red",
   loadings.label = TRUE, loadings.label.size = 3, loadings.label.colour = "black"
 ) +
   theme(legend.position = "none")
 
-# high values of PC6 = small bodied species
-# high values of PC4 = long tails but short tarsus and shallow beak
+# PC5 is explained entirely by body mass
+# PC6 is wing length, beak depth and tarsus length vs tail length and beak length/width
 
+# combine plots
+pall_full <- gridExtra::arrangeGrob(p1_full, p2_full, p3_full, nrow = 1) # body mass only loads onto PC5, which is entirely explained by body mass- this does not have a large loading for any ecoregional migrant group, so size not a big factor in differentiating species/groups in traitspace
 
-pall_full <- gridExtra::arrangeGrob(p1_full, p2_full, p3_full, nrow = 1)
+pdf("PCA_Loadings_plot_PC1:6.pdf", width = 14, height = 10)
+plot(pall_full)
+dev.off()
 
-ggsave("Manuscript/Figures/pca_loadings_plots.pdf", pall_full, width = 12, height = 6, dpi = 300, bg = "white")
+# get PC 7 for interest
+p4_full <- autoplot(pca,
+  x = 7, y = 6, data = avospace_7, colour = "species",
+  loadings = TRUE, loadings.colour = "red",
+  loadings.label = TRUE, loadings.label.size = 3, loadings.label.colour = "black"
+) +
+  theme(legend.position = "none")
+
+p4_full
+
+# JK:TG:new<- PC7 is beak width vs beak depth- it is interesting that beak width seperates from beak depth along PC7, despite the fact that the two traits are heavily correlated?

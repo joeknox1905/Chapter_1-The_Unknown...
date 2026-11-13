@@ -246,7 +246,7 @@ gannet <- pheno_df[1, ] %>%
     n.present = TRUE
   ) %>%
   select(names(pheno_df))
-pheo_df <- pheno_df %>%
+pheno_df <- pheno_df %>%
   filter(species_rast != "Morus_bassanus") %>%
   bind_rows(gannet)
 
@@ -276,11 +276,11 @@ aoh_maps <- tibble(path = list.files(aoh_dir, pattern = "\\.tif$", recursive = T
   mutate(
     m = str_match(
       tools::file_path_sans_ext(basename(path)),
-      regex("^FRC_(\\d+)_(Breeding|Nonbreeding|Resident)$",
+      regex("^FRC_(\\d+)_(Breeding|Nonbreeding|Resident)$", #extract layer names
         ignore_case = TRUE
       )
     ),
-    sisid = as.numeric(m[, 2]), layer = tolower(m[, 3])
+    sisid = as.numeric(m[, 2]), layer = tolower(m[, 3]) # convert layer names to lower case
   ) %>%
   filter(!is.na(sisid), sisid %in% range_all$sisid) %>% # filter aoh maps to only species with Birdlife range in Britain and Ireland
   select(path, sisid, layer)
@@ -354,7 +354,8 @@ aoh_ok <- aoh_km2 %>%
   filter(km2 >= aoh_min_km2) %>% # aoh map must intersect at least 1km2 of ecoregion (equal to one grid cell)
   inner_join(range_comps, by = "layer", relationship = "many-to-many") %>% # range must be verified by aoh map
   group_by(ecoregion, sisid, seasonal) %>%
-  filter(seasonal != 1 | any(layer == "resident") | all(c("breeding", "non-breeding") %in% layer)) %>% # if species is a partial migrant (i.e. has both resident and non-resident birdlife range in an ecoregion) its breeding and non-breeding aoh map must overlap to confirm its year-round resident presence, as it will have no resident aoh map to confirm it). If not will be dropped.
+  filter(seasonal != 1 | any(layer == "resident") | all(c("breeding", "nonbreeding") %in% layer)) %>% # if species is a partial migrant (i.e. has a resident layer in birdlife, but a non-breeding and breeding aoh map) its breeding and non-breeding aoh map must overlap to confirm its year-round resident presence in the ecoregion, as it will have no resident aoh map to confirm it). If not will be dropped.
+  #on the other hand, if a species is a partial migrant and has breeding and non-breeding birdlife range but no resident range (for whatever reason) it will be treated as resident/migrant in that ecoregion depending on its breeding phenology
   ungroup() %>%
   distinct(ecoregion, sisid, seasonal) %>%
   mutate(ok = TRUE)

@@ -177,8 +177,6 @@ range_type_by_season_and_origin %>%
     full_width = FALSE
   )
 
-# TG:done You could render this as table so we can check it regularly without having to run the whole code. Either simply by saving the summary in a csv file or, if you want more fancy, check the kable package.
-
 
 # get area of each species' range type intersecting each ecoregion
 range_cache <- paste0(out_dir, "range_ecoregions_km2.rds")
@@ -401,7 +399,7 @@ make.pools <- function(use_aoh = FALSE) {
     distinct(ecoregion, sisid, species) %>%
     anti_join(eco_month, by = c("ecoregion", "species"))
 
-  # Get migratory status based on months present to avoid cases where migrants have multiple non-resident range types in an ecoregion that add to 12 months as these species will contribute to functional diversity year round-----
+  # Get migratory status based on months present to see if migrant contribution differs between passage/short-stay species and longer-stay species-----
 
   eco_year <- eco_month %>%
     count(ecoregion, species, name = "n_month_year") %>% # get number of month columns for each species and assign to column
@@ -429,56 +427,21 @@ make.pools <- function(use_aoh = FALSE) {
   list(long = eco_long, season = eco_season, lost = lost, aoh_dropped = aoh_dropped)
 }
 
-# Wide formats for dispRity/mFD/BAT/betapart: i.e. a monthly and seasonal presence/absence dataframe plus migratory status
 
-make.wide <- function(p) {
-  seasons <- unique(unname(season_lookup))
-  list(
-    # species x month rows, ecoregions as columns: 1 = present that month, 0 = absent
-    month = p$long %>%
-      transmute(species, month, ecoregion, present = 1L) %>%
-      pivot_wider(names_from = ecoregion, values_from = present) %>%
-      complete(species, month = month_cols) %>%
-      mutate(across(-c(species, month), ~ replace_na(.x, 0L))) %>%
-      arrange(species, match(month, month_cols)),
-
-    # species x season rows: months present in that season (0-4)
-    season = p$season %>%
-      select(species, season, ecoregion, n_month_season) %>%
-      pivot_wider(names_from = ecoregion, values_from = n_month_season) %>%
-      complete(species, season = seasons) %>%
-      mutate(across(-c(species, season), ~ replace_na(.x, 0L))) %>%
-      arrange(species, match(season, seasons)),
-
-    # one row per species: status and months present per ecoregion
-    year = p$long %>%
-      distinct(ecoregion, species, status, n_month_year) %>%
-      pivot_wider(
-        id_cols = species, names_from = ecoregion,
-        values_from = c(status, n_month_year),
-        names_glue = "{ecoregion}_{.value}"
-      ) %>%
-      arrange(species)
-  )
-}
 
 
 # call function
 pools_aoh <- make.pools()
-wide_aoh <- make.wide(pools_aoh)
 
 pools_aoh$aoh_dropped # range rows removed after aoh verification (130 species lost)
 pools_aoh$lost # range rows removed by phenology matching (1 species lost)
 
 saveRDS(pools_aoh$season, paste0(out_dir, "seasonal_ecoregion_pools_aoh.rds")) # seasonal
 saveRDS(pools_aoh$long, paste0(out_dir, "seasonal_ecoregion_pools_aoh_long.rds")) # monthly, long- every month present/absence for each species (month as column), delete as don't really need + pipeline for this (eco_long)
-saveRDS(wide_aoh, paste0(out_dir, "seasonal_ecoregion_wide_aoh.rds")) # every month presence (1/0) and seasonal monthly presence (1-4) for each species, may be useful for disprity etc but could be overkill
 
-# 195 species retained, so 15 dropped due to further refinement e.g. removal of edge cases
 # taxonomy is Birdlife v10 (HBW and Birdlife International, 2025)
 ```
 
-<!-- TG: Nice functionalisation here! -->
 
 
 # checks

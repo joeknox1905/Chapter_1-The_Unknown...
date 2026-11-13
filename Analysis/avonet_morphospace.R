@@ -57,12 +57,12 @@ avonet_lookup <- c(
   Luscinia_svecica = "Cyanecula_svecica"
 )
 
-# join all ten traits to all species in British Isles,
+# join all nine traits to all species in British Isles,
 avonet_traits <- tibble(species = spp_name, ) %>%
   mutate(lookup_name = coalesce(avonet_lookup[species], species)) %>%
   left_join(avonet %>% select(
     species, Beak.Length_Culmen, Beak.Length_Nares, Beak.Width, Beak.Depth,
-    Tarsus.Length, Wing.Length, Secondary1, Tail.Length, Mass, Kipps.Distance # JK:TG<- kipps distance is also a derived variable (wing length - secondary1); should I remove?
+    Tarsus.Length, Wing.Length, Secondary1, Tail.Length, Mass # removing Kipp's distance (wing length-secondary1) and HWI (kipps distance/wing length x100) as these are derived from variables already present in the traitspace
   ), by = c("lookup_name" = "species")) %>%
   dplyr::select(-lookup_name)
 
@@ -81,7 +81,7 @@ avonet_na_all <- avonet_traits %>%
 morph_traits <- avonet_traits %>%
   select(
     species, Beak.Length_Culmen, Beak.Length_Nares, Beak.Width, Beak.Depth,
-    Tarsus.Length, Wing.Length, Secondary1, Tail.Length, Mass, Kipps.Distance
+    Tarsus.Length, Wing.Length, Secondary1, Tail.Length, Mass
   ) %>%
   column_to_rownames("species")
 
@@ -102,7 +102,7 @@ my_residual_data <- cbind(res_traits, LogMass)
 
 
 # Check correlations among logged morphological traits
-ggcorrplot(cor(my_residual_data[, 1:10]), hc.order = TRUE)
+ggcorrplot(cor(my_residual_data[, 1:9]), hc.order = TRUE)
 
 # body mass not correlated with anything so effectively removes allometry
 # main correlations (can use for PCOA groups):
@@ -416,13 +416,13 @@ plot(eco_year_subsets, type = "preview", specific.args = list(dimensions = c(3, 
 
 #------------------------------Checking loadings--------------------------------------------
 
+Loadings as an exploration, should not use this to infer trait correlations with PC axes as that is not what PCA does- it does not try to find explanatory variables
+
+
 # full traitspace
 full_loadings <- as.data.frame(pca$rotation)[1:7] # loadings for PCs 1-6 #for full loadings, body mass has a small influence on trait space as it only correlates with HWI (which is expected), so traitspace is largely independent of allometry
 
 
-# @@@JK to TG: does this make sense? I think given this, I will use the full trait space, or I could use the sheffield beak space but I think I may get the new dataset from Gavin later
-# TG: it's worth checking how you're going to the loading thingy together. Are you just measuring the correlation between your input variables and the output PC axes? I think in general loadings can be useful for exploring the traitspace and having a vague understanding but in effect, to demonstrate properly it requires much more work. TL:DR; PCA ranks the correlations between your variables hierachically, it doesn't try to understand what variable explains what. E.g. PC5 is the major axes of variance-covariance in your dataset once you've removed the 4 first major axes of variance-covariance.
-# JK:TG:new<- yes just looking at correlation between variable and PC axes. Also not sure if i would have to plot loadings for each subset or just the whole trait space, I am assuming just the full space as PC scores are relative to the full space?
 
 # plot loadings for full traitspace---------------------
 
@@ -433,8 +433,6 @@ p1_full <- autoplot(pca,
 ) +
   theme(legend.position = "none")
 
-# PC1 is about wing and tail length
-# PC2 is essentially beak length vs beak depth and width- so Caledon residents may have unusual/a wide diversity of beaks?
 
 
 p2_full <- autoplot(pca,
@@ -444,8 +442,7 @@ p2_full <- autoplot(pca,
 ) +
   theme(legend.position = "none")
 
-# PC3 is about tarsus and secondary length vs wing pointiness, so European Atlantic forest migrants likely have a diversity of/unusual wing shape/tarsi traits?
-# PC4 is about wing length vs all other traits (but not paritcuarly strong loading)
+
 
 p3_full <- autoplot(pca,
   x = 5, y = 6, data = avospace_7, colour = "species",
@@ -454,8 +451,6 @@ p3_full <- autoplot(pca,
 ) +
   theme(legend.position = "none")
 
-# PC5 is explained entirely by body mass
-# PC6 is wing length, beak depth and tarsus length vs tail length and beak length/width
 
 # combine plots
 pall_full <- gridExtra::arrangeGrob(p1_full, p2_full, p3_full, nrow = 1) # body mass only loads onto PC5, which is entirely explained by body mass- this does not have a large loading for any ecoregional migrant group, so size not a big factor in differentiating species/groups in traitspace
@@ -474,4 +469,38 @@ p4_full <- autoplot(pca,
 
 p4_full
 
-# JK:TG:new<- PC7 is beak width vs beak depth- it is interesting that beak width seperates from beak depth along PC7, despite the fact that the two traits are heavily correlated?
+#BUT good for plots- which you should use for actual report probably (or ordiplots)
+
+#also without loadings:
+
+
+p1_full_no_loadings<- autoplot(pca,
+  x = 1, y = 2, data = avospace_7, colour = "species") +
+  theme(legend.position = "none")
+
+
+
+
+p2_full_no_loadings <- autoplot(pca,
+  x = 3, y = 4, data = avospace_7, colour = "species") +
+  theme(legend.position = "none")
+
+
+
+p3_full_no_loadings <- autoplot(pca,
+  x = 5, y = 6, data = avospace_7, colour = "species") +
+  theme(legend.position = "none")
+
+
+# combine plots
+pall_full_no_loadings <- gridExtra::arrangeGrob(p1_full, p2_full, p3_full, nrow = 1) # body mass only loads onto PC5, which is entirely explained by body mass- this does not have a large loading for any ecoregional migrant group, so size not a big factor in differentiating species/groups in traitspace
+
+pdf("PCA_plot_no_loadings_PC1:6.pdf", width = 14, height = 10)
+plot(pall_full_no_loadings)
+dev.off()
+
+# get PC 7 for interest
+p4_full <- autoplot(pca,
+  x = 7, y = 6, data = avospace_7, colour = "species") +
+  theme(legend.position = "none")
+

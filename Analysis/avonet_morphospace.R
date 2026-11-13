@@ -218,6 +218,30 @@ plot(eco_month_axes)
 dev.off() # JK:TG:new<-cannot plot due to lack of species present in only 1 month of year
 
 
+# may need to check whether number of dimensions is enough for migrant grouping by number of months present in each season if decide to do this--------------
+
+eco_month_season_mig_group <- eco_season_pca %>%
+  distinct(ecoregion, season, n_month_season, species) %>%
+  {
+    split(.$species, paste(.$ecoregion, .$season, .$n_month_season, sep = "_"))
+  } # list of species in each group by ecoregion and number of months present (more granular migratory status definition)
+
+lengths(eco_month_season_mig_group) # JK:TG<- 0 to 124 species, notably low species richness in winter, would have to rarefy but to what?
+# again species-level ellipsoid contribution + stats e.g. season*season_mon_present ~ ellipsoid.cont probably better metric for these groups
+
+
+eco_month_season_axes <- select.axes(pca, group = eco_month_season_mig_group, threshold = 0.95, inc.threshold = TRUE)
+# get dimensions necessary for each group
+
+eco_month_season_axes # 7 dimensions needed
+
+summary(eco_month_season_axes) # PC1:7 explain 96.2 to 99.4% of variance in all groups
+
+pdf("PCOA_axes_variance_explained_by_ecoregion_season_mon_present_group.pdf", width = 14, height = 10)
+plot(eco_month_season_axes)
+dev.off() # can't plot again as NAs
+
+
 # variance as a kable (whole space, no groups)---------
 
 pca_variance <- summary(pca)$importance %>%

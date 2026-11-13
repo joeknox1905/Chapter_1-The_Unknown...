@@ -9,7 +9,6 @@ output: html_document
 --------------------------------------
 
 - This script builds assemblages based on ecoregions rather than grid cells, first with range maps from Birdlife International, which is stands accurate at coarse scales (>=200km) such as ecoregions (or though some are below this, including some in UK) and is more feasible for global scales (Hulbert and Jetz, 2007).
-<!-- TG: Pro-tip for when using GitHub: I tend to do one sentence per line. This is because version control tracks line changes so that if you change just a typo in a sentence, it doesn't mark the whole paragraph as changed, just the one sentence. Incidentally it also helps me writing shorter sentences :P If it looks like a big chunk on my screen it's probably time to split it into different sentences.-->
 It then refines ranges with area of habitat maps to ensure range maps are suitable based on elevation and habitat variables (Lumbierres et al., 2022) -->
 - The idea is to create a pipeline that is reproducible and scalable for global datasets.
 Furthermore, using AOH maps is also reproducible for mammals (5481 species) but these are all mapped with a single resident range so seasonality will be harder to determine, will probably just need to use migratory status lists for each continent and may not be able to resolve monthly, just in terms of the annual traitspace (Lumbierres et al., 2022)
@@ -19,8 +18,7 @@ Thus pelagic species exclusive to marine habitats are excluded, and are also exl
 
 - For true migrant species (species with no resident range and any non-resident range type of breeding, non-breeding or passage), they are counted as present in each month if their range intersects the ecoregion (thresholded at 1km2) and matches the monthly range type specified in the monthly phenology from Bellve et al. (2026). 
 - Partial migrants (species with any non-resident range and resident range) and resident species (species with only resident range) are counted as residents as some or all of their population respectively will be contributing to that ecoregion year-round.
-This is ensured by the fact that residents are additionally defined as being present in every month in the ecoregion i.e. 12. This also accounts for cases of migrants with overlapping non-breeding and breeding ranges which mean they are present in the ecoregion year-round.
-
+This is ensured by the fact that residents are additionally defined as being present in every month in the ecoregion i.e. 12. This also accounts for cases of migrants with overlapping non-breeding and breeding ranges which mean they are present in the ecoregion year-round and for cases where a resident may have a single non-redient range map in birdlife that describes their year-round distribution e.g. common pheasant
 - For the area of habitat refinement, if at least 1km2 (sum of grid cells, essentially equivalent to one grid cell) of the non-breeding and breeding aoh map range (migratory species) or resident range (resident species) intersects the ecoregion and the aoh range map can verify the birdlife range map then, the species is counted is present in the ecoregion.
 
 Verification checks with aoh maps are as follows:

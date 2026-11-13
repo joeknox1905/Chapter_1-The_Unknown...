@@ -68,24 +68,28 @@ result_binary  <- calculate.disprity.by.ecoregion(BI_traitspace, group = "status
 
 
 #i.e. "functional" arrangement within each group- niche packing vs expansion in each group
-#if normal, means species are tend to be within their group (whatever trait combinations represent the centroid)
-#if uneven, suggests clumpiness/dispersion from centroid
+#if normal, means species tend to be more clustered  within their group around average trait combinations (whatever trait combinations represent the centroid), niche packing within group- maybe more fine-scale specialisation
+#if uneven, suggests dispersion from centroid- niche expansion within group
 
 distribution.of.group.around.group.centroid <- function(matrix) {
 group_centroid<- colMeans(matrix) #centroid of group
 for (i in 1:nrow(matrix)) { #for each species row in ecoregional annual trait space
 species_row <- matrix[i, ]#get pc score for each dimension for each pc
 
+#avg e.g. if smaller avg distance in migrants than migrants more clustered around centroid and more clumped? to compare between groups- i guess kind of similae to 
 sqrt(sum((species_row - colMeans(matrix2))^2)) #distance from group centroid of each species
 
-##@@@JK- then will need to plot histogram of distribution function and test difference using t test (not permutation as already have done bootstrapping to account for null tests)
+need to call between.groups = FALSE
+result_binary  <- calculate.disprity.by.ecoregion(BI_traitspace, group = "status", metric = distribution.of.group.around.group.centroid , trait_cols = trait_cols, between = FALSE) 
 
+# plot histogram of distribution function and test difference using t test (not permutation as already have done bootstrapping to account for null tests)
+pdf("distribution_around_centroid_per_"group".pdf", width = 14, height = 10)
+ggplot(result_binary, aes(x= $obs)), 
+geom_histogram(binwidth = 10) +
+facet_grid(group~.) #migrants and residents side by side
+dev.off()
 
-
-#need to call between.groups = FALSE
-result_binary  <- calculate.disprity.by.ecoregion(BI_traitspace, group = "status", metric = distance.between.centroids , trait_cols = trait_cols, between = FALSE) 
-
-}
+} # plot histogram of distribution function and test difference using t test (not permutation as already have done bootstrapping to account for null tests)
 
 
 

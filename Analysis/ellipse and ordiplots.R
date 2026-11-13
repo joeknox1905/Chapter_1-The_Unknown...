@@ -9,7 +9,7 @@ Library(ggplot)
 #loading traitspaces
 avospace<- read.csv("Data/Processed/eco_region_traitspace__PCA_BI.csv")
 
-#@@@ JK n.b. will also want to join pcs to assemb for seasonal splits and analysis e.g. BI seasonal traitspace from avospace
+#can easily functionalise I am sure
 
 #######################################################################
 #visualising overlap of groups in traitspace with ggplot------------------
@@ -87,7 +87,7 @@ par(mfrow = c(n_distinct(avospace$season), n_distinct(avospace$ecoregion)),
 
 for (i in seq_len(nrow(panels))) {
   d <- avospace %>% filter(ecoregion == panels$ecoregion[i], season == panels$season[i])
-  plot(range(avospace$PC1), range(avospace$PC2), type = "n", las = 1,
+  plot(range(avospace$PC3), range(avospace$PC4), type = "n", las = 1,
        main = paste(panels$ecoregion[i], panels$season[i], sep = " | "), cex.main = 0.8)
   if (nrow(d) == 0) next
 
@@ -116,7 +116,7 @@ par(mfrow = c(n_distinct(avospace$season), n_distinct(avospace$ecoregion)),
 
 for (i in seq_len(nrow(panels))) {
   d <- avospace %>% filter(ecoregion == panels$ecoregion[i], season == panels$season[i])
-  plot(range(avospace$PC1), range(avospace$PC2), type = "n", las = 1,
+  plot(range(avospace$PC5), range(avospace$PC6), type = "n", las = 1,
        main = paste(panels$ecoregion[i], panels$season[i], sep = " | "), cex.main = 0.8)
   if (nrow(d) == 0) next
 

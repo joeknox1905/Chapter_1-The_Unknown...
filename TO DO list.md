@@ -13,15 +13,12 @@ Chapter 1:
 
 
 To do:
-[] go through comments and enact (wait till meeting)
-[] Run PCOA script
-[] finish r stats
-[] visualise groups in traitspace and interpret (with a pinch of salt)
-[] visualise as seasons (join from assemb/seasonal pool.aoh)
-[] run first analysis
+[] re-run aoh pipeline
+[] go through comments and enact for PCA (removing kipps distance), seasonal assemblage pipeline, intial thesis plan and funct contribution (can wait till hacakthon)
+[] visualise PCAs in traitspace (ggplots/ordiplot/ellipse plot)
 [] Work on report
+[] Run FD metrics
 [] Update README
-[] TNA/PDP
 [] mendeley reference list, export as bib. file
 []remove unnessecary stuff from aoh pipeline i.e. eco_long
 [] xtable- like this idea, repurposable tables when updating analysis/results

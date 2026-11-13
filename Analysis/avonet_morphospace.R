@@ -86,7 +86,9 @@ morph_traits <- avonet_traits %>%
   column_to_rownames("species")
 
 # Log body mass for function call
-LogMass <- log(morph_traits$Mass)
+LogMass <- log(morph_traits$Mass) #logging as although, not so relevant for britain where bird size does not hugely vary,  will allow a reproducible pipeline across regions i.e. where there is lots of variation between bird sizes (e.g. ostrich vs hummingbird)
+#this prevents body mass dominating the trait space and better resolves instances where for example there are two birds of the same mass with different beak lenghs (without logging/controlling for residuals these species would have almost the same coords in traitspace, but with logging their distances will be better estimated; cite paper()) 
+#this is also the reason for performing thebody mass regression to get residuals below.
 
 # Log and transform morphological traits relative to body mass (residuals)
 get.residuals <- function(x) {

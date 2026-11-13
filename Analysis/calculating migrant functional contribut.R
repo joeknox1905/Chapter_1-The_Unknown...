@@ -169,22 +169,29 @@ calculate.disprity.by.ecoregion <- function(traitspace, site = "ecoregion", ...)
 }
 
 
-#for seasonal analysis
-calculate.disprity.by.ecoregion.and.season <- function(traitspace, site = "ecoregion", ...) {
+#for seasonal analysis with migrants grouped by seasonal presence
+calculate.disprity.by.ecoregion.and.season <- function(traitspace, site = "ecoregion", season ="season"...) {
   split(traitspace, traitspace[[site, season]]) %>% #list of pc score dataframes split by ecoregion
     map(calculate.disprity.by.migrant.group , ...) %>% #apply disprity by migrant and resident group to each ecoregion dataframe and return list of results
     bind_rows(.id = site, season) #bind rows of results from list so that disprity is summarised for all ecoregions and pairs in a dataframe
 }
 
 
-#get results e.g. for distance between group centroids:
-result_binary  <- calculate.disprity.by.ecoregion(BI_traitspace, group = "status", metric = distance.between.centroids , trait_cols = trait_cols, between = TRUE) 
+#call function e.g. get results e.g. for distance between group centroids for all migrants vs residents across the full annual cycle
+result_binary_yearly  <- calculate.disprity.by.ecoregion(BI_traitspace, group = "status", metric = distance.between.centroids , trait_cols = trait_cols, between = TRUE) 
+
+#get result for distance between centroids for migrants grouped by seasons
+result_binary_seasonally  <- calculate.disprity.by.ecoregion.and.season(BI_traitspace, group = "status", metric = distance.between.centroids , trait_cols = trait_cols, between = TRUE) 
+# for this analysis, the seasonal migrant group pairs would also be compared against eachother as well as to residents which is what we want
 
 
-#get result monthly
-result_monthly <- calculate.disprity.by.ecoregion(BI_traitspace, group = "n_year_month", metric = distance.between.centroids , trait_cols = trait_cols, between = TRUE) 
-# for this analysis, the monthly migrant group pairs would also be compared against eachother which is what we want
+#get result for migrants grouped by number of months present (more grnaular/passage analysis)- can also check passage vs non-passage migrants (grouped by range type from birdlife)
+result_monthly_yearly <- calculate.disprity.by.ecoregion(BI_traitspace, group = "n_month_year", metric = distance.between.centroids , trait_cols = trait_cols, between = TRUE) 
+# for this analysis, the monthly migrant group pairs would also be compared against eachother as well as to residents which is what we want
+
+#get result for migrants grouped by number of months present in each season - follows on from seasonal analysis a bit better
+result_monthly_seasonally <- calculate.disprity.by.ecoregion.and.season(BI_traitspace, group = "n_month_season", metric = distance.between.centroids , trait_cols = trait_cols, between = TRUE) 
 
 
-#@@@ JK will need to update for seasons e.g. group by several variables but can do later------
+
 

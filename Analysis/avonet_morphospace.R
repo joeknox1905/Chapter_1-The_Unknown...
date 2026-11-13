@@ -62,7 +62,7 @@ avonet_traits <- tibble(species = spp_name, ) %>%
   mutate(lookup_name = coalesce(avonet_lookup[species], species)) %>%
   left_join(avonet %>% select(
     species, Beak.Length_Culmen, Beak.Length_Nares, Beak.Width, Beak.Depth,
-    Tarsus.Length, Wing.Length, Secondary1, Tail.Length, Mass, Kipps.Distance
+    Tarsus.Length, Wing.Length, Secondary1, Tail.Length, Mass, Kipps.Distance # JK:TG<- kipps distance is also a derived variable (wing length - secondary1); should I remove?
   ), by = c("lookup_name" = "species")) %>%
   dplyr::select(-lookup_name)
 

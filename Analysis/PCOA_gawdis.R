@@ -76,10 +76,7 @@ avonet_na_all <- avonet_traits %>%
 
 # 10 AVONET morphological traits (excluding HWI as this = Kipps.Distance/Wing.Length x100; so would just describe variables already considered)
 morph_traits <- avonet_traits %>%
-  select(
-    species, Beak.Length_Culmen, Beak.Length_Nares, Beak.Width, Beak.Depth,
-    Tarsus.Length, Wing.Length, Secondary1, Tail.Length, Mass, Kipps.Distance
-  )
+  select(species, Mass, Beak.Length_Culmen, Beak.Length_Nares, Beak.Width, Beak.Depth, Tarsus.Length, Wing.Length, Kipps.Distance, Secondary1, Tail.Length)
 
 
 # TG:done In general I would avoid ratios, especially if they are based on some variables already present. E.g. if HWI = BeakWidth/BeakDepth you're effectively counting these two variables twice compared to the other ones not in a ratio. Also, logging is probably not a problem here but it should not be an automatic thing (e.g. why do you need to log the data? If the answer is "because that's just what people do", you probably should not log the data).
@@ -93,18 +90,17 @@ get.residuals <- function(x) {
   ResTrait <- lm(LogTrait ~ LogMass)$residuals
 }
 
-res_traits <- apply(morph_traits[, -9], 2, get.residuals) # apply to all columns except body mass
+res_traits <- apply(morph_traits[, -c(1, 2)], 2, get.residuals) # apply to all columns except species and body mass
 colnames(res_traits) <- paste0("Res", colnames(res_traits)) # rename to reflective relative trait values
-my_residual_data <- cbind(res_traits, LogMass)
+my_residual_data <- cbind(LogMass, res_traits)
 
 
 # Check correlations among morphological traits
 ggcorrplot(cor(my_residual_data[, 1:10]), hc.order = TRUE) # correlated variables ordered together
-# get groups for gawdis as allows for grouping of traits (i.e. HWI correlated with body mass, beak length traits correlated, wing traits correlated, wing and tail traits correlated)
+# get groups for gawdis as allows for grouping of traits (i.e.body mass not correlayed with anything beak length traits correlated, wing length and pointiness correlated, wing width and tail length correlated)
 
-my_residual_data <- rel_morph_traits %>%
-  select(1:10) %>%
-  scale() # scale traits JK:TG:new<- not sure if I need to scale if scaling by weights with gawdis below?
+my_residual_data <- scale(my_residual_data[, 2:10])
+# scale traits JK:TG:new<- not sure if I need to scale if scaling by weights with gawdis below?
 
 
 # Create distance matrix of species using functional traits (WIlliams and Curley, 2025) based on trait correlations
@@ -112,7 +108,7 @@ dist_mat <- gawdis(my_residual_data,
   w.type = "analytic", # weights optimised by mathematical algorithm
   groups = c(
     1, # Body mass
-    2, 2, # Beak length
+    2, 2, # Beak length traits
     3, 3, # Beak shape (beak depth and width)
     4, # Tarsus length
     5, 5, # Wing length and pointiness (kipps distance, wing length) # hard to differentiate groups here as kipps distance also correlated with wing length but chose based on logic of Williams and Curley 2025 as both measure pointiness of wing. Doesn't change weights much anyway.
@@ -124,7 +120,7 @@ attr(dist_mat, "weights") # get weights of each group
 
 # scales each trait by dividing by the range of species' dissimilarity values for each trait
 
-# fairly even, beak shape given most weight (0.22), followed by body mass, beak length, wing length, tarsus length and wing/tail length (0.15)
+# fairly even, beak shape given most weight (0.22), followed by body mass, wing length/pointiness, beak length, tarsus length and wing/tail length (0.15)
 
 
 # Perform PCOA--------------

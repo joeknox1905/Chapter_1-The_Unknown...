@@ -7,7 +7,7 @@ Library(ggplot)
 
 
 #loading traitspaces
-avospace<- read.csv("Data/Processed/eco_region_traitspace__PCA_BI.csv")
+avospace<- read.csv("Data/Processed/eco_region_traitspace_PCA_BI.csv")
 
 #can easily functionalise I am sure
 

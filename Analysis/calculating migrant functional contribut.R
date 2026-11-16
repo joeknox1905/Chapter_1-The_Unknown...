@@ -70,6 +70,9 @@ complete_overlap <- custom.subsets(space_2D, group = list("A" = random_groups[,1
 expect_equal(summary(dispRity(complete_overlap, metric = pairwise.distance.between.centroids, between.groups = TRUE))$obs, 0)
 
 
+#also compare to group.dist (minimum vector norm dist between two groups)
+disprity((metric = group.dist, probs = c(colMeans())), groups = "status", between.groups = true)
+
 ## Step 3: formalising- but other way is probably better for interpretation and visualisation
 
 ## Creating a 2D uniform space
@@ -82,6 +85,8 @@ example_test <- test.metric(example_space, metric = c(pairwise.distance.between.
  summary(example_test)
  #runs three replicates of the space reduction and again runs tests sequentially removing 10% of data with specified metrics and linear modelling
 # a good metric will have no trend in the size direction, but have a trend for the reduction of interest i.e. if interested in size, should show sensitivity to space decreases?
+#for size returns size.inner (contracting space), size.outer (hollowing space), for position returns position.top and position.bottom(removing data from one side of space or the other)
+
 
 #visualise
 plot(example_test)
@@ -91,14 +96,13 @@ plot(example_test)
 
 #-------------metric for calculating nestedness vs overlap-----------------------------------------------
 
-within.edge.quantiles.
+within.quantiles<- 
 #is group within the upper bounds of the other group trait space (for each PC seperately; in this case would be residents as the reference). if complete overlap = group is a complete subset of the other group
 #if not than group is not a complete subset of the other group and there is some functional turnover
 # need resident matrix
 # migrant matrix
-#between groups
+#between groups (quantiles of each axis in matrix 1 -quantiles of each axis in matrix 2) #default is 95% quantiles
 #return matrix overlap for each group 
-
 
 
 
@@ -204,8 +208,6 @@ t.test((mean_ellips_cont ~ group, data = disparity_result )) # welches t test ac
 #call function
 calculate.mean.ellipse.contrib.sig(disparity_result = result_binary) #or result_monthly
 
-
-Functions to calculate how nested the groups are?
 
 
 

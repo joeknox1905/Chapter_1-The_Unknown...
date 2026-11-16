@@ -38,7 +38,6 @@ Thus to ensure that passage ranges are accounted for, the un-refined passage ran
 ```{r}
 library(dplyr)
 library(tidyr)
-library(aoh)
 library(terra)
 library(rappdirs)
 library(ggplot2)
@@ -68,7 +67,7 @@ my_path <- "~/Data/Raw/"
 out_dir <- "~/Data/Processed/"
 eco_path <- paste0(my_path, "Ecoregions2017.shp")
 eco_col <- "ECO_NAME"
-aoh_dir <- paste0(my_path, "area-habitat/AOH maps") # area of habitat rasters, update when change file structure to "Raw"
+aoh_dir <- paste0(my_path, "AOH maps") # area of habitat rasters, update when change file structure to "Raw"
 
 target_crs <- "EPSG:3035" # for area projections
 
@@ -100,7 +99,7 @@ Get Britain and Ireland bounding box and ecoregions
 # get GADM boundaries for great britain, ireland and crown dependencies (Isle of man and channel islands) (GADM, 2026, V 4.1)
 land <- c("gadm41_GBR_0_pk", "gadm41_IRL_0_pk", "gadm41_IMN_0_pk", "gadm41_GGY_0_pk", "gadm41_JEY_0_pk") %>%
   lapply(function(f) {
-    obj <- readRDS(paste0(my_path, f, ".rds"))
+    obj <- readRDS(paste0(my_path, f))
     if (inherits(obj, "PackedSpatVector")) obj <- terra::unwrap(obj)
     st_as_sf(obj)
   }) %>%

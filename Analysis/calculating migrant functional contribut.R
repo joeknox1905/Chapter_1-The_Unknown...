@@ -8,14 +8,14 @@
 ##############################################################################################################################################
 
 
-BI_traitspace<- read.csv("../Data/Processed/eco_region_traitspace_PCA_BI.csv") # full Britain and Ireland trait space or beak-only AVONET PCA/PCOA scores, status and species (columns) by ecoregion (rows)- can either use PCOA or PCA
+BI_traitspace<- read.csv("Data/Processed/eco_region_traitspace_PCA_BI.csv") # full Britain and Ireland trait space or beak-only AVONET PCA/PCOA scores, status and species (columns) by ecoregion (rows)- can either use PCOA or PCA
 #TG: it's better/more common to write things in path_from_the_file (so that "/Data/..." becomes "../Data/...")
 
 #specificy trait columns from trait space
 trait_cols <- grep("^PC", names(BI_traitspace), value = TRUE)
 
 #Also need seasonal trait space for seasonal comparisons (e.g. winter/summer/autumn migrants unique compared to residents 
-season_eco_region_traitspace<- read.csv("../Data/Processed/eco_region_season_traitspace_PCA_BI.csv")
+season_eco_region_traitspace<- read.csv("Data/Processed/eco_region_season_traitspace_PCA_BI.csv")
 
 #@@@JK to TG: (PC scores are created from the full traitspace for Britain and Ireland) so for each ecoregion, migrant and resident group centroids will be relative to the full Britain and Ireland species traitspace- is this ok if I am focusing on local (ecoregional) functional diversity?
 
@@ -60,7 +60,7 @@ random_test <- custom.subsets(space_2D, group = list("A" = random_groups[,1], "B
 expect_equal(summary(dispRity(random_test, metric = pairwise.distance.between.centroids, between.groups = TRUE))$obs, 0.088)
 
 non_random_groups <- list("A" = which(space_2D[,1] <= -0.5 & space_2D[,2] <= -0.5),
-                          "B" = which(space_2D[,1] >= 1 & space_2D[,2] >= 1))
+"B" = which(space_2D[,1] >= 1 & space_2D[,2] >= 1))
 non_random_test <- custom.subsets(space_2D, group = non_random_groups)
 # plot(non_random_test)
 expect_equal(summary(dispRity(non_random_test, metric = pairwise.distance.between.centroids, between.groups = TRUE))$obs, 5.382)
@@ -70,14 +70,39 @@ complete_overlap <- custom.subsets(space_2D, group = list("A" = random_groups[,1
 expect_equal(summary(dispRity(complete_overlap, metric = pairwise.distance.between.centroids, between.groups = TRUE))$obs, 0)
 
 
+## Step 3: formalising- but other way is probably better for interpretation and visualisation
+
+## Creating a 2D uniform space
+example_space <- space.maker(300, 2, runif)
+
+example_test <- test.metric(example_space, metric = c(pairwise.distance.between.centroids),
+ shifts = c("random",  "size", "density", "position")) #position may be better here for this metric i.e. do the groups change position in trait space
+ 
+ #get results
+ summary(example_test)
+ #runs three replicates of the space reduction and again runs tests sequentially removing 10% of data with specified metrics and linear modelling
+# a good metric will have no trend in the size direction, but have a trend for the reduction of interest i.e. if interested in size, should show sensitivity to space decreases?
+
+#visualise
+plot(example_test)
 
 
-## Step 3: same but formally
-# https://raw.githack.com/TGuillerme/dispRity/master/inst/gitbook/_book/details-of-specific-functions.html#which-disparity-metric-to-choose
-# https://nsojournals.onlinelibrary.wiley.com/doi/full/10.1111/ecog.07580
 
 
-#-----------------------------metric for calculating displacement to centroid------------------------
+#-------------metric for calculating nestedness vs overlap-----------------------------------------------
+
+within.edge.quantiles.
+#is group within the upper bounds of the other group trait space (for each PC seperately; in this case would be residents as the reference). if complete overlap = group is a complete subset of the other group
+#if not than group is not a complete subset of the other group and there is some functional turnover
+# need resident matrix
+# migrant matrix
+#between groups
+#return matrix overlap for each group 
+
+
+
+
+#-----------------------------metric for calculating displacement from centroid (deviance pf migrant group from average trait combos)------------------------
 
 #i.e. is migrant groups average trait combinations (centroid) at the center (centroid, 1) or away from centre (<1) of traitspace and therefore does it represent typical/redundant niches (generalist) or more unique niches (specialist)?
 #more of a positional measure than a size measure (Guillerme et al., 2020). 
@@ -178,6 +203,11 @@ t.test((mean_ellips_cont ~ group, data = disparity_result )) # welches t test ac
 
 #call function
 calculate.mean.ellipse.contrib.sig(disparity_result = result_binary) #or result_monthly
+
+
+Functions to calculate how nested the groups are?
+
+
 
 ##############################################################################################################################################
 #------------functions to calculate disprity metrics by ecoregion and summarise metric in a single table for all ecoregions------------------

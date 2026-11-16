@@ -8,13 +8,14 @@
 ##############################################################################################################################################
 
 
-BI_traitspace<- read.csv("Data/Processed/eco_region_traitspace__PCA_BI.csv") # full Britain and Ireland trait space or beak-only AVONET PCA/PCOA scores, status and species (columns) by ecoregion (rows)- can either use PCOA or PCA
+BI_traitspace<- read.csv("../Data/Processed/eco_region_traitspace_PCA_BI.csv") # full Britain and Ireland trait space or beak-only AVONET PCA/PCOA scores, status and species (columns) by ecoregion (rows)- can either use PCOA or PCA
+#TG: it's better/more common to write things in path_from_the_file (so that "/Data/..." becomes "../Data/...")
 
 #specificy trait columns from trait space
 trait_cols <- grep("^PC", names(BI_traitspace), value = TRUE)
 
 #Also need seasonal trait space for seasonal comparisons (e.g. winter/summer/autumn migrants unique compared to residents 
-season_eco_region_traitspace<- read.csv("Data/Processed/eco_region_season_traitspace_PCA_BI.csv")
+season_eco_region_traitspace<- read.csv("../Data/Processed/eco_region_season_traitspace_PCA_BI.csv")
 
 #@@@JK to TG: (PC scores are created from the full traitspace for Britain and Ireland) so for each ecoregion, migrant and resident group centroids will be relative to the full Britain and Ireland species traitspace- is this ok if I am focusing on local (ecoregional) functional diversity?
 
@@ -31,7 +32,7 @@ season_eco_region_traitspace<- read.csv("Data/Processed/eco_region_season_traits
 
 
 
-distance.between.centroids <- function(matrix, matrix2) {
+pairwise.distance.between.centroids <- function(matrix, matrix2) {
     ## calculate the centroid of the matrices of n-dimensional traitspace
    sqrt(sum((colMeans(matrix) - colMeans(matrix2))^2))
 } #sum of the euclidean distance between migrant group and resident centroids across multidimensional traitspace
@@ -39,6 +40,41 @@ distance.between.centroids <- function(matrix, matrix2) {
 
 ## Test if disprity understands it
 make.metric(pairwise.distance.between.centroids) #in this case should be level 1 (only one output) and between.groups
+
+## Unit testing
+
+## Step 1: make sure the function does what you tell it to do
+stupid <- matrix(rnorm(25), 5, 5)
+testthat::expect_equal(pairwise.distance.between.centroids(stupid, stupid), 0)
+
+matrix <- matrix(0, 5, 2)
+matrix2 <- matrix(10, 5, 2)
+testthat::expect_equal(pairwise.distance.between.centroids(matrix, matrix2), sqrt(2*(10^2)))
+
+## Step 2: try to understand how the function works in a real multidimensional example/space
+set.seed(1)
+space_2D <- BI_traitspace[, c("PC1", "PC2")]
+random_groups <- replicate(2, sample(1:nrow(BI_traitspace), floor(nrow(BI_traitspace)/2)))
+random_test <- custom.subsets(space_2D, group = list("A" = random_groups[,1], "B" = random_groups[,2]))
+# plot(random_test)
+expect_equal(summary(dispRity(random_test, metric = pairwise.distance.between.centroids, between.groups = TRUE))$obs, 0.088)
+
+non_random_groups <- list("A" = which(space_2D[,1] <= -0.5 & space_2D[,2] <= -0.5),
+                          "B" = which(space_2D[,1] >= 1 & space_2D[,2] >= 1))
+non_random_test <- custom.subsets(space_2D, group = non_random_groups)
+# plot(non_random_test)
+expect_equal(summary(dispRity(non_random_test, metric = pairwise.distance.between.centroids, between.groups = TRUE))$obs, 5.382)
+
+complete_overlap <- custom.subsets(space_2D, group = list("A" = random_groups[,1], "B" = random_groups[,1]))
+# plot(complete_overlap)
+expect_equal(summary(dispRity(complete_overlap, metric = pairwise.distance.between.centroids, between.groups = TRUE))$obs, 0)
+
+
+
+
+## Step 3: same but formally
+# https://raw.githack.com/TGuillerme/dispRity/master/inst/gitbook/_book/details-of-specific-functions.html#which-disparity-metric-to-choose
+# https://nsojournals.onlinelibrary.wiley.com/doi/full/10.1111/ecog.07580
 
 
 #-----------------------------metric for calculating displacement to centroid------------------------

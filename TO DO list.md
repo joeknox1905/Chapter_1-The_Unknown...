@@ -13,9 +13,9 @@ Chapter 1:
 
 
 To do:
-[] re-run aoh pipeline- add check- check residents are present in every month of very season
-[] go through comments and enact for PCA (rerun without kipps distance), seasonal assemblage pipeline, intial thesis plan and funct contribution (can wait till hacakthon)
-[] visualise PCAs in traitspace (ggplots/ordiplot/ellipse plot)- functionalise plots
+[] re-run aoh pipeline- add check
+[] go through comments and enact for PCA (rerun without kipps distance), 
+[] visualise PCAs in traitspace (ggplots/ordiplot/ellipse plot)- functionalise plots; using custom functions to get subsets for plotting- then can refine more metrics e.g. edge ones
 [] Work on report
 [] Run FD metrics- hackathon
 [] what traits/things explain the difference among migrants/residents in traitspace if there is any- transience (monthly analysis)/ diet/forgaing niche (avoniche)- do literature search to explore possible seasonal effects.

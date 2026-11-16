@@ -8,7 +8,7 @@
 ##############################################################################################################################################
 
 
-BI_traitspace<- read.csv("Data/Processed/eco_region_traitspace_PCA_BI.csv") # full Britain and Ireland trait space or beak-only AVONET PCA/PCOA scores, status and species (columns) by ecoregion (rows)- can either use PCOA or PCA
+BI_traitspace<- read.csv("../Data/Processed/eco_region_traitspace_PCA_BI.csv") # full Britain and Ireland trait space or beak-only AVONET PCA/PCOA scores, status and species (columns) by ecoregion (rows)- can either use PCOA or PCA
 #TG: it's better/more common to write things in path_from_the_file (so that "/Data/..." becomes "../Data/...")
 
 #specificy trait columns from trait space
@@ -222,7 +222,7 @@ calculate.disprity.by.migrant.group <- function(d, group, metric, trait_cols, be
   custom.subsets(mat, group = grp) %>% 
     boot.matrix(bootstraps = bootstraps, rarefaction = min)) %>% #bootstrap with replacement (resample species from ecoregional pool for each migrant group and rarefy to the minimum number of species of a group in the ecoregion
     #rarefaction = min would work as resident vs migrant groups are not too skewed in species richness 
-    disparity<- dispRity(metric = metric, between.groups = between) %>% in the group with the fewest species
+    disparity<- dispRity(metric = metric, groups= groups, between.groups = between) %>% in the group with the fewest species
     disp_result<- summary(disparity) #summarise disprity metric, (50, 95%) quantiles, median boostrap value)
 }
 #n.b. bootstrapping ensures greater confidence in metric for the group i.e. metric is due to a real biological difference, not just an artefact of sampling variance
@@ -251,11 +251,11 @@ result_binary_seasonally  <- calculate.disprity.by.ecoregion.and.season(BI_trait
 # for this analysis, the seasonal migrant group pairs would also be compared against eachother as well as to residents which is what we want
 
 
-#get result for migrants grouped by number of months present (more grnaular/passage analysis)- can also check passage vs non-passage migrants (grouped by range type from birdlife)
+#get result for migrants grouped by number of months present (more granular/passage analysis)- can also check passage vs non-passage migrants (grouped by range type from birdlife)
 result_monthly_yearly <- calculate.disprity.by.ecoregion(BI_traitspace, group = "n_month_year", metric = distance.between.centroids , trait_cols = trait_cols, between = TRUE) 
 # for this analysis, the monthly migrant group pairs would also be compared against eachother as well as to residents which is what we want
 
-#get result for migrants grouped by number of months present in each season - follows on from seasonal analysis a bit better
+#get result for migrants grouped by number of months present in each season - follows on from seasonal analysis a bit better- will have to change this
 result_monthly_seasonally <- calculate.disprity.by.ecoregion.and.season(BI_traitspace, group = "n_month_season", metric = distance.between.centroids , trait_cols = trait_cols, between = TRUE) 
 
 

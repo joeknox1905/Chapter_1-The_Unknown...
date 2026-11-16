@@ -63,8 +63,8 @@ AOH maps from Birdlife International, building on (Lumbierres et al., 2022): "th
 
 ```{r}
 # ---- Settings ----
-my_path <- "~/Data/Raw/"
-out_dir <- "~/Data/Processed/"
+my_path <- "~//Desktop/Chapter 1/Data/Raw/"
+out_dir <- "~/Desktop/Chapter 1/Data/Processed/"
 eco_path <- paste0(my_path, "Ecoregions2017.shp")
 eco_col <- "ECO_NAME"
 aoh_dir <- paste0(my_path, "AOH maps") # area of habitat rasters, update when change file structure to "Raw"
@@ -72,7 +72,7 @@ aoh_dir <- paste0(my_path, "AOH maps") # area of habitat rasters, update when ch
 target_crs <- "EPSG:3035" # for area projections
 
 presence_keep <- c(1, 2) # extant and probably extant species are retained in line with aoh maps
-origin_keep <- c(1, 2, 6) # native, reintroduced and assisted colonisation ranges are retained, introduced (was causing issues), vagrant and uncertain origin ranges are removed  in line with aoh maps
+origin_keep <- c(1, 2, 6) # native, reintroduced and assisted colonisation ranges are retained, introduced (will add fall back if decide to comapre later), vagrant and uncertain origin ranges are removed  in line with aoh maps
 seasonal_keep <- 1:4 # resident, breeding and non-breeding and passage range is kept, vagrant range where or range of uncertain seasonal presence is removed (n.b. aoh map makers include uncertain presence).
 
 min_km2 <- 1 # species with at least 1km2 of range intersecting will be included in ecoregional assemblage to avoid edge cases

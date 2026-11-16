@@ -127,7 +127,8 @@ displacements() in dispRity
 #need to call between.groups = FALSE
 result_binary  <- calculate.disprity.by.ecoregion(BI_traitspace, group = "status", metric = distance.between.centroids , trait_cols = trait_cols, between = FALSE) 
 
-
+#could also calculate point.dist- distance from centroid of matrix 2 to matrix which may be more what you want
+dispRity(point.dist(point=colMeans))
 
 #----------------metric for calculating distribution of species within each group around centroid----------------
 

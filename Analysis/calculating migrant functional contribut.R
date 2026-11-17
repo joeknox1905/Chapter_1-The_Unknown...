@@ -76,8 +76,9 @@ European Atlantic mixed forests.migrant:European Atlantic mixed forests.resident
 North Atlantic moist mixed forests.migrant:North Atlantic moist mixed forests.resident = 0.78, bootstrapped = 0.84, rarefied = 0.94
 
 
-# so looks like celtic and english forests have largest distances but also happen to be the largets groups:
-#so then need to look at rarefied and bootstrapped values- in this case looks like boostrapping and rarefying do a good job (cfairly onsistent with observed value, so metric is not too sensitive to species richness) so will use the the rarefied boostrapped values
+# so looks like european atlantic forest especially, and then english lowland and caldeon conifer forests have a large distance between centroids, suggesting divergent average trait combinations
+# n these ecoregions- would have to llok into ecosystem types, the diets, phylogeny and kinds of birds to continue to subset first, also look across groups and find a better way of plotting
+
 
 
 

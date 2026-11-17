@@ -3,7 +3,7 @@ performs a PERMANOVA BY migratory status, ecoregion and season as a preliminary 
 
 load libraries------------
 library(vegan)
-Library(ggplot)
+library(ggplot2)
 
 
 #loading traitspaces
@@ -15,29 +15,26 @@ avospace<- read.csv("Data/Processed/eco_region_traitspace_PCA_BI.csv")
 #visualising overlap of groups in traitspace with ggplot------------------
 #######################################################################
 
+#ellipses of migrant vs resident group in traitspace by ecoregion
 ellipse_plot1 <- ggplot(avospace, aes(PC1, PC2, colour = status)) +
+  stat_ellipse(aes(fill = status), geom = "polygon", alpha = 0.2) +
+  geom_point() +
+  facet_wrap(~ ecoregion) +
+  theme_light()
+
+ggsave("ecoregion_seasonal_status_pca_ellipses_plot1.png", plot = ellipse_plot1, dpi=300)
+
+#ellipses of migrant vs resident group in traitspace by ecoregion and season
+ellipse_plot2 <- ggplot(avospace, aes(PC1, PC2, colour = status)) +
   stat_ellipse(aes(fill = status), geom = "polygon", alpha = 0.2) +
   geom_point() +
   facet_wrap(~ season + ecoregion) +
   theme_light()
 
-ggsave("ecoregion_seasonal_status_pca_ellipses_plot1.png", plot = ellipse_plot1, dpi=300)
+ggsave("ecoregion_seasonal_status_pca_ellipses_plot2.png", plot = ellipse_plot2, dpi=300)
 
-ellipse_plot2 <- ggplot(avospace, aes(PC3, PC4, colour = status)) +
-  stat_ellipse(aes(fill = status), geom = "polygon", alpha = 0.2) +
-  geom_point() +
-  facet_wrap(~ season + ecoregion) +
-  theme_light() 
 
-  ggsave("ecoregion_seasonal_status_pca_ellipses_plot2.png", plot = ellipse_plot2, dpi=300)
-
-ellipse_plot3 <- ggplot(avospace, aes(PC5, PC6, colour = status)) +
-  stat_ellipse(aes(fill = status), geom = "polygon", alpha = 0.2) +
-  geom_point() +
-  facet_wrap(~ season + ecoregion) +
-  theme_light() 
-
-  ggsave("ecoregion_seasonal_status_pca_ellipses_plot3.png", plot = ellipse_plot3, dpi=300)
+#looks like edge-edge nestedness will be good
 
 ####################################################################
 #visualise distance to centroids of group with vegan---------------------

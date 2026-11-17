@@ -95,13 +95,15 @@ plot(example_test)
 #-------------metric for calculating nestedness vs overlap-----------------------------------------------
 
 within.quantiles<- 
-#is group within the upper bounds of the other group trait space (for each PC seperately; in this case would be residents as the reference). if complete overlap = group is a complete subset of the other group
+#is migrant group within the upper bounds of the resident group trait space (for each PC seperately; in this case would be residents as the reference)- compute quantiles compute quantile overlap
+#if complete overlap = group is a complete subset of the other group
 #if not than group is not a complete subset of the other group and there is some functional turnover
 # need resident matrix
 # migrant matrix
 #between groups (quantiles of each axis in matrix 1 -quantiles of each axis in matrix 2) #default is 95% quantiles
 #return matrix overlap for each group 
 
+#could calculate as a proportion e.g. proportional overlap
 
 
 #-----------------------------metric for calculating displacement from centroid (deviance pf migrant group from average trait combos)------------------------

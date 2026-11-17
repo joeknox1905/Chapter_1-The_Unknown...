@@ -103,6 +103,26 @@ within.quantiles<-
 #between groups (quantiles of each axis in matrix 1 -quantiles of each axis in matrix 2) #default is 95% quantiles
 #return matrix overlap for each group 
 
+
+quantile.overlap<- function(matrix, matrix2, probs = c(0.25, 0.975){
+  q1 <- apply(matrix, 2, quantile, probs = probs) # apply quantile calculation to each PC dimension (column) in the group matrix
+  q2<- apply(matrix2, 2, quantile, probs = probs) #returns vector of 95% quantiles for for each dimension
+  intersect <- pmax(0, pmin(qa[2, ], qb[2, ]) - pmax(qa[1, ], qb[1, ])) #get minimum upper bound of groups and maximum lower bound of groups for each dimension (column)  i.e. get minimum distance between group (nearest edges), this will be the intersection (overlap), if groups do not overlap, set to 0 as distance is negative
+  span <- pmax(qa[2, ], qb[2, ]) - pmin(qa[1, ], qb[1, ]) #minus maximum upper bound of groups from minimum lower bound of groups for each dimension to get combined group span across each dimension
+  intersect / span # quantile overlap = proportion of overlap compared to full span.
+  #no overlap = 0
+  #complete overlap = 1 
+  #Which essentially returns the nestedness compared to funcitonal uniqueness -
+}
+
+#
+disprity(traitspace_mat, metric = quantile.overlap, between.groups = TRUE) #either returns vector of overlap for each dimension
+disprity(traitspace_mat, metric = c(mean, quantile.overlap), between.groups = TRUE) #or overlap of all quantiles- which is not as informative
+
+
+#distance between groups using 95% quantiles- assuming this is the overlap?- ask Thomas
+dispRity(traitspace_mat, metric = group.dist, between.groups = TRUE))probs = c(0.025, 0.975)
+
 #could calculate as a proportion e.g. proportional overlap
 
 

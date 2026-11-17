@@ -50,6 +50,7 @@ library(stringr)
 library(exactextractr)
 library(testthat)
 library(xtable)
+library(aoh)
 ```
 <!-- TG: There's a lot of packages loaded here! No problem per se but it's always good to keep in mind that the more packages the harder it is to reproduce the code in the future (due to packages dependencies, updates, etc...). -->
 
@@ -67,7 +68,7 @@ my_path <- "~//Desktop/Chapter 1/Data/Raw/"
 out_dir <- "~/Desktop/Chapter 1/Data/Processed/"
 eco_path <- paste0(my_path, "Ecoregions2017.shp")
 eco_col <- "ECO_NAME"
-aoh_dir <- paste0(my_path, "AOH maps") # area of habitat rasters, update when change file structure to "Raw"
+aoh_dir <- paste0(my_path, "AOH maps/") # area of habitat rasters, update when change file structure to "Raw"
 
 target_crs <- "EPSG:3035" # for area projections
 
@@ -169,12 +170,149 @@ range_type_by_season_and_origin %>%
     format = "latex",
     booktabs = TRUE,
     caption = "Range Types by Origin and Season",
-    align = c("l", "c", "r")
-  ) %>%
+    align = c("l", "c", "c")) %>%
   kable_styling(
     latex_options = c("striped", "hold_position"),
-    full_width = FALSE
-  )
+    full_width = FALSE) %>%
+    cat(., file = "range_type_by_season_and_origin.tex")
+
+
+# get area of each species' range type intersecting each ecoregion
+range_cache <- paste0(out_dir, "range_ecoregions_km2.rds")
+if (file.exists(range_cache)) {
+  range_all <- readRDS(range_cache) # overwrite file if re-running on another continent
+} else {
+  eco_3035 <- st_transform(eco_land, tarlibrary(dplyr)
+library(tidyr)
+library(terra)
+library(rappdirs)
+library(ggplot2)
+library(ggmap)
+library(sf)
+library(tibble)
+library(kableExtra)
+library(purrr)
+library(stringr)
+library(exactextractr)
+library(testthat)
+library(xtable)
+```
+<!-- TG: There's a lot of packages loaded here! No problem per se but it's always good to keep in mind that the more packages the harder it is to reproduce the code in the future (due to packages dependencies, updates, etc...). -->
+
+
+# Refining species ranges based on area of habitat maps
+-------------------------
+
+AOH maps from Birdlife International, building on (Lumbierres et al., 2022): "the distribution of a species within its range, refined by habitat suitability" (Bridge et al., 2019). These rasters are created from habitat (Copernicus landcover product at 100m res and World Behrmann cylindrical equal-area projection (ESRI:54017); Buchhorn et al., 2020 Lumierres et al., 2021; Dahal et al., 2022) and elevation suitability (upper and lower altitudinal limits using global digital elevation model EarthEnv-DEM90 at 90m resolution, Robinson et al., 2014) for each species. Non-breeding (resident, non-breeding, uncertain seasonal occurrence and missing range data) and breeding maps (resident, breeding, uncertain seasonal occurrence and missing range data) are used for migratory species (all full and altitudinal migrants but not nomads or species with unknown migratory status), whilst a single resident range map (resident, breeding, non-breeding, passage, uncertain seasonal occurrence and missing range data) is used for residents. Maps were validated by comparing proportion of grid cells inside the range map retained in the AOH map following Dahal et al., (2021). (The final maps are to 1km2 resolution aggregated to ecoregions). 
+
+# defintions
+
+```{r}
+# ---- Settings ----
+my_path <- "~//Desktop/Chapter 1/Data/Raw/"
+out_dir <- "~/Desktop/Chapter 1/Data/Processed/"
+eco_path <- paste0(my_path, "Ecoregions2017.shp")
+eco_col <- "ECO_NAME"
+aoh_dir <- paste0(my_path, "AOH maps/") # area of habitat rasters, update when change file structure to "Raw"
+
+target_crs <- "EPSG:3035" # for area projections
+
+presence_keep <- c(1, 2) # extant and probably extant species are retained in line with aoh maps
+origin_keep <- c(1, 2, 6) # native, reintroduced and assisted colonisation ranges are retained, introduced (will add fall back if decide to comapre later), vagrant and uncertain origin ranges are removed  in line with aoh maps
+seasonal_keep <- 1:4 # resident, breeding and non-breeding and passage range is kept, vagrant range where or range of uncertain seasonal presence is removed (n.b. aoh map makers include uncertain presence).
+
+min_km2 <- 1 # species with at least 1km2 of range intersecting will be included in ecoregional assemblage to avoid edge cases
+aoh_min_km2 <- 1 # calculation for how much aoh range overlaps ecoregion
+min_months <- 1 # a species must be present in at least 1 month in a season to be included in the season
+
+month_cols <- month.abb
+season_lookup <- c(
+  Apr = "Spring Mig", May = "Summer", Jun = "Summer", Jul = "Summer",
+  Aug = "Autumn Mig", Sep = "Autumn Mig", Oct = "Autumn Mig", Nov = "Winter", Dec = "Winter", Jan = "Winter", Feb = "Winter", Mar = "Spring Mig"
+)
+
+stopifnot(setequal(names(season_lookup), month_cols)) # to catch typos e.g. september instead of sep
+
+# Tried to be as consistent with seasonality of BTO BBS and WBS breeding vs non-breeding timings as possible, whilst accounting for passage periods and late/early migrations. Seems like a lot of species may be exclusive to winter/summer season and not to passage season from preliminary analysis but will see.
+
+# note that in each continent, seasons will change.
+```
+
+Get Britain and Ireland bounding box and ecoregions
+-----------
+
+```{r}
+# get GADM boundaries for great britain, ireland and crown dependencies (Isle of man and channel islands) (GADM, 2026, V 4.1)
+land <- c("gadm41_GBR_0_pk", "gadm41_IRL_0_pk", "gadm41_IMN_0_pk", "gadm41_GGY_0_pk", "gadm41_JEY_0_pk") %>%
+  lapply(function(f) {
+    obj <- readRDS(paste0(my_path, f))
+    if (inherits(obj, "PackedSpatVector")) obj <- terra::unwrap(obj)
+    st_as_sf(obj)
+  }) %>%
+  bind_rows() %>%
+  st_transform(4326) %>%
+  st_union() # project to WGS84 lon/lat
+
+bbox_wkt <- st_as_text(st_as_sfc(st_bbox(land)))
+
+# overwrite RDS if change the GADM files or ecoregion shapefile- i.e. when analysing other continents
+eco_cache <- paste0(out_dir, "eco_land.rds")
+if (file.exists(eco_cache)) {
+  eco_land <- readRDS(eco_cache)
+} else {
+  eco_land <- st_read(eco_path, wkt_filter = bbox_wkt, quiet = TRUE) %>% # read in ecoregion shape file and clip to bounding box
+    st_transform(4326) %>%
+    st_make_valid() %>%
+    select(ecoregion = all_of(eco_col)) %>%
+    st_intersection(land) # clip ecoregions to birdlife range maps
+  saveRDS(eco_land, eco_cache) # save clipped ecoregion  polygon as rds file.
+}
+```
+
+Read in Birdlife range maps
+-------
+
+```{r}
+# clip all seasonal and resident range maps to bounding box
+
+range_raw <- st_read(paste0(my_path, "BOTW_2025.gpkg"),
+  query = "SELECT sisid, sci_name, presence, origin, seasonal, geom
+FROM \"all_species\"",
+  wkt_filter = bbox_wkt, quiet = TRUE
+) # This follows the Birdlife taxonomy (HBW and Birdlife International, 2025; from del Hoyo and Collar 2014 & 2016)
+
+# filter to keep only the specified presences, origins and seasons specified earlier
+range_sf <- filter(
+  range_raw,
+  presence %in% presence_keep,
+  origin %in% origin_keep,
+  seasonal %in% seasonal_keep
+)
+
+# get extant species that lose their polygons due to origin and seasonal filters (i.e. introduced, vagrant and uncertain season species)
+dropped_by_codes <- range_raw %>%
+  st_drop_geometry() %>% #transforms spatial geometry into dataframe
+  filter(presence %in% presence_keep) %>%
+  distinct(sisid, sci_name) %>%
+  anti_join(distinct(st_drop_geometry(range_sf), sisid), by = "sisid")
+dropped_by_codes # 13 introduced/vagrant species are lost: monk and rose-ringed parakeets, ruddy, mandarin and muscovy ducks,  common, golden and reeve's pheasants; geese (canada, black swan, bar-headed, egyptian and snow). Otherwise would be dropped by aoh maps as can't be verified. WIll re-run analysis with species range maps as fallbacks later on.
+
+# range types by origin- note will not be the final number, but can repurpose
+range_type_by_season_and_origin <- count(st_drop_geometry(range_sf), seasonal, origin)
+
+
+# render in latex
+
+range_type_by_season_and_origin %>%
+  kable(
+    format = "latex",
+    booktabs = TRUE,
+    caption = "Range Types by Origin and Season",
+    align = c("l", "c", "c")) %>%
+  kable_styling(
+    latex_options = c("striped", "hold_position"),
+    full_width = FALSE) %>%
+    cat(., file = "range_type_by_season_and_origin.tex")
 
 
 # get area of each species' range type intersecting each ecoregion
@@ -197,6 +335,8 @@ if (file.exists(range_cache)) {
     st_crop(bb) # crop to more generous bounding box
   sf_use_s2(TRUE) # reproject to non-planar
 
+  length(unique(range_bi$species)) #279 species with generous gadm boundaries
+
   # get area of intersection of birdlife ranges with ecoregions
   range_all <- range_bi %>%
     st_transform(target_crs) %>%
@@ -206,6 +346,8 @@ if (file.exists(range_cache)) {
     st_drop_geometry() %>%
     group_by(ecoregion, sisid, species, seasonal) %>%
     summarise(km2 = sum(km2), .groups = "drop") # summarise area in km2 of each species' range maps intersecting each ecoregion
+
+  length(unique(range_bi$species)) #250 species once clipped Britain and Ireland Birdlife ranges to ecoregions
 
   # save as RDS
   saveRDS(range_all, range_cache)
@@ -261,7 +403,115 @@ no_pheno <- range_all %>%
   distinct(sisid, species)
 no_pheno
 
-# morus bassanus has no phenology but has no aoh map as a seabird so will be removed later
+#0 species so all good
+```
+
+
+# Get area of habitat maps for each species and overlay
+
+```{r}
+# extract species aoh rasters by birdlife ID
+aoh_maps <- tibble(path = list.files(aoh_dir, pattern = "\\.tif$", recursive = TRUE, full.names = TRUE)) %>% # species aoh rasters
+  mutate(
+    m = str_match(
+      tools::file_path_sans_ext(basename(path)),
+      regex("^FRC_(\\d+)_(Breeding|Nonbreeding|Resident)$", #extract layer names
+        ignore_case = TRUE
+      )
+    ),
+    sisid = as.numeric(m[, 2]), layer = tolower(m[, 3]) # convert layer names to lower case
+  ) %>%
+  filter(!is.na(sisid), sisid %in% range_all$sisid) %>% # filter aoh maps to only species with Birdlife range in Britain and Ireland
+  select(path, sisid, layer)
+
+has_map <- unique(aoh_maps$sisid) # all species with an aoh map
+
+# check species with Britain and Ireland Birdlife range but no aoh map e.g. pelagic?
+no_map <- range_all %>%
+  filter(!sisid %in% has_map) %>%
+  distinct(sisid, species)
+no_map 
+
+# project ecoregions in WGS84 to ESRI 3035 for area calculation.
+  bb <- st_bbox(land) + c(-1, -1, 1, 1) # allow a slight margin of error for cropping birdlife ranges to GADM bounding box to avoid cutting off land near edge of bounding box
+
+  sf_use_s2(FALSE) # working on flat earth to avoid make_valid issues later on with birdlife range polygons
+  range_bi <- range_sf %>%
+    mutate(
+      species = str_replace_all(sci_name, " ", "_"),
+      sisid = as.numeric(sisid)
+    ) %>%
+    select(sisid, species, seasonal) %>%
+    st_make_valid() %>%
+    st_crop(bb) # crop to more generous bounding box
+  sf_use_s2(TRUE) # reproject to non-planar
+
+  # get area of intersection of birdlife ranges with ecoregions
+  range_all <- range_bi %>%
+    st_transform(target_crs) %>%
+    st_make_valid() %>%
+    st_intersection(eco_3035) %>%
+    mutate(km2 = as.numeric(st_area(.)) / 1e6) %>%
+    st_drop_geometry() %>%
+    group_by(ecoregion, sisid, species, seasonal) %>%
+    summarise(km2 = sum(km2), .groups = "drop") # summarise area in km2 of each species' range maps intersecting each ecoregion
+
+  # save as RDS
+  saveRDS(range_all, range_cache)
+}
+
+```
+
+
+
+# Get monthly presence of species in each ecoregion using the Bellve et al. (2026) phenology for migratory species
+
+```{r}
+# read in monthly phenology data from Bellve et al. (2026)
+pheno_df <- read.csv(paste0(my_path, "bird_season_by_month.csv"))
+pheno_df$species_rast <- str_replace_all(pheno_df$species_rast, " ", "_")
+codes <- c("Resident" = 1, "Breeding" = 2, "Non-Breeding" = 3, "Passage" = 4)
+pheno_df[month_cols] <- lapply(pheno_df[month_cols], function(x) unname(codes[x])) # apply range codes to each month of the year
+
+# ##change phenology data for Coturnix coturnix to encompass seasonal breeding season in
+# British Isles (May-August). Little is known about passage/non-breeding season but fine to
+# impute as only breeding range covers sites in British Isles.
+pheno_df[pheno_df$species_rast == "Coturnix_coturnix", month_cols] <-
+  data.frame(
+    Jan = 3, Feb = 4, Mar = 4, Apr = 4, May = 2, Jun = 2,
+    Jul = 2, Aug = 2, Sep = 4, Oct = 4, Nov = 4, Dec = 3
+  )
+
+# change phenology for Larus marinus to encompass non-breeding range in winter:
+pheno_df[pheno_df$species_rast == "Larus_marinus", c("Dec", "Jan", "Feb", "Mar")] <- 3
+
+# change phenology for Morus bassanus compiled from eBird S&T, BTO, RSPB, NatureScot
+gannet <- pheno_df[1, ] %>%
+  mutate(
+    species_rast = "Morus_bassanus", Nov = 3, Dec = 3, Jan = 3, Feb = 4,
+    Mar = 2, Apr = 2, May = 2, Jun = 2, Jul = 2, Aug = 2, Sep = 4, Oct = 4,
+    n.present = TRUE
+  ) %>%
+  select(names(pheno_df))
+pheno_df <- pheno_df %>%
+  filter(species_rast != "Morus_bassanus") %>%
+  bind_rows(gannet)
+
+# get monthly ranges type (as codes) for each species
+pheno_long <- pheno_df %>%
+  group_by(species_rast) %>%
+  slice(1) %>%
+  ungroup() %>% # species with different northern and southern hemisphere ranges will use northern phenology- for global will change to use northern in northern hemisphere and southern in southern hemisphere
+  pivot_longer(all_of(month_cols), names_to = "month", values_to = "code") %>% # match phenology to month names and range type codes in Birdlife
+  select(species = species_rast, month, code)
+
+# check which migrants (with non-seasonal range maps in birdlife) have no phenology Bellve et al. (2026) so will be dropped from analysis
+no_pheno <- range_all %>%
+  filter(seasonal != 1, !species %in% pheno_long$species) %>%
+  distinct(sisid, species)
+no_pheno
+
+#0 species so all good
 ```
 
 

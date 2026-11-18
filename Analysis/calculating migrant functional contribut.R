@@ -13,19 +13,35 @@ library(dispRity)
 
 #load functions
 
-make.ecoregional.migrant.groups <- function(by) {
-  lapply(split(traitspace_df$species, traitspace_df[by], drop = TRUE), unique) #split traitspace by distinct ecoregion, status (and season for seasonal analysis) across all columns
+#making groups function
+make.ecoregional.migrant.groups <- function(traitspace_df, by) {
+  lapply(split(traitspace_df$species, traitspace_df[by], drop = TRUE), unique) #get list of species per ecoregion, status (and season for seasonal analysis) by splitting dataframe
 }
 
-# Create subsets
+#calcualting distance between centroids function
+pairwise.distance.between.centroids <- function(matrix, matrix2) {
+    ## calculate the centroid of the matrices of n-dimensional traitspace
+   sqrt(sum((colMeans(matrix) - colMeans(matrix2))^2))
+}
+
+#calcualting quantile overlap function (nestedness)
+quantile.overlap<- function (matrix, matrix2, probs = c(0.25, 0.975)) {
+  q1 <- apply(matrix, 2, quantile, probs = probs) 
+  q2<- apply(matrix2, 2, quantile, probs = probs)
+  intersect <- pmax(0, pmin(q1[2, ], q2[2, ]) - pmax(q1[1, ], q2[1, ])) 
+  span <- pmax(q1[2, ], q2[2, ]) - pmin(q1[1, ], q2[1, ])
+  intersect / span 
+}
+
+# LOad traitspace and convert to matrix
 
 traitspace_df<- read.csv("Data/Processed/eco_region_season_traitspace_PCA_BI.csv") 
 
 pc_cols <- names(traitspace_df)[8:13] #get names of PC columns excluding metadata
 species_pcs <- unique(traitspace_df[c("species", pc_cols)]) #get unique pc cols per species # i.e. the full trait space, 1 row per species
 
-
-traitspace_mat <- as.matrix(species_pcs[, pc_cols]) #convert to matrix for disprity
+#convert to matrix for disprity
+traitspace_mat <- as.matrix(species_pcs[, pc_cols]) 
 rownames(traitspace_mat) <- species_pcs$species 
 
 
@@ -35,7 +51,7 @@ rownames(traitspace_mat) <- species_pcs$species
 #see ellipse plots for preliminary plotting (mostly small overlaps, close to circle in a circle situation (see nestedness below))
 
 #call function to split groups by ecoregion and migratory status
-groups_yearly   <- make.ecoregional.migrant.groups(c("ecoregion", "status"))
+groups_yearly   <- make.ecoregional.migrant.groups(traitspace_df =traitspace_df, by = c("ecoregion", "status"))
 
 
 #feed into custom subsets
@@ -101,7 +117,7 @@ North Atlantic moist mixed forests.migrant:North Atlantic moist mixed forests.re
 
 #create migrant and resident group by ecoergion and season
 
-groups_seasonally <- make.ecoregional.migrant.groups(c("ecoregion", "season", "status")) #seasonal analysis has additional season split
+groups_seasonally <- make.ecoregional.migrant.groups(traitspace_df = traitspace_df, by = c("ecoregion", "season", "status")) #seasonal analysis has additional season split
 
 subsets_seaosonally <- custom.subsets(data = traitspace_mat, group = groups_seasonally) 
 

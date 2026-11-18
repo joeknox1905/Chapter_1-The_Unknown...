@@ -7,7 +7,7 @@ library(ggplot2)
 
 
 #loading traitspaces
-avospace<- read.csv("Data/Processed/eco_region_traitspace_PCA_BI.csv")
+avospace<- read.csv("Data/Processed/eco_region_season_traitspace_PCA_BI.csv")
 
 #can easily functionalise I am sure
 
@@ -35,6 +35,7 @@ ggsave("ecoregion_seasonal_status_pca_ellipses_plot2.png", plot = ellipse_plot2,
 
 
 #looks like edge-edge nestedness will be good
+
 
 ####################################################################
 #visualise distance to centroids of group with vegan---------------------

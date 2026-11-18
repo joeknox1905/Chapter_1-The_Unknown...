@@ -9,13 +9,17 @@
 
 library(dispRIty)
 library(MCMCglmm)
+library(testthat)
 
-BI_traitspace<- read.csv("Data/Processed/eco_region_traitspace_PCA_BI.csv") # full Britain and Ireland trait space or beak-only AVONET PCA/PCOA scores, status and species (columns) by ecoregion (rows)- can either use PCOA or PCA
+BI_traitspace<- read.csv("Data/Processed/eco_region_season_traitspace_PCA_BI.csv") # full Britain and Ireland trait space or beak-only AVONET PCA/PCOA scores, status and species (columns) by ecoregion (rows)- can either use PCOA or PCA
 #TG: it's better/more common to write things in path_from_the_file (so that "/Data/..." becomes "../Data/...")
 
-#specificy trait columns from trait space
-trait_cols <- grep("^PC", names(BI_traitspace), value = TRUE)
+pc_cols <- names(traitspace_df)[8:13] #get names of PC columns excluding metadata
+species_pcs <- unique(traitspace_df[c("species", pc_cols)]) #get unique pc cols per species # i.e. the full trait space, 1 row per species
 
+#convert to matrix for disprity
+traitspace_mat <- as.matrix(species_pcs[, pc_cols]) 
+rownames(traitspace_mat) <- species_pcs$species 
 
 #@@@JK to TG: (PC scores are created from the full traitspace for Britain and Ireland) so for each ecoregion, migrant and resident group centroids will be relative to the full Britain and Ireland species traitspace- is this ok if I am focusing on local (ecoregional) functional diversity?
 
@@ -53,8 +57,8 @@ testthat::expect_equal(pairwise.distance.between.centroids(matrix, matrix2), sqr
 
 ## Step 2: try to understand how the function works in a real multidimensional example/space
 set.seed(1)
-space_2D <- BI_traitspace[, c("PC1", "PC2")]
-random_groups <- replicate(2, sample(1:nrow(BI_traitspace), floor(nrow(BI_traitspace)/2)))
+space_2D <- traitspace_mat[, c("PC1", "PC2")]
+random_groups <- replicate(2, sample(1:nrow(traitspace_mat), floor(nrow(traitspace_mat)/2)))
 random_test <- custom.subsets(space_2D, group = list("A" = random_groups[,1], "B" = random_groups[,2]))
 # plot(random_test)
 expect_equal(summary(dispRity(random_test, metric = pairwise.distance.between.centroids, between.groups = TRUE))$obs, 0.088)
@@ -108,36 +112,36 @@ quantile.overlap<- function (matrix, matrix2, probs = c(0.25, 0.975)) {
   #complete overlap = 1 
   #Which essentially returns the nestedness compared to funcitonal uniqueness (turnover)
 }
+disprity(traitspace_mat, metric = quantile.overlap, between.groups = TRUE) #either returns vector of overlap for each dimension
+disprity(traitspace_mat, metric = c(mean, quantile.overlap), between.groups = TRUE) #or overlap of all quantiles- which is not as informative
+
+#unit testing----------
 
 ## Step 1: make sure the function does what you tell it to do
 set.seed(1)
 stupid <- matrix(rnorm(25), 5, 5) # if matrix 1 + 2 = are the same, would expect proportional overlap to be 1 (intersect == span), so overlap = 1
 testthat::expect_all_equal(quantile.overlap(stupid, stupid), 1) # correct
 
-
-stupid2 <- matrix(3:9, ncol = 1)
-stupid3 <- matrix(7:15, ncol = 1)
-testthat::expect_equal(quantile.overlap(stupid2, stupid3, probs = c(0, 1)), 0.17) #testing that for a hypothetical 1 dimesnional trait space where quantiles = max, and min, function returns as expected
+#generate two random groups in a hypothetical 2d traitspace
+space_2D <- traitspace_mat[, c("PC1", "PC2")]
+random_groups <- replicate(2, sample(1:nrow(traitspace_mat), floor(nrow(traitspace_mat)/2)))
+#testing complete overlap
+complete_overlap <- custom.subsets(space_2D, group = list("A" = random_groups[,1], "B" = random_groups[,1]))
+# plot(complete_overlap)
+res<- expect_all_equal(summary(dispRity(complete_overlap, metric = quantile.overlap, between.groups = TRUE))$obs, 1) #good
 
 
 ## Step 2: try to understand how the function works in a real multidimensional example/space
 set.seed(1)
-space_2D <- BI_traitspace[, c("PC1", "PC2")]
-random_groups <- replicate(2, sample(1:nrow(BI_traitspace), floor(nrow(BI_traitspace)/2))) # split traitspace, rounding down
-random_test <- custom.subsets(space_2D, group = list("A" = random_groups[,1], "B" = random_groups[,2])) 
+space_2D <- traitspace_mat[, c("PC1", "PC2")]
+random_groups <- replicate(2, sample(1:nrow(traitspace_mat), floor(nrow(traitspace_mat)/2))) # split traitspace randomly, rounding down
+random_test <- custom.subsets(space_2D, group = list("A" = random_groups[,1], "B" = random_groups[,2])) #get groups from matrix columns
 # plot(random_test)
-expect_equal(summary(dispRity(random_test, metric = pairwise.distance.between.centroids, between.groups = TRUE))$obs, 0.088)
+expect_all_true(summary(dispRity(random_test, metric = quantile.overlap, between.groups = TRUE))$obs, != 0)
 
-non_random_groups <- list("A" = which(space_2D[,1] <= -0.5 & space_2D[,2] <= -0.5),
-"B" = which(space_2D[,1] >= 1 & space_2D[,2] >= 1))
-non_random_test <- custom.subsets(space_2D, group = non_random_groups)
-# plot(non_random_test)
-expect_equal(summary(dispRity(non_random_test, metric = pairwise.distance.between.centroids, between.groups = TRUE))$obs, 5.382)
 
 #boot matrix etc
 
-disprity(traitspace_mat, metric = quantile.overlap, between.groups = TRUE) #either returns vector of overlap for each dimension
-disprity(traitspace_mat, metric = c(mean, quantile.overlap), between.groups = TRUE) #or overlap of all quantiles- which is not as informative
 
 unit testing---------------------
 

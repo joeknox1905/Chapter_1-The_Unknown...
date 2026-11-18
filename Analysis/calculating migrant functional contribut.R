@@ -24,7 +24,7 @@ pairwise.distance.between.centroids <- function(matrix, matrix2) {
    sqrt(sum((colMeans(matrix) - colMeans(matrix2))^2))
 }
 
-#calcualting quantile overlap function (proportional overlap, does not identify nestedness)
+#calcualting quantile overlap function (proportional overlap, does not identify nestedness only how much of traitspace is common to BOTH groups) so a good start- i.e. can answer, are groups occupying different or common areas of trait space?
 quantile.overlap<- function (matrix, matrix2, probs = c(0.25, 0.975)) {
   q1 <- apply(matrix, 2, quantile, probs = probs) 
   q2<- apply(matrix2, 2, quantile, probs = probs)
@@ -109,11 +109,11 @@ rarefaction = TRUE)
 
 
 
-#nestedness vs turnover (proportional overlap via quantiles)
+# (proportional overlap via quantiles)
 
 
-
-
+# nestedness is one group a complete subset of another group- would need directionality 
+#i.e. which group is a subset of which group
 
 #seasonal analysis-------------------------
 

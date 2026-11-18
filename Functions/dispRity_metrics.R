@@ -96,7 +96,7 @@ plot(example_test)
 
 
 
-#-------------metric for calculating nestedness vs overlap-----------------------------------------------
+#-------------metric for calculating proportional overlap of groups-----------------------------------------------
 
 
 
@@ -168,10 +168,13 @@ nested_overlap <- custom.subsets(space_2D, group = nested_groups)
 
 
 
+#so actually this metric differentiates completely overlapping groups from non-overlapping groups but doesn't really identify full nestedness?
+#good start
+#but will need another metric to full identify nestedness i.e.
 
 
-unit testing---------------------
-
+nestedness<- 
+#if inter = subset of span, nestedness = 1
 
 
 

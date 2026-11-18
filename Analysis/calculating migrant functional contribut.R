@@ -24,7 +24,7 @@ pairwise.distance.between.centroids <- function(matrix, matrix2) {
    sqrt(sum((colMeans(matrix) - colMeans(matrix2))^2))
 }
 
-#calcualting quantile overlap function (nestedness)
+#calcualting quantile overlap function (proportional overlap, does not identify nestedness)
 quantile.overlap<- function (matrix, matrix2, probs = c(0.25, 0.975)) {
   q1 <- apply(matrix, 2, quantile, probs = probs) 
   q2<- apply(matrix2, 2, quantile, probs = probs)

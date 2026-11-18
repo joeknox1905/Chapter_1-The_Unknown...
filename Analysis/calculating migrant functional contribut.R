@@ -100,12 +100,16 @@ English Lowlands beech forests.migrant:English Lowlands beech forests.resident =
 European Atlantic mixed forests.migrant:European Atlantic mixed forests.resident = 2.79, boostrapped =2.81, rarefied = 2.80 # will be similar across all as rarefied to this groups minimum species
 North Atlantic moist mixed forests.migrant:North Atlantic moist mixed forests.resident = 0.78, bootstrapped = 0.84, rarefied = 0.94
 
+#in this case looks like observed values are pretty close to boostrapped and rarefied values but will use booted and rared values to be safe
+boot_rare_disp<- <- get.disparity(disp_result, observed = FALSE,
+rarefaction = TRUE)
 
-# so looks like european atlantic forest especially, and then english lowland and caldeon conifer forests have a large distance between centroids, suggesting divergent average trait combinations
-# n these ecoregions- would have to llok into ecosystem types, the diets, phylogeny and kinds of birds to continue to subset first, also look across groups and find a better way of plotting
+# so looks like european atlantic forest especially, and then english lowland and caldeon conifer forests have a large distance between centroids, suggesting divergent average trait combinations between migrants and residents
+# in these ecoregions- would have to look into ecosystem types, the diets, phylogeny and kinds of birds to continue to subset first, also look across groups and find a better way of plotting
 
 
-#nestednes vs turnover (proportional overlap via quantiles)
+
+#nestedness vs turnover (proportional overlap via quantiles)
 
 
 

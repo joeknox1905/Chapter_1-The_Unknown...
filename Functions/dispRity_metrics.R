@@ -7,6 +7,8 @@
 #pre-requisites-----
 ##############################################################################################################################################
 
+library(dispRIty)
+library(MCMCglmm)
 
 BI_traitspace<- read.csv("Data/Processed/eco_region_traitspace_PCA_BI.csv") # full Britain and Ireland trait space or beak-only AVONET PCA/PCOA scores, status and species (columns) by ecoregion (rows)- can either use PCOA or PCA
 #TG: it's better/more common to write things in path_from_the_file (so that "/Data/..." becomes "../Data/...")
@@ -25,7 +27,7 @@ trait_cols <- grep("^PC", names(BI_traitspace), value = TRUE)
 
 ##------------Create metric for calcualting distance between resident and migrant centroids, two arguments (matrix 1 = res, matrix 2 = mig)------------
 
-#Do migrants differ on average to residents in local (ecoregional) trait space (i.e. do they occupy different niches?)
+#Do migrants differ on average to residents n local (ecoregional) trait space (i.e. do they occupy different niches?)
 #N.b. tells us nothing about the spread of species within their group or the nestedness of migrants and residents, could just be skewed by a few outliers
 
 
@@ -94,34 +96,65 @@ plot(example_test)
 
 #-------------metric for calculating nestedness vs overlap-----------------------------------------------
 
-within.quantiles<- 
-#is migrant group within the upper bounds of the resident group trait space (for each PC seperately; in this case would be residents as the reference)- compute quantiles compute quantile overlap
-#if complete overlap = group is a complete subset of the other group
-#if not than group is not a complete subset of the other group and there is some functional turnover
-# need resident matrix
-# migrant matrix
-#between groups (quantiles of each axis in matrix 1 -quantiles of each axis in matrix 2) #default is 95% quantiles
-#return matrix overlap for each group 
 
 
-quantile.overlap<- function(matrix, matrix2, probs = c(0.25, 0.975){
+quantile.overlap<- function (matrix, matrix2, probs = c(0.25, 0.975)) {
   q1 <- apply(matrix, 2, quantile, probs = probs) # apply quantile calculation to each PC dimension (column) in the group matrix
   q2<- apply(matrix2, 2, quantile, probs = probs) #returns vector of 95% quantiles for for each dimension
-  intersect <- pmax(0, pmin(qa[2, ], qb[2, ]) - pmax(qa[1, ], qb[1, ])) #get minimum upper bound of groups and maximum lower bound of groups for each dimension (column)  i.e. get minimum distance between group (nearest edges), this will be the intersection (overlap), if groups do not overlap, set to 0 as distance is negative
-  span <- pmax(qa[2, ], qb[2, ]) - pmin(qa[1, ], qb[1, ]) #minus maximum upper bound of groups from minimum lower bound of groups for each dimension to get combined group span across each dimension
+  intersect <- pmax(0, pmin(q1[2, ], q2[2, ]) - pmax(q1[1, ], q2[1, ])) #get minimum upper bound of groups and maximum lower bound of groups for each dimension (column)  i.e. get minimum distance between group (nearest edges), this will be the intersection (overlap), if groups do not overlap, set to 0 as distance is negative
+  span <- pmax(q1[2, ], q2[2, ]) - pmin(q1[1, ], q2[1, ]) #minus maximum upper bound of groups from minimum lower bound of groups for each dimension to get combined group span across each dimension
   intersect / span # quantile overlap = proportion of overlap compared to full span.
   #no overlap = 0
   #complete overlap = 1 
-  #Which essentially returns the nestedness compared to funcitonal uniqueness -
+  #Which essentially returns the nestedness compared to funcitonal uniqueness (turnover)
 }
 
-#
+## Step 1: make sure the function does what you tell it to do
+set.seed(1)
+stupid <- matrix(rnorm(25), 5, 5) # if matrix 1 + 2 = are the same, would expect proportional overlap to be 1 (intersect == span), so overlap = 1
+testthat::expect_all_equal(quantile.overlap(stupid, stupid), 1) # correct
+
+
+stupid2 <- matrix(3:9, ncol = 1)
+stupid3 <- matrix(7:15, ncol = 1)
+testthat::expect_equal(quantile.overlap(stupid2, stupid3, probs = c(0, 1)), 0.17) #testing that for a hypothetical 1 dimesnional trait space where quantiles = max, and min, function returns as expected
+
+
+## Step 2: try to understand how the function works in a real multidimensional example/space
+set.seed(1)
+space_2D <- BI_traitspace[, c("PC1", "PC2")]
+random_groups <- replicate(2, sample(1:nrow(BI_traitspace), floor(nrow(BI_traitspace)/2))) # split traitspace, rounding down
+random_test <- custom.subsets(space_2D, group = list("A" = random_groups[,1], "B" = random_groups[,2])) 
+# plot(random_test)
+expect_equal(summary(dispRity(random_test, metric = pairwise.distance.between.centroids, between.groups = TRUE))$obs, 0.088)
+
+non_random_groups <- list("A" = which(space_2D[,1] <= -0.5 & space_2D[,2] <= -0.5),
+"B" = which(space_2D[,1] >= 1 & space_2D[,2] >= 1))
+non_random_test <- custom.subsets(space_2D, group = non_random_groups)
+# plot(non_random_test)
+expect_equal(summary(dispRity(non_random_test, metric = pairwise.distance.between.centroids, between.groups = TRUE))$obs, 5.382)
+
+#boot matrix etc
+
 disprity(traitspace_mat, metric = quantile.overlap, between.groups = TRUE) #either returns vector of overlap for each dimension
 disprity(traitspace_mat, metric = c(mean, quantile.overlap), between.groups = TRUE) #or overlap of all quantiles- which is not as informative
+
+unit testing---------------------
+
+make.metric(quantile.overlap) #outputs matrix of proportional overlap per dimension and pairwise comparsion as expected, dimension level 2: 
+
+
 
 
 #distance between groups using 95% quantiles- assuming this is the overlap?- ask Thomas
 dispRity(traitspace_mat, metric = group.dist, between.groups = TRUE))probs = c(0.025, 0.975)
+
+
+
+
+
+
+
 
 #could calculate as a proportion e.g. proportional overlap
 

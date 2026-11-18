@@ -3,43 +3,52 @@
 
 
 
-
-
-
-
 ###################################################################################################################################################################################################
 #------------calculate disprity metrics by ecoregion, status and season for binary status and monthly status defintiions and then summarise metric in a single table for all ecoregions------------------
 ###################################################################################################################################################################################################
 
+#load packages
+library(dispRity)
 
 
-traitspace_df<- read.csv("Data/Processed/eco_region_traitspace_PCA_BI.csv") 
+#load functions
+
+make.ecoregional.migrant.groups <- function(by) {
+  lapply(split(traitspace_df$species, traitspace_df[by], drop = TRUE), unique) #split traitspace by distinct ecoregion, status (and season for seasonal analysis) across all columns
+}
+
+# Create subsets
+
+traitspace_df<- read.csv("Data/Processed/eco_region_season_traitspace_PCA_BI.csv") 
+
+pc_cols <- names(traitspace_df)[8:13] #get names of PC columns excluding metadata
+species_pcs <- unique(traitspace_df[c("species", pc_cols)]) #get unique pc cols per species # i.e. the full trait space, 1 row per species
 
 
-traitspace_mat <- as.matrix(traitspace_df[, 8:13]) #convert to matrix and extract PC scores
-
-#yearly analysis-----------------------------
-
-#create migrant and resident groups by ecoregion from row indexes
-
-groups_yearly <- split(
-  seq_len(nrow(traitspace_df)), 
-  list(traitspace_df$ecoregion, traitspace_df$status), #get rows of all species in each ecoregion and migratory status group
-  drop = TRUE
-)
+traitspace_mat <- as.matrix(species_pcs[, pc_cols]) #convert to matrix for disprity
+rownames(traitspace_mat) <- species_pcs$species 
 
 
 
-#pass to custom.subsets to make groups
-subsets_yearly <- custom.subsets(data = traitspace_mat, group = groups_yearly) 
+#yearly analysis: Do migrants and residents differ in functional space occupation/contribution?-----------------------------
+
+#see ellipse plots for preliminary plotting (mostly small overlaps, close to circle in a circle situation (see nestedness below))
+
+#call function to split groups by ecoregion and migratory status
+groups_yearly   <- make.ecoregional.migrant.groups(c("ecoregion", "status"))
 
 
+#feed into custom subsets
+subsets_yearly  <- custom.subsets(traitspace_mat, group = groups_yearly) #make subsets
+
+
+#visualise
 plot(subsets_yearly, type ="preview") #PC1 V2
 
 
 plot(subsets_yearly, type="preview", specific.args = list(dimensions = c(3,4))) #PC1 v3
 
-#boot and rarefy subsets
+#boot and rarefy subsets to minimum species richness in any group for comparable ecoregional/season/migratory status comparisons
 boot_yearly<- boot.matrix(subsets_yearly, bootstraps = 100, rarefaction = "min") #bootstrap with replacement (resample species from ecoregional pool for each migrant group and rarefy to the minimum number of species of a group in the ecoregion
 
 
@@ -80,7 +89,7 @@ North Atlantic moist mixed forests.migrant:North Atlantic moist mixed forests.re
 # n these ecoregions- would have to llok into ecosystem types, the diets, phylogeny and kinds of birds to continue to subset first, also look across groups and find a better way of plotting
 
 
-
+#nestednes vs turnover (proportional overlap via quantiles)
 
 
 
@@ -92,12 +101,7 @@ North Atlantic moist mixed forests.migrant:North Atlantic moist mixed forests.re
 
 #create migrant and resident group by ecoergion and season
 
-
-groups_seasonally <- split(
-  seq_len(nrow(traitspace_df)), 
-  list(traitspace_df$ecoregion, traitspace_df$status,  traitspace_df$status), #get rows of all species in each ecoregion and migratory status group
-  drop = TRUE
-)
+groups_seasonally <- make.ecoregional.migrant.groups(c("ecoregion", "season", "status")) #seasonal analysis has additional season split
 
 subsets_seaosonally <- custom.subsets(data = traitspace_mat, group = groups_seasonally) 
 

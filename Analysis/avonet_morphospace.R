@@ -25,7 +25,7 @@ library(ggcorrplot)
 library(tibble)
 library(ggfortify)
 
-assemb <- readRDS("Data/Processed/seasonal_ecoregion_pools_aoh") # get monthly presence of each species for full annual trait space
+assemb <- readRDS("Data/Processed/seasonal_ecoregion_pools_aoh") # species from britain and ireland for full annual trait space
 
 # load avonet trait data
 avonet <- read.csv("Data/Raw/AVONET1_BirdLife.csv") # trait means in Birdlife V7
@@ -239,7 +239,7 @@ eco_month_season_axes # 7 dimensions needed
 
 summary(eco_month_season_axes) # PC1:7 explain 96.2 to 99.4% of variance in all groups
 
-pdf("PCOA_axes_variance_explained_by_ecoregion_season_mon_present_group.pdf", width = 14, height = 10)
+pdf("PCA_axes_variance_explained_by_ecoregion_season_mon_present_group.pdf", width = 14, height = 10)
 plot(eco_month_season_axes)
 dev.off() # can't plot again as NAs
 

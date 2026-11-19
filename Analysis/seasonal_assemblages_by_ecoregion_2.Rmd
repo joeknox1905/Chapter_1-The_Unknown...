@@ -201,7 +201,7 @@ if (file.exists(range_cache)) {
 
   length(unique(range_bi$species)) #279 species with generous gadm boundaries
 
-  # crop birdlife ranges to ecoregions and get area of intersection of specieis' seasonal birdlife ranges with each ecoregion
+  # crop britain and ireland birdlife ranges to ecoregions and get area of intersection of species' seasonal birdlife ranges with each ecoregion
   range_all <- range_bi %>%
     st_transform(target_crs) %>%
     st_make_valid() %>%
@@ -371,6 +371,7 @@ make.pools <- function(use_aoh = FALSE) { #adding so can use un-refined birdlife
   range_eco <- filter(range_all, km2 >= min_km2) # get all species with more than 1km2 of a birdlife range intersecting an ecoregion, regardless of whether have an aoh map to avoid edge cases
   pass_sp <- unique(range_eco$species[range_eco$seasonal == 4]) # get list of species with any passage range in Britain and Ireland
 
+  # filter species with birdlife ranges to those that pass aoh-map verification checks:
   # a species' birdlife range type is kept in an ecoregion if it has an aoh_map and this can be verified by the aoh map. For species with passage birdlife range in an ecoregion and an aoh map, their unrefined passage birdlife range is kept as no aoh range can verify it.
   range_tagged <- range_eco %>%
     left_join(aoh_ok, by = c("ecoregion", "sisid", "seasonal")) %>%

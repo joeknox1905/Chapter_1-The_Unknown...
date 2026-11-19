@@ -1,0 +1,49 @@
+This is BibTeX, Version 0.99d (TeX Live 2025/Debian)
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: Initial_Thesis_Plan.aux
+The style file: plainnat.bst
+Database file #1: References/bibliography_chap1.bib
+Warning--I didn't find a database entry for "Toussaint2021"
+Warning--I didn't find a database entry for "https://doi.org/10.1111/ele.13905"
+You've used 23 entries,
+            2773 wiz_defined-function locations,
+            794 strings with 14373 characters,
+and the built_in function-call counts, 20538 in all, are:
+= -- 1622
+> -- 2280
+< -- 1
++ -- 761
+- -- 738
+* -- 2149
+:= -- 3463
+add.period$ -- 117
+call.type$ -- 23
+change.case$ -- 314
+chr.to.int$ -- 23
+cite$ -- 46
+duplicate$ -- 477
+empty$ -- 887
+format.name$ -- 761
+if$ -- 4017
+int.to.chr$ -- 1
+int.to.str$ -- 1
+missing$ -- 23
+newline$ -- 171
+num.names$ -- 92
+pop$ -- 537
+preamble$ -- 1
+purify$ -- 291
+quote$ -- 0
+skip$ -- 510
+stack$ -- 0
+substring$ -- 451
+swap$ -- 40
+text.length$ -- 0
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 253
+warning$ -- 0
+while$ -- 87
+width$ -- 0
+write$ -- 401
+(There were 2 warnings)

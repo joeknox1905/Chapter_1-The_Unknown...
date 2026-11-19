@@ -1,0 +1,171 @@
+\begin{thebibliography}{23}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Brosse et~al.(2021)Brosse, Charpin, Su, Toussaint, Herrera‐R, Tedesco, and Villéger]{Brosse2021}
+Sébastien Brosse, Nicolas Charpin, Guohuan Su, Aurèle Toussaint, Guido~A. Herrera‐R, Pablo~A. Tedesco, and Sébastien Villéger.
+\newblock Fishmorph: A global database on morphological traits of freshwater fishes.
+\newblock \emph{Global Ecology and Biogeography}, 30:\penalty0 2330--2336, 12 2021.
+\newblock ISSN 1466-822X.
+\newblock \doi{10.1111/geb.13395}.
+
+\bibitem[Cox et~al.(2021)Cox, Gardner, and Gaston]{Cox2021}
+D.~T.~C. Cox, A.~S. Gardner, and K.~J. Gaston.
+\newblock Diel niche variation in mammals associated with expanded trait space.
+\newblock \emph{Nature Communications}, 12:\penalty0 1753, 3 2021.
+\newblock ISSN 2041-1723.
+\newblock \doi{10.1038/s41467-021-22023-4}.
+
+\bibitem[Dawson et~al.(2021)Dawson, Carmona, González‐Suárez, Jönsson, Chichorro, Mallen‐Cooper, Melero, Moor, Simaika, and Duthie]{Dawson2021}
+Samantha~K. Dawson, Carlos~Pérez Carmona, Manuela González‐Suárez, Mari Jönsson, Filipe Chichorro, Max Mallen‐Cooper, Yolanda Melero, Helen Moor, John~P. Simaika, and Alexander~Bradley Duthie.
+\newblock The traits of “trait ecologists”: An analysis of the use of trait and functional trait terminology.
+\newblock \emph{Ecology and Evolution}, 11:\penalty0 16434--16445, 12 2021.
+\newblock ISSN 2045-7758.
+\newblock \doi{10.1002/ece3.8321}.
+
+\bibitem[de~Sousa Gomes-Gonçalves et~al.(2024)de~Sousa Gomes-Gonçalves, da~Silva~Ferreira, and Araújo]{GOMESGONCALVES2024108818}
+Rafaela de~Sousa Gomes-Gonçalves, Laryssa~Cordeiro da~Silva~Ferreira, and Francisco~Gerson Araújo.
+\newblock Anthropogenic activities decrease functional richness over time, but not other functional aspects of the fish community in a tropical bay.
+\newblock \emph{Estuarine, Coastal and Shelf Science}, 303:\penalty0 108818, 2024.
+\newblock ISSN 0272-7714.
+\newblock \doi{https://doi.org/10.1016/j.ecss.2024.108818}.
+\newblock URL \url{https://www.sciencedirect.com/science/article/pii/S0272771424002063}.
+
+\bibitem[Dias et~al.(2025)Dias, Bastazini, Gianuca, and Matthews]{Dias2025}
+Rafael~Antunes Dias, Vinicius Augusto~Galvão Bastazini, Andros~T. Gianuca, and Thomas~J. Matthews.
+\newblock The spatial scaling of multiple dimensions of functional diversity in habitat islands.
+\newblock \emph{Functional Ecology}, 39:\penalty0 3164--3180, 11 2025.
+\newblock ISSN 0269-8463.
+\newblock \doi{10.1111/1365-2435.70158}.
+
+\bibitem[Gaüzère et~al.(2025)Gaüzère, Violle, Schrodt, Grenié, Santini, Hedde, Porcher, Goury, Beck, and Thuiller]{Gazre2025}
+Pierre Gaüzère, Cyrille Violle, Franziska Schrodt, Matthias Grenié, Luca Santini, Mickaël Hedde, Emmanuelle Porcher, Romain Goury, Miriam Beck, and Wilfried Thuiller.
+\newblock Bridging macroecology and temporal dynamics to better attribute global change impacts on biodiversity.
+\newblock \emph{Global Ecology and Biogeography}, 34, 7 2025.
+\newblock ISSN 1466-822X.
+\newblock \doi{10.1111/geb.70086}.
+
+\bibitem[Germain et~al.(2023)Germain, Feng, Buffan, Carmona, Chen, Graves, Tobias, Rahbek, Lei, Fjeldså, Hosner, Gilbert, Zhang, and Nogués-Bravo]{Germain2023}
+Ryan~R. Germain, Shaohong Feng, Lucas Buffan, Carlos~P. Carmona, Guangii Chen, Gary~R. Graves, Joseph~A. Tobias, Carsten Rahbek, Fumin Lei, Jon Fjeldså, Peter~A. Hosner, M.~Thomas~P. Gilbert, Guojie Zhang, and David Nogués-Bravo.
+\newblock Changes in the functional diversity of modern bird species over the last million years.
+\newblock \emph{Proceedings of the National Academy of Sciences}, 120, 2 2023.
+\newblock ISSN 0027-8424.
+\newblock \doi{10.1073/pnas.2201945119}.
+
+\bibitem[Goswami et~al.(2016)Goswami, Bhattacharyya, Mukherjee, and Tribedi]{article}
+Madhurankhi Goswami, Purnita Bhattacharyya, Indranil Mukherjee, and Prosun Tribedi.
+\newblock Functional diversity: An important measure of ecosystem functioning.
+\newblock \emph{Advances in Microbiology}, 07:\penalty0 82--93, 10 2016.
+\newblock \doi{10.4236/aim.2017.71007}.
+
+\bibitem[Green et~al.(2022)Green, Brookson, Hardy, and Crowder]{10.1098/rspb.2022.0071}
+Stephanie~J. Green, Cole~B. Brookson, Natasha~A. Hardy, and Larry~B. Crowder.
+\newblock Trait-based approaches to global change ecology: moving from description to prediction.
+\newblock \emph{Proceedings of the Royal Society B: Biological Sciences}, 289\penalty0 (1971):\penalty0 20220071, 03 2022.
+\newblock ISSN 0962-8452.
+\newblock \doi{10.1098/rspb.2022.0071}.
+\newblock URL \url{https://doi.org/10.1098/rspb.2022.0071}.
+
+\bibitem[Guillerme et~al.(2020)Guillerme, Puttick, Marcy, and Weisbecker]{Guillerme2020}
+Thomas Guillerme, Mark~N. Puttick, Ariel~E. Marcy, and Vera Weisbecker.
+\newblock Shifting spaces: Which disparity or dissimilarity measurement best summarize occupancy in multidimensional spaces?
+\newblock \emph{Ecology and Evolution}, 10:\penalty0 7261--7275, 7 2020.
+\newblock ISSN 2045-7758.
+\newblock \doi{10.1002/ece3.6452}.
+
+\bibitem[Guillerme et~al.(2025)Guillerme, Cardoso, Jørgensen, Mammola, and Matthews]{Guillerme2025}
+Thomas Guillerme, Pedro Cardoso, Maria~Wagner Jørgensen, Stefano Mammola, and Thomas~J. Matthews.
+\newblock The what, how, and why of trait‐based analyses in ecology.
+\newblock \emph{Ecography}, 2025, 7 2025.
+\newblock ISSN 0906-7590.
+\newblock \doi{10.1111/ecog.07580}.
+
+\bibitem[Huang et~al.(2023)Huang, Sun, Song, Yuan, and Zhou]{Huang2023}
+Na~Huang, Xinyuan Sun, Yanfang Song, Zhiyong Yuan, and Weiwei Zhou.
+\newblock Amphibian traits database: A global database on morphological traits of amphibians.
+\newblock \emph{Global Ecology and Biogeography}, 32:\penalty0 633--641, 5 2023.
+\newblock ISSN 1466-822X.
+\newblock \doi{10.1111/geb.13656}.
+
+\bibitem[Mammola et~al.(2021)Mammola, Carmona, Guillerme, and Cardoso]{Mammola2021}
+Stefano Mammola, Carlos~P. Carmona, Thomas Guillerme, and Pedro Cardoso.
+\newblock Concepts and applications in functional diversity.
+\newblock \emph{Functional Ecology}, 35:\penalty0 1869--1885, 9 2021.
+\newblock ISSN 0269-8463.
+\newblock \doi{10.1111/1365-2435.13882}.
+
+\bibitem[Marino et~al.(2025)Marino, Soares, and Bellard]{Marino2025}
+Clara Marino, Filipa~Coutinho Soares, and Céline Bellard.
+\newblock Conservation priorities for functionally unique and specialized terrestrial vertebrates threatened by biological invasions.
+\newblock \emph{Conservation Biology}, 39, 4 2025.
+\newblock ISSN 0888-8892.
+\newblock \doi{10.1111/cobi.14401}.
+
+\bibitem[Nunes et~al.(2026)Nunes, Niederman, and Dreiss]{NUNES2026182318}
+Laura~A. Nunes, Talia~E. Niederman, and Lindsay~M. Dreiss.
+\newblock Mapping potential global change impacts on biodiversity important areas of the contiguous us.
+\newblock \emph{Science of The Total Environment}, 1052:\penalty0 182318, 2026.
+\newblock ISSN 0048-9697.
+\newblock \doi{https://doi.org/10.1016/j.scitotenv.2026.182318}.
+\newblock URL \url{https://www.sciencedirect.com/science/article/pii/S0048969726009861}.
+
+\bibitem[Oskyrko et~al.(2024)Oskyrko, Mi, Meiri, and Du]{Oskyrko2024}
+Oleksandra Oskyrko, Chunrong Mi, Shai Meiri, and Weiguo Du.
+\newblock Repttraits: a comprehensive dataset of ecological traits in reptiles.
+\newblock \emph{Scientific Data}, 11:\penalty0 243, 2 2024.
+\newblock ISSN 2052-4463.
+\newblock \doi{10.1038/s41597-024-03079-5}.
+
+\bibitem[Pfenning-Butterworth et~al.(2024)Pfenning-Butterworth, Buckley, Drake, Farner, Farrell, Gehman, Mordecai, Stephens, Gittleman, and Davies]{PFENNINGBUTTERWORTH2024e270}
+Alaina Pfenning-Butterworth, Lauren~B Buckley, John~M Drake, Johannah~E Farner, Maxwell~J Farrell, Alyssa-Lois~M Gehman, Erin~A Mordecai, Patrick~R Stephens, John~L Gittleman, and T~Jonathan Davies.
+\newblock Interconnecting global threats: climate change, biodiversity loss, and infectious diseases.
+\newblock \emph{The Lancet Planetary Health}, 8\penalty0 (4):\penalty0 e270--e283, 2024.
+\newblock ISSN 2542-5196.
+\newblock \doi{https://doi.org/10.1016/S2542-5196(24)00021-4}.
+\newblock URL \url{https://www.sciencedirect.com/science/article/pii/S2542519624000214}.
+
+\bibitem[Pigot et~al.(2020)Pigot, Sheard, Miller, Bregman, Freeman, Roll, Seddon, Trisos, Weeks, and Tobias]{Pigot2020}
+Alex~L. Pigot, Catherine Sheard, Eliot~T. Miller, Tom~P. Bregman, Benjamin~G. Freeman, Uri Roll, Nathalie Seddon, Christopher~H. Trisos, Brian~C. Weeks, and Joseph~A. Tobias.
+\newblock Macroevolutionary convergence connects morphological form to ecological function in birds.
+\newblock \emph{Nature Ecology \& Evolution}, 4:\penalty0 230--239, 1 2020.
+\newblock ISSN 2397-334X.
+\newblock \doi{10.1038/s41559-019-1070-4}.
+
+\bibitem[Purvis et~al.(2019)Purvis, Moln{\'a}r, Obura, Ichii, Willis, Chettri, Dulloo, Hendry, Gabrielyan, Gutt, et~al.]{purvis2019global}
+A~Purvis, Z~Moln{\'a}r, D~Obura, K~Ichii, K~Willis, N~Chettri, M~Dulloo, A~Hendry, B~Gabrielyan, J~Gutt, et~al.
+\newblock Global assessment report of the intergovernmental science-policy platform on biodiversity and ecosystem services.
+\newblock \emph{IPBES Secretariat}, 2019.
+
+\bibitem[Roehrdanz(2026)]{doi:10.1073/pnas.2531790123}
+Patrick~R. Roehrdanz.
+\newblock Beyond species ranges: How functional diversity and integrated life history can inform conservation priorities.
+\newblock \emph{Proceedings of the National Academy of Sciences}, 123\penalty0 (4):\penalty0 e2531790123, 2026.
+\newblock \doi{10.1073/pnas.2531790123}.
+\newblock URL \url{https://www.pnas.org/doi/abs/10.1073/pnas.2531790123}.
+
+\bibitem[Tobias et~al.(2022)Tobias, Sheard, Pigot, Devenish, Yang, Sayol, Neate‐Clegg, Alioravainen, Weeks, Barber, Walkden, MacGregor, Jones, Vincent, Phillips, Marples, Montaño‐Centellas, Leandro‐Silva, Claramunt, Darski, Freeman, Bregman, Cooney, Hughes, Capp, Varley, Friedman, Korntheuer, Corrales‐Vargas, Trisos, Weeks, Hanz, Töpfer, Bravo, Remeš, Nowak, Carneiro, R., Matysioková, Baldassarre, Martínez‐Salinas, Wolfe, Chapman, Daly, Sorensen, Neu, Ford, Mayhew, Silveira, Kelly, Annorbah, Pollock, Grabowska‐Zhang, McEntee, Gonzalez, Meneses, Muñoz, Powell, Jamie, Matthews, Johnson, Brito, Zyskowski, Crates, Harvey, Zevallos, Hosner, Bradfer‐Lawrence, Maley, Stiles, Lima, Provost, Chibesa, Mashao, Howard, Mlamba, Chua, Li, Gómez, García, Päckert, Fuchs, Ali, Derryberry, Carlson, Urriza, Brzeski, Prawiradilaga, Rayner, Miller, Bowie, Lafontaine, Scofield, Lou, Somarathna, Lepage, Illif, Neuschulz, Templin, Dehling, Cooper, Pauwels, Analuddin, Fjeldså, Seddon, Sweet, DeClerck, Naka, Brawn, Aleixo, Böhning‐Gaese, Rahbek, Fritz, Thomas, and Schleuning]{Tobias2022}
+Joseph~A. Tobias, Catherine Sheard, Alex~L. Pigot, Adam J.~M. Devenish, Jingyi Yang, Ferran Sayol, Montague H.~C. Neate‐Clegg, Nico Alioravainen, Thomas~L. Weeks, Robert~A. Barber, Patrick~A. Walkden, Hannah E.~A. MacGregor, Samuel E.~I. Jones, Claire Vincent, Anna~G. Phillips, Nicola~M. Marples, Flavia~A. Montaño‐Centellas, Victor Leandro‐Silva, Santiago Claramunt, Bianca Darski, Benjamin~G. Freeman, Tom~P. Bregman, Christopher~R. Cooney, Emma~C. Hughes, Elliot J.~R. Capp, Zoë~K. Varley, Nicholas~R. Friedman, Heiko Korntheuer, Andrea Corrales‐Vargas, Christopher~H. Trisos, Brian~C. Weeks, Dagmar~M. Hanz, Till Töpfer, Gustavo~A. Bravo, Vladimír Remeš, Larissa Nowak, Lincoln~S. Carneiro, Amilkar J.~Moncada R., Beata Matysioková, Daniel~T. Baldassarre, Alejandra Martínez‐Salinas, Jared~D. Wolfe, Philip~M. Chapman, Benjamin~G. Daly, Marjorie~C. Sorensen, Alexander Neu, Michael~A. Ford, Rebekah~J. Mayhew, Luis~Fabio Silveira, David~J. Kelly, Nathaniel N.~D. Annorbah, Henry~S. Pollock, Ada~M. Grabowska‐Zhang, Jay~P. McEntee, Juan Carlos~T. Gonzalez, Camila~G. Meneses, Marcia~C. Muñoz, Luke~L. Powell, Gabriel~A. Jamie, Thomas~J. Matthews, Oscar Johnson, Guilherme R.~R. Brito, Kristof Zyskowski, Ross Crates, Michael~G. Harvey, Maura~Jurado Zevallos, Peter~A. Hosner, Tom Bradfer‐Lawrence, James~M. Maley, F.~Gary Stiles, Hevana~S. Lima, Kaiya~L. Provost, Moses Chibesa, Mmatjie Mashao, Jeffrey~T. Howard, Edson Mlamba, Marcus A.~H. Chua, Bicheng Li, M.~Isabel Gómez, Natalia~C. García, Martin Päckert, Jérôme Fuchs, Jarome~R. Ali, Elizabeth~P. Derryberry, Monica~L. Carlson, Rolly~C. Urriza, Kristin~E. Brzeski, Dewi~M. Prawiradilaga, Matt~J. Rayner, Eliot~T. Miller, Rauri C.~K. Bowie, René‐Marie Lafontaine, R.~Paul Scofield, Yingqiang Lou, Lankani Somarathna, Denis Lepage, Marshall Illif, Eike~Lena Neuschulz, Mathias Templin, D.~Matthias Dehling, Jacob~C. Cooper, Olivier S.~G. Pauwels, Kangkuso Analuddin, Jon Fjeldså, Nathalie Seddon, Paul~R. Sweet, Fabrice A.~J. DeClerck, Luciano~N. Naka, Jeffrey~D. Brawn, Alexandre Aleixo, Katrin Böhning‐Gaese, Carsten Rahbek, Susanne~A. Fritz, Gavin~H. Thomas, and Matthias Schleuning.
+\newblock Avonet: morphological, ecological and geographical data for all birds.
+\newblock \emph{Ecology Letters}, 25:\penalty0 581--597, 3 2022.
+\newblock ISSN 1461-023X.
+\newblock \doi{10.1111/ele.13898}.
+
+\bibitem[{Vigués Jorba} et~al.(2025){Vigués Jorba}, Scherrer, Duchenne, Zellweger, Gossner, and Bollmann]{VIGUESJORBA2025113855}
+Jan {Vigués Jorba}, Daniel Scherrer, François Duchenne, Florian Zellweger, Martin~M. Gossner, and Kurt Bollmann.
+\newblock Differential responses of taxonomic, functional and phylogenetic multi-taxa diversity to environmental factors in temperate forest ecosystems.
+\newblock \emph{Ecological Indicators}, 178:\penalty0 113855, 2025.
+\newblock ISSN 1470-160X.
+\newblock \doi{https://doi.org/10.1016/j.ecolind.2025.113855}.
+\newblock URL \url{https://www.sciencedirect.com/science/article/pii/S1470160X2500785X}.
+
+\bibitem[Wilman et~al.(2014)Wilman, Belmaker, Simpson, de~la Rosa, Rivadeneira, and Jetz]{Wilman2014}
+Hamish Wilman, Jonathan Belmaker, Jennifer Simpson, Carolina de~la Rosa, Marcelo~M. Rivadeneira, and Walter Jetz.
+\newblock Eltontraits 1.0: Species‐level foraging attributes of the world's birds and mammals.
+\newblock \emph{Ecology}, 95:\penalty0 2027--2027, 7 2014.
+\newblock ISSN 0012-9658.
+\newblock \doi{10.1890/13-1917.1}.
+
+\end{thebibliography}

@@ -187,6 +187,22 @@ quantile.uniqueness<- function (matrix, matrix2, probs = c(0.25, 0.975)) {
   return(turnover1/span1, turnover2/span2)
 }
 
+#or this would return 1 value per pairwise comaprison (1 for each group), dimension level 2?
+
+
+quantile.uniqueness<- function (matrix, matrix2, probs = c(0.25, 0.975)) {
+  q1 <- apply(matrix, 2, quantile, probs = probs) 
+  q2<- apply(matrix2, 2, quantile, probs = probs)
+  intersect <- pmax(0, pmin(q1[2, ], q2[2, ]) - pmax(q1[1, ], q2[1, ])) 
+  span <- q1[2, ] - q1[1, ]
+  turnover<- span-intersect
+
+return(turnover/span)
+}
+   
+#call disprity
+disprity(trait_mat, metric=quantile.uniqueness, between.groups = list(c(1,2), c(2,1)))
+
 #turnover = span (= complete turnover, group is completely unique)
 #turnover < span (= partial turnover (just partial overlap)
 #turnover = 0 = no turnover (complete overlap/nestedness)
@@ -204,7 +220,21 @@ quantile.nestedness<- function (matrix, matrix2, probs = c(0.25, 0.975)) {
   return(intersect/span1, intersect/span2)
 }
 
-#should be calculated pairwise and return 2 matrices, 1 per group of each dimension -dimesion level 3 to see which group is nested in which
+#or this would return 1 value per pairwise comaprison (1 for each group), dimension level 2?
+
+quantile.nestedness<- function (matrix, matrix2, probs = c(0.25, 0.975)) {
+  q1 <- apply(matrix, 2, quantile, probs = probs) 
+  q2<- apply(matrix2, 2, quantile, probs = probs)
+  intersect <- pmax(0, pmin(q1[2, ], q2[2, ]) - pmax(q1[1, ], q2[1, ])) 
+  span <- q1[2, ] - q1[1, ]
+
+  return(intersect/span, intersect/span)
+}
+
+#call disprity
+disprity(trait_mat, metric=quantile.uniqueness, between.groups = list(c(1,2), c(2,1)))
+
+#should be calculated pairwise and return 2 matrices, 1 per group of each dimension -dimesion level 3 to see which group is nested in which #summary would return median of all dimensions
 #intersect of 0/span = 0 (non-overlapping group)
 #intersect =span = 1 (completely nested group; group is a complete subset of the other group)
 #intersect < span = partially nested group (just partial overlap)

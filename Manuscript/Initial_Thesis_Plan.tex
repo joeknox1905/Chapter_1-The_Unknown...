@@ -4,11 +4,12 @@
 \usepackage[scaled=0.92]{helvet}
 \renewcommand{\familydefault}{\sfdefault} %sans-serif for Arial font
 \renewcommand{\thesection}{\arabic{section}} %remove 0 from section headers
+\renewcommand{\bibname}{References}
 \usepackage[onehalfspacing]{setspace} %set line width
 \usepackage[margin=2.5cm]{geometry} %set margins
 \usepackage{graphicx} %for image inclusion
 \usepackage{amsmath} % for mathematical notations
-\usepackage{natbib} %for organising references 
+\usepackage[authoryear]{natbib} %for organising references 
 \usepackage{hyperref} %for making references clickable
 
 %cover page
@@ -18,6 +19,7 @@
 
 \begin{document}
 
+\bibliographystyle{plainnat}
 
 \maketitle
 
@@ -52,11 +54,32 @@
 
 \begin{itemize}
 \item why is it good to study functional diversity? what do people study it for? e.g. ecosystem services, more informative than species richness
-\item key problem: Biodiversity is not static (changes with seasons (migration, hibernation) even daily as nocturnal species replace the diurnal)), we lose important information about how these ecosystem services vary across time and space, species interactions, niche partitioning (temporal as well niche) etc if we fail to characterise functional turnover. Further we don't know at what temporal granularity these ecosystem services shifts might/need to be captured.
+\item key problem: Biodiversity is not static (changes with seasons (migration, hibernation) even daily as nocturnal species replace the diurnal), we lose important information about how these ecosystem services vary across time and space, species interactions, niche partitioning (temporal as well niche) etc if we fail to characterise functional turnover. Further we don't know at what temporal granularity these ecosystem services shifts might/need to be captured.
  \item A lot of work has been done looking shift in biodiversity across space e.g.latitudinal shifts, and along environmental gradients but not so much across the annual cycle, particularly outside of coarse seasonal change (i.e. winter vs summer). 
 \item To address this knowledge gap, this study will combine functional diversity with cyclical change to assess how seasonal and daily turnover effects ecosystem functioning and resilience to global change 
 \item We will expect to see (hypothesis background below)
 \end{itemize}
+
+
+Biodiversity is an umbrella term which encompasses multiple dimensions \citep{VIGUESJORBA2025113855}. 
+Historically, biodiversity has been limited to taxonomic diversity (species richness) \citep{purvis2019global}, a crude measure of biodiversity that tells us little about how organisms interact with one another or their environment to shape productive ecosystems \citep{article}. 
+In contrast, functional diversity (the variety of ecological roles within a species assemblage) is arguably a more meaningful dimension of biodiversity, that scales to the broader ecosystem level \citep{Marino2025}.
+By characterising what functional groups are present within ecosystems, we can understand how species might interact, co-exist and contribute to ecosystem productivity \citep{GOMESGONCALVES2024108818}.
+Moreover, in this anthropogenic era where emergent threats such as climate change are increasingly pervasive,  it is, now, more than ever, important to understand how biodiversity will respond to global change  \citep{NUNES2026182318, PFENNINGBUTTERWORTH2024e270} .
+Functional shifts across space and time can provide us with insights into resource fluxes, niche restructuring, ecosystem adaptation and resilience \citep{Mammola2021, 10.1098/rspb.2022.0071, Gazre2025}. 
+Furthermore, understanding the distribution of functions within an ecosystem allows us to assess complementarity versus redundancy among species and how this might buffer or amplify ecosystem disturbances \citep{doi:10.1073/pnas.2531790123, Germain2023}.
+Thus, functional diversity studies have broad cross-taxa applications spanning (but not limited to) the fields of macroecology, biogeography and conservation \citep[e.g.,][]{Pigot2020, Toussaint2021, https://doi.org/10.1111/ele.13905, Marino2025}.
+This is partly due to the multi-faceted nature of functional diversity itself which can, again, be split into multiple dimensions \citep{Dias2025}.
+These dimensions can be summarised into four broad categories: functional richness (the range of ecological functions within a community), functional specialisation/generalisation (whether species with extreme functions or species approximating average functions dominate the assemblage), functional originality (the uniqueness of species' functions) and functional divergence (the distribution of species' functions within the assemblage relative to the average functions within the assemblage) \citep{Guillerme2025}.
+Each of these dimensions have different use-cases and there is increasing recognition that metrics should be tailoired to the dimension of interest given the research question\citep{Guillerme2020, Guillerme2025}.
+Aside from the multi-dimensionality of functional diversity, another reason for its wide applicability in ecology, is that it can be approximated using a trait-based approach \citep{Guillerme2020}
+Employing an evidence-backed definition from \citet{Dawson2021}, a trait refers to "a measurable characteristic (morphological, phenological, physiological, behavioural, or cultural) of an individual organism that is measured at either the individual or other relevant level of organization". 
+Such traits are widely available for most verterbrate taxa from global databases \citep[e.g.,][]{Tobias2022, Wilman2014, Oskyrko2024, Huang2023, Brosse2021}, and, by selecting traits that correlate with species-environment interactions such as locomotion, foraging and diet, ordinations can be used to construct a multi-dimensional trait space that approximates a species' ecological niche \citep[e.g.,][]{Guillerme2020, Pigot2020, Cox2021}. 
+Therefore, functional diversity is an informative and easy-to-study dimension of biodiversity, providing critical insight into biological interactions and ecosystem processes at multiple scales at low computational burden. 
+
+
+
+
 
 % TG:done I think you could re-arrange the ideas a bit above. It looks like it contains everything for the background but could get rearranged to get straight to the point. One idea (but not the only one) could be to first explain A) what people have been using functional diversity up to today (e.g. the ecosystem services stuff) but that this is assuming that biodiversity is static. B) Then you can introduce that it's not (season, etc.). C) then combine the two points A and B saying you're gonna have a look at how these two things interact (functional diversity + cyclical stuff) and then something like D) explain what you expect to change.
 % TG:done In general I'd suggest to not insist on novelty. If it's novel (it is) people will realise it by themselves. If it's not, it's not a problem as long as it's cool (it is!).
@@ -193,10 +216,8 @@
 \end{itemize}
 
 
-\section{References}\label{sec4}
 
-\bibliographystyle{harvard}
-\bibliography{bibliography_chap1.bib}
+\bibliography{References/bibliography_chap1}
 
 \end{document}
 

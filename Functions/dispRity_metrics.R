@@ -98,6 +98,7 @@ plot(example_test)
 
 #-------------metric for calculating proportional overlap of groups-----------------------------------------------
 
+#how much do groups represent eachother in functional space?
 
 
 quantile.overlap<- function (matrix, matrix2, probs = c(0.25, 0.975)) {
@@ -108,7 +109,7 @@ quantile.overlap<- function (matrix, matrix2, probs = c(0.25, 0.975)) {
   intersect / span # quantile overlap = proportion of overlap compared to full span.
   #no overlap = 0
   #complete overlap = 1 
-  #Which essentially returns the nestedness compared to funcitonal uniqueness (turnover)
+  #partial overlap = >0 & <1
 }
 
 #boot matrix etc
@@ -172,13 +173,41 @@ nested_overlap <- custom.subsets(space_2D, group = nested_groups)
 #good start
 #but will need another metric to full identify nestedness i.e.
 
-
-nestedness<- 
-#if inter = subset of span, nestedness = 1
+#metric for descibing turnover - what proportion of trait space is unique to each group?-------------------------------
 
 
+quantile.uniqueness<- function (matrix, matrix2, probs = c(0.25, 0.975)) {
+  q1 <- apply(matrix, 2, quantile, probs = probs) 
+  q2<- apply(matrix2, 2, quantile, probs = probs)
+  intersect <- pmax(0, pmin(q1[2, ], q2[2, ]) - pmax(q1[1, ], q2[1, ])) 
+  span1 <- q1[2, ] - q1[1, ]
+  span2 <- q2[2, ] - q2[1, ]
+  turnover1<- span1-intersect
+  turnover2<- span2-intersect
+  return(turnover1/span1, turnover2/span2)
+}
 
+#turnover = span (= complete turnover, group is completely unique)
+#turnover < span (= partial turnover (just partial overlap)
+#turnover = 0 = no turnover (complete overlap/nestedness)
 
+#should be calculated pairwise for intersection, but return a matrix of values for each dimension for each group- dimesion level 3
+
+#metric for describing nestedness- what proportion of a group's traits are a subset of the other group's?
+
+quantile.nestedness<- function (matrix, matrix2, probs = c(0.25, 0.975)) {
+  q1 <- apply(matrix, 2, quantile, probs = probs) 
+  q2<- apply(matrix2, 2, quantile, probs = probs)
+  intersect <- pmax(0, pmin(q1[2, ], q2[2, ]) - pmax(q1[1, ], q2[1, ])) 
+  span1 <- q1[2, ] - q1[1, ]
+  span2 <- q2[2, ] - q2[1, ]
+  return(intersect/span1, intersect/span2)
+}
+
+#should be calculated pairwise and return 2 matrices, 1 per group of each dimension -dimesion level 3 to see which group is nested in which
+#intersect of 0/span = 0 (non-overlapping group)
+#intersect =span = 1 (completely nested group; group is a complete subset of the other group)
+#intersect < span = partially nested group (just partial overlap)
 
 #distance between groups using 95% quantiles- assuming this is the overlap?- ask Thomas
 dispRity(traitspace_mat, metric = group.dist, between.groups = TRUE))probs = c(0.025, 0.975)

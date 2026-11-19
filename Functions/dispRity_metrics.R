@@ -187,6 +187,9 @@ quantile.uniqueness<- function (matrix, matrix2, probs = c(0.25, 0.975)) {
   return(turnover1/span1, turnover2/span2)
 }
 
+#call disprity
+disprity(trait_mat, metric=quantile.uniqueness, between.groups = TRUE)
+
 #or this would return 1 value per pairwise comaprison (1 for each group), dimension level 2?
 
 
@@ -220,6 +223,9 @@ quantile.nestedness<- function (matrix, matrix2, probs = c(0.25, 0.975)) {
   return(intersect/span1, intersect/span2)
 }
 
+#call disprity
+disprity(trait_mat, metric=quantile.uniqueness, between.groups = TRUE)
+
 #or this would return 1 value per pairwise comaprison (1 for each group), dimension level 2?
 
 quantile.nestedness<- function (matrix, matrix2, probs = c(0.25, 0.975)) {
@@ -228,7 +234,7 @@ quantile.nestedness<- function (matrix, matrix2, probs = c(0.25, 0.975)) {
   intersect <- pmax(0, pmin(q1[2, ], q2[2, ]) - pmax(q1[1, ], q2[1, ])) 
   span <- q1[2, ] - q1[1, ]
 
-  return(intersect/span, intersect/span)
+  return(intersect/span)
 }
 
 #call disprity

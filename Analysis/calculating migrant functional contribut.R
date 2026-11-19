@@ -107,6 +107,13 @@ rarefaction = TRUE)
 # so looks like european atlantic forest especially, and then english lowland and caldeon conifer forests have a large distance between centroids, suggesting divergent average trait combinations between migrants and residents
 # in these ecoregions- would have to look into ecosystem types, the diets, phylogeny and kinds of birds to continue to subset first, also look across groups and find a better way of plotting
 
+#or table of result
+
+pdf(file= pairwise_centroid_dist_result_binary_yearly.pdf)
+xtabs(get.disparity(disp_result, observed = FALSE,
+rarefaction = TRUE) ~ disp_result$subsets)
+dev.off()
+
 
 
 # (proportional overlap via quantiles)

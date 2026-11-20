@@ -61,12 +61,14 @@ random_test <- custom.subsets(space_2D, group = list("A" = random_groups[,1], "B
 # plot(random_test)
 expect_equal(summary(dispRity(random_test, metric = pairwise.distance.between.centroids, between.groups = TRUE))$obs, 0.088)
 
+#non-overlapping groups
 non_random_groups <- list("A" = which(space_2D[,1] <= -0.5 & space_2D[,2] <= -0.5),
 "B" = which(space_2D[,1] >= 1 & space_2D[,2] >= 1))
 non_random_test <- custom.subsets(space_2D, group = non_random_groups)
 # plot(non_random_test)
 expect_equal(summary(dispRity(non_random_test, metric = pairwise.distance.between.centroids, between.groups = TRUE))$obs, 5.382)
 
+#completely overlapping groups
 complete_overlap <- custom.subsets(space_2D, group = list("A" = random_groups[,1], "B" = random_groups[,1]))
 # plot(complete_overlap)
 expect_equal(summary(dispRity(complete_overlap, metric = pairwise.distance.between.centroids, between.groups = TRUE))$obs, 0)
@@ -101,7 +103,7 @@ plot(example_test)
 #how much do groups represent eachother in functional space?
 
 
-quantile.overlap<- function (matrix, matrix2, probs = c(0.25, 0.975)) {
+quantile.overlap<- function (matrix, matrix2, probs = c(0.025, 0.975)) {
   q1 <- apply(matrix, 2, quantile, probs = probs) # apply quantile calculation to each PC dimension (column) in the group matrix
   q2<- apply(matrix2, 2, quantile, probs = probs) #returns vector of 95% quantiles for for each dimension
   intersect <- pmax(0, pmin(q1[2, ], q2[2, ]) - pmax(q1[1, ], q2[1, ])) #get minimum upper bound of groups and maximum lower bound of groups for each dimension (column)  i.e. get minimum distance between group (nearest edges), this will be the intersection (overlap), if groups do not overlap, set to 0 as distance is negative
@@ -114,15 +116,12 @@ quantile.overlap<- function (matrix, matrix2, probs = c(0.25, 0.975)) {
 
 #boot matrix etc
 
-disprity(traitspace_mat, metric = quantile.overlap, between.groups = TRUE) #returns vector of overlap for each dimension
+disprity(traitspace_mat, metric = quantile.overlap, between.groups = (c(1,2), c(4,3), c(5,6), c(7,8), c(9,10))) #returns vector of overlap for each dimension or between.groups = (c(1,2), c(2,1)) listing each migrant x resident ecoregional pair
 
 
 #get.disprity = returns vector of overlap across every dimension
 #summary returns median across all dimensions
 
-
-
-disprity(traitspace_mat, metric = c(mean, quantile.overlap), between.groups = TRUE) #returns mean overlap across of all quantiles- which is not as informative
 
 #unit testing----------
 
@@ -148,6 +147,9 @@ expect_equal(summary(dispRity(complete_overlap, metric = quantile.overlap, betwe
 
 #testing partial overlap
 
+idx<- 1:nrow(space_2D)
+half<- floor(length(idx)/2)
+
 set.seed(1)
 test_that("quantile.overlap between two partly overlapping groups is between 0,1", {
   partial_overlap <- custom.subsets(space_2D, group = list("A" = idx[1:half], "B" = idx[(half + 1):(2 * half)]))
@@ -156,7 +158,7 @@ test_that("quantile.overlap between two partly overlapping groups is between 0,1
   expect_gt(summary(dispRity(partial_overlap, metric = quantile.overlap, between.groups = TRUE))$obs.median, 0)
 }) #yay!
 
-#testing that nested groups are still counted as not completely overlapping
+#testing that nested groups are still counted as not completely overlapping so does not differentiate nestedness from partial overlap
 set.seed(1)
 test_that("quantile overlap for a nested group = >0 & <1", {
 nested_groups<- list("A" = which(space_2D[,1] >-3 & space_2D[,1] <3 & space_2D[,2] >-3 & space_2D[,2] <3),
@@ -169,34 +171,24 @@ nested_overlap <- custom.subsets(space_2D, group = nested_groups)
 
 
 
-#so actually this metric differentiates completely overlapping groups from non-overlapping groups but doesn't really identify full nestedness?
-#good start
-#but will need another metric to full identify nestedness i.e.
+#non-overlapping groups: should be 0
+test_that("quantile overlap = 0 for non-overlapping groups", {
+non_random_groups <- list("A" = which(space_2D[,1] <= -0.5 & space_2D[,2] <= -0.5),
+"B" = which(space_2D[,1] >= 1 & space_2D[,2] >= 1))
+non_random_test <- custom.subsets(space_2D, group = non_random_groups)
+# plot(non_random_test)
+expect_equal(summary(dispRity(non_random_test, metric = quantile.overlap, between.groups = TRUE))$obs, 0)
+}) #good
 
-#metric for descibing turnover - what proportion of trait space is unique to each group?-------------------------------
+
+#-----------------------------------metric for descibing turnover - what proportion of trait space is unique to each group?-------------------------------
 
 
-quantile.uniqueness<- function (matrix, matrix2, probs = c(0.25, 0.975)) {
+
+quantile.uniqueness<- function (matrix, matrix2, probs = c(0.025, 0.975)) {
   q1 <- apply(matrix, 2, quantile, probs = probs) 
   q2<- apply(matrix2, 2, quantile, probs = probs)
-  intersect <- pmax(0, pmin(q1[2, ], q2[2, ]) - pmax(q1[1, ], q2[1, ])) 
-  span1 <- q1[2, ] - q1[1, ]
-  span2 <- q2[2, ] - q2[1, ]
-  turnover1<- span1-intersect
-  turnover2<- span2-intersect
-  return(turnover1/span1, turnover2/span2)
-}
-
-#call disprity
-disprity(trait_mat, metric=quantile.uniqueness, between.groups = TRUE)
-
-#or this would return 1 value per pairwise comaprison (1 for each group), dimension level 2?
-
-
-quantile.uniqueness<- function (matrix, matrix2, probs = c(0.25, 0.975)) {
-  q1 <- apply(matrix, 2, quantile, probs = probs) 
-  q2<- apply(matrix2, 2, quantile, probs = probs)
-  intersect <- pmax(0, pmin(q1[2, ], q2[2, ]) - pmax(q1[1, ], q2[1, ])) 
+  intersect <- pmax(0, pmin(q1[2, ], q2[2, ]) - pmax(q1[1, ], q2[1, ])) #if no intersect, defualts to 0
   span <- q1[2, ] - q1[1, ]
   turnover<- span-intersect
 
@@ -204,7 +196,7 @@ return(turnover/span)
 }
    
 #call disprity
-disprity(trait_mat, metric=quantile.uniqueness, between.groups = list(c(1,2), c(2,1)))
+dispRity(traitspace_mat, metric=quantile.uniqueness, between.groups = list(c(matrix,matrix2), c(matrix2,matrix))) #would need to list each ecoregion pair
 
 #turnover = span (= complete turnover, group is completely unique)
 #turnover < span (= partial turnover (just partial overlap)
@@ -212,9 +204,54 @@ disprity(trait_mat, metric=quantile.uniqueness, between.groups = list(c(1,2), c(
 
 #should be calculated pairwise for intersection, but return a matrix of values for each dimension for each group- dimesion level 3
 
-#metric for describing nestedness- what proportion of a group's traits are a subset of the other group's?
+unit testing--------------
 
-quantile.nestedness<- function (matrix, matrix2, probs = c(0.25, 0.975)) {
+
+make.metric(quantile.uniqueness) #correct, outputs as a matrix, performed between groups
+
+set.seed(1)
+equal_matrices <- matrix(rnorm(25), 5, 5) # if matrix 1 + 2 = are the same, would expect turnover to be 0 (intersect = span), so turnover = 0/span = 0
+testthat::expect_all_equal(quantile.uniqueness(equal_matrices, equal_matrices), 0) # correct, yay
+
+#testing on a real multi-dimensional space
+
+#generate two random groups in a hypothetical 2d traitspace
+space_2D <- traitspace_mat[, c("PC1", "PC2")]
+random_groups <- replicate(2, sample(1:nrow(traitspace_mat), floor(nrow(traitspace_mat)/2)))
+
+#testing complete overlap, should be 0 turnover as intersect = span
+test_that("groups with complete overlap return median quantile.uniqueness of 0", {
+complete_overlap <- custom.subsets(space_2D, group = list("A" = random_groups[,1], "B" = random_groups[,1]))
+# plot(complete_overlap)
+expect_all_equal(summary(dispRity(complete_overlap, metric = quantile.uniqueness, between.groups = list(c("A","B"), c("B","A"))))$obs.median, 0)
+}) #yay, all good and returns two matrices for each pairwise comparison 
+
+#testing partial overlap
+
+idx<- 1:nrow(space_2D)
+half<- floor(length(idx)/2)
+
+set.seed(1)
+test_that("quantile.uniqueness between two partly overlapping groups is between 0,1", {
+  partial_overlap <- custom.subsets(space_2D, group = list("A" = idx[1:half], "B" = idx[(half + 1):(2 * half)])) #assign half row values to group, A and half to group B
+  # plot(partial_overlap)
+  expect_all_true(summary(dispRity(partial_overlap, metric = quantile.uniqueness, between.groups = list(c("A","B"), c("B","A"))))$obs.median <1)
+  expect_all_true(summary(dispRity(partial_overlap, metric = quantile.uniqueness, between.groups = list(c("A","B"), c("B","A"))))$obs.median > 0)
+}) #yay!
+
+#testing that nested group has no turnover
+set.seed(1)
+test_that("quantile.uniqueness for a nested group = 0 and the non-nested group = >0", {
+nested_groups<- list("A" = which(space_2D[,1] >-3 & space_2D[,1] <3 & space_2D[,2] >-3 & space_2D[,2] <3),
+"B" = which(space_2D[,1] >-2 & space_2D[,1] <2 & space_2D[,2] >-2 & space_2D[,2] <2))
+nested_overlap <- custom.subsets(space_2D, group = nested_groups)
+ expect_all_true(get.disparity(dispRity(nested_overlap, metric = quantile.uniqueness, between.groups = list(c("A","B"), c("B","A"))))$`A:B` >0)
+expect_all_equal(get.disparity(dispRity(nested_overlap, metric = quantile.uniqueness, between.groups = list(c("A","B"), c("B","A"))))$`B:A`, 0)
+}) #yay- accurately characterises turnover of each group reative to the other group
+
+#-----------------------------metric for describing nestedness- what proportion of a group's traits are a subset of the other group's?--------------------------------------
+
+quantile.nestedness<- function (matrix, matrix2, probs = c(0.025, 0.975)) {
   q1 <- apply(matrix, 2, quantile, probs = probs) 
   q2<- apply(matrix2, 2, quantile, probs = probs)
   intersect <- pmax(0, pmin(q1[2, ], q2[2, ]) - pmax(q1[1, ], q2[1, ])) 
@@ -223,12 +260,13 @@ quantile.nestedness<- function (matrix, matrix2, probs = c(0.25, 0.975)) {
   return(intersect/span1, intersect/span2)
 }
 
+
 #call disprity
 disprity(trait_mat, metric=quantile.uniqueness, between.groups = TRUE)
 
 #or this would return 1 value per pairwise comaprison (1 for each group), dimension level 2?
 
-quantile.nestedness<- function (matrix, matrix2, probs = c(0.25, 0.975)) {
+quantile.nestedness<- function (matrix, matrix2, probs = c(0.025, 0.975)) {
   q1 <- apply(matrix, 2, quantile, probs = probs) 
   q2<- apply(matrix2, 2, quantile, probs = probs)
   intersect <- pmax(0, pmin(q1[2, ], q2[2, ]) - pmax(q1[1, ], q2[1, ])) 
@@ -238,19 +276,52 @@ quantile.nestedness<- function (matrix, matrix2, probs = c(0.25, 0.975)) {
 }
 
 #call disprity
-disprity(trait_mat, metric=quantile.uniqueness, between.groups = list(c(1,2), c(2,1)))
+disprity(trait_mat, metric=quantile.nestedness, between.groups = list(c(1,2), c(2,1))) #should be 20 combinations for 5 ecoregions
 
 #should be calculated pairwise and return 2 matrices, 1 per group of each dimension -dimesion level 3 to see which group is nested in which #summary would return median of all dimensions
 #intersect of 0/span = 0 (non-overlapping group)
 #intersect =span = 1 (completely nested group; group is a complete subset of the other group)
 #intersect < span = partially nested group (just partial overlap)
 
-#distance between groups using 95% quantiles- assuming this is the overlap?- ask Thomas
-dispRity(traitspace_mat, metric = group.dist, between.groups = TRUE))probs = c(0.025, 0.975)
+set.seed(1)
+test_that("quantile.nestedness for a nested group = 0 and the non-nested group = <1", {
+nested_groups<- list("A" = which(space_2D[,1] >-3 & space_2D[,1] <3 & space_2D[,2] >-3 & space_2D[,2] <3),
+"B" = which(space_2D[,1] >-2 & space_2D[,1] <2 & space_2D[,2] >-2 & space_2D[,2] <2))
+nested_overlap <- custom.subsets(space_2D, group = nested_groups)
+expect_all_true(get.disparity(dispRity(nested_overlap, metric = quantile.nestedness, between.groups = list(c("A","B"), c("B","A"))))$`A:B` <1)
+expect_all_equal(get.disparity(dispRity(nested_overlap, metric = quantile.nestedness, between.groups = list(c("A","B"), c("B","A"))))$`B:A`, 1)
+}) #yay- accurately characterises nestedness of each group reative to the other group
 
 
 
+#unit testing------------------
 
+
+set.seed(1)
+equal_matrices <- matrix(rnorm(25), 5, 5) # if matrix 1 + 2 = are the same, would expect nestedness to be 1 (intersect = span), so nestedness = 1/1
+testthat::expect_all_equal(quantile.nestedness(equal_matrices, equal_matrices), 1) #correct
+
+#generate two random groups in a hypothetical 2d traitspace
+space_2D <- traitspace_mat[, c("PC1", "PC2")]
+random_groups <- replicate(2, sample(1:nrow(traitspace_mat), floor(nrow(traitspace_mat)/2)))
+
+#testing complete overlap, should be 1 as intersect = span so nestedness = 1 
+test_that("groups with complete overlap return median quantile.nestedness of 1", {
+complete_overlap <- custom.subsets(space_2D, group = list("A" = random_groups[,1], "B" = random_groups[,1]))
+# plot(complete_overlap)
+expect_all_equal(summary(dispRity(complete_overlap, metric = quantile.nestedness, between.groups = list(c("A","B"), c("B","A"))))$obs.median, 1)
+}) #yep, all good
+
+idx<- 1:nrow(space_2D)
+half<- floor(length(idx)/2)
+
+#testing partial overlap: should be between 0 and 1 as groups are partially nested
+test_that("quantile.nestedness between two partly overlapping groups is between 0,1", {
+  partial_overlap <- custom.subsets(space_2D, group = list("A" = idx[1:half], "B" = idx[(half + 1):(2 * half)])) #assign half row values to group, A and half to group B
+  # plot(partial_overlap)
+  expect_all_true(summary(dispRity(partial_overlap, metric = quantile.nestedness, between.groups = list(c("A","B"), c("B","A"))))$obs.median <1)
+  expect_all_true(summary(dispRity(partial_overlap, metric = quantile.nestedness, between.groups = list(c("A","B"), c("B","A"))))$obs.median > 0)
+}) #good
 
 
 
@@ -363,6 +434,17 @@ calculate.mean.ellipse.contrib.sig(disparity_result = result_binary) #or result_
 
 
 
+#other forms of species-level functional contribution calculations based on (Marino et al., 2024):
+
+#functional specialization
+
+#euclidean distance from centroid of multi-dimesnisonal  traitspace of each species (then model migrant vs resident)
+
+
+#functional uniqueness
+#sum of euclidean distances between species and its 5 nearest neighbours in multi-dimensional traitspace
+
+#fucntional irreplaceability = functional specialisation x functional uniqueness?
 
 
 

@@ -24,8 +24,8 @@ pairwise.distance.between.centroids <- function(matrix, matrix2) {
    sqrt(sum((colMeans(matrix) - colMeans(matrix2))^2))
 }
 
-#calcualting quantile overlap function (proportional overlap, does not identify nestedness only how much of traitspace is common to BOTH groups) so a good start- i.e. can answer, are groups occupying different or common areas of trait space?
-quantile.overlap<- function (matrix, matrix2, probs = c(0.25, 0.975)) {
+#calculating quantile overlap function (proportional overlap, does not identify nestedness only how much of traitspace is common to BOTH groups) so a good start- i.e. can answer, are groups occupying different or common areas of trait space?
+quantile.overlap<- function (matrix, matrix2, probs = c(0.025, 0.975)) {
   q1 <- apply(matrix, 2, quantile, probs = probs) 
   q2<- apply(matrix2, 2, quantile, probs = probs)
   intersect <- pmax(0, pmin(q1[2, ], q2[2, ]) - pmax(q1[1, ], q2[1, ])) 
@@ -33,7 +33,30 @@ quantile.overlap<- function (matrix, matrix2, probs = c(0.25, 0.975)) {
   intersect / span 
 }
 
-# LOad traitspace and convert to matrix
+#calculating turnover of a group relative to the other group: i.e. what proportion of traits are unique to the group? comparisons are pairwise
+quantile.uniqueness<- function (matrix, matrix2, probs = c(0.025, 0.975)) {
+  q1 <- apply(matrix, 2, quantile, probs = probs) 
+  q2<- apply(matrix2, 2, quantile, probs = probs)
+  intersect <- pmax(0, pmin(q1[2, ], q2[2, ]) - pmax(q1[1, ], q2[1, ])) #if no intersect, defualts to 0
+  span <- q1[2, ] - q1[1, ]
+  turnover<- span-intersect
+
+return(turnover/span)
+}
+
+#calculating nestedness of a group relative to the other group: i.e. what proportion of traits are simply a subset of the other group? comparisons are pairwise
+quantile.nestedness<- function (matrix, matrix2, probs = c(0.025, 0.975)) {
+  q1 <- apply(matrix, 2, quantile, probs = probs) 
+  q2<- apply(matrix2, 2, quantile, probs = probs)
+  intersect <- pmax(0, pmin(q1[2, ], q2[2, ]) - pmax(q1[1, ], q2[1, ])) 
+  span <- q1[2, ] - q1[1, ]
+
+  return(intersect/span)
+}
+
+
+
+# Load traitspace and convert to matrix------------------------
 
 traitspace_df<- read.csv("Data/Processed/eco_region_season_traitspace_PCA_BI.csv") 
 
@@ -51,7 +74,7 @@ rownames(traitspace_mat) <- species_pcs$species
 #see ellipse plots for preliminary plotting (mostly small overlaps, close to circle in a circle situation (see nestedness below))
 
 #call function to split groups by ecoregion and migratory status
-groups_yearly   <- make.ecoregional.migrant.groups(traitspace_df =traitspace_df, by = c("ecoregion", "status"))
+groups_yearly   <- make.ecoregional.migrant.groups(traitspace_df =traitspace_df, by = c("ecoregion", "status")) #disprity is calculated relative to the full trait space, i.e. what is the disprity of the ecoregional migrant vs resident group in the full Britain and Ireland traitspace. so will be regional for each region.- can compare biomes across a region but not across multiple regions (as will be different traitspaces)
 
 
 #feed into custom subsets

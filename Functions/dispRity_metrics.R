@@ -249,6 +249,18 @@ nested_overlap <- custom.subsets(space_2D, group = nested_groups)
 expect_all_equal(get.disparity(dispRity(nested_overlap, metric = quantile.uniqueness, between.groups = list(c("A","B"), c("B","A"))))$`B:A`, 0)
 }) #yay- accurately characterises turnover of each group reative to the other group
 
+#non-overlapping groups: should be 1
+test_that("quantile uniqueness = 1 for non-overlapping groups", {
+non_random_groups <- list("A" = which(space_2D[,1] <= -0.5 & space_2D[,2] <= -0.5),
+"B" = which(space_2D[,1] >= 1 & space_2D[,2] >= 1))
+no_overlap <- custom.subsets(space_2D, group = non_random_groups)
+# plot(non_random_test)
+ expect_all_equal(get.disparity(dispRity(no_overlap, metric = quantile.uniqueness, between.groups = list(c("A","B"), c("B","A"))))$`A:B`, 1)
+expect_all_equal(get.disparity(dispRity(no_overlap, metric = quantile.uniqueness, between.groups = list(c("A","B"), c("B","A"))))$`B:A`, 1)
+}) #good 
+
+
+
 #-----------------------------metric for describing nestedness- what proportion of a group's traits are a subset of the other group's?--------------------------------------
 
 quantile.nestedness<- function (matrix, matrix2, probs = c(0.025, 0.975)) {
@@ -283,15 +295,6 @@ disprity(trait_mat, metric=quantile.nestedness, between.groups = list(c(1,2), c(
 #intersect =span = 1 (completely nested group; group is a complete subset of the other group)
 #intersect < span = partially nested group (just partial overlap)
 
-set.seed(1)
-test_that("quantile.nestedness for a nested group = 0 and the non-nested group = <1", {
-nested_groups<- list("A" = which(space_2D[,1] >-3 & space_2D[,1] <3 & space_2D[,2] >-3 & space_2D[,2] <3),
-"B" = which(space_2D[,1] >-2 & space_2D[,1] <2 & space_2D[,2] >-2 & space_2D[,2] <2))
-nested_overlap <- custom.subsets(space_2D, group = nested_groups)
-expect_all_true(get.disparity(dispRity(nested_overlap, metric = quantile.nestedness, between.groups = list(c("A","B"), c("B","A"))))$`A:B` <1)
-expect_all_equal(get.disparity(dispRity(nested_overlap, metric = quantile.nestedness, between.groups = list(c("A","B"), c("B","A"))))$`B:A`, 1)
-}) #yay- accurately characterises nestedness of each group reative to the other group
-
 
 
 #unit testing------------------
@@ -324,9 +327,28 @@ test_that("quantile.nestedness between two partly overlapping groups is between 
 }) #good
 
 
+#test that non-overlapping groups = 0 
+set.seed(1)
+test_that("quantile nestedness = 0 for non-overlapping groups", {
+non_random_groups <- list("A" = which(space_2D[,1] <= -0.5 & space_2D[,2] <= -0.5),
+"B" = which(space_2D[,1] >= 1 & space_2D[,2] >= 1))
+no_overlap <- custom.subsets(space_2D, group = non_random_groups)
+# plot(non_random_test)
+expect_all_equal(get.disparity(dispRity(no_overlap, metric = quantile.nestedness, between.groups = list(c("A","B"), c("B","A"))))$`A:B`, 0)
+expect_all_equal(get.disparity(dispRity(no_overlap, metric = quantile.nestedness, between.groups = list(c("A","B"), c("B","A"))))$`B:A`, 0)
+}) #good 
+
+set.seed(1)
+test_that("quantile.nestedness for a nested group = 0 and the non-nested group = <1", {
+nested_groups<- list("A" = which(space_2D[,1] >-3 & space_2D[,1] <3 & space_2D[,2] >-3 & space_2D[,2] <3),
+"B" = which(space_2D[,1] >-2 & space_2D[,1] <2 & space_2D[,2] >-2 & space_2D[,2] <2))
+nested_overlap <- custom.subsets(space_2D, group = nested_groups)
+expect_all_true(get.disparity(dispRity(nested_overlap, metric = quantile.nestedness, between.groups = list(c("A","B"), c("B","A"))))$`A:B` <1)
+expect_all_equal(get.disparity(dispRity(nested_overlap, metric = quantile.nestedness, between.groups = list(c("A","B"), c("B","A"))))$`B:A`, 1)
+}) #yay- accurately characterises nestedness of each group reative to the other group
 
 
-#could calculate as a proportion e.g. proportional overlap
+
 
 
 #-----------------------------metric for calculating displacement from centroid (deviance pf migrant group from average trait combos)------------------------

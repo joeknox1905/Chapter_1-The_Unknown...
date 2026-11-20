@@ -350,30 +350,34 @@ expect_all_equal(get.disparity(dispRity(nested_overlap, metric = quantile.nested
 
 
 
+-------------------------------------------------------------------------------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------species level metrics--------------------------------------------------------------#
+-------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-#-----------------------------metric for calculating displacement from centroid (deviance pf migrant group from average trait combos)------------------------
+#distribution.of.group.from.other.group.centroid------------------------
 
-#i.e. is migrant groups average trait combinations (centroid) at the center (centroid, 1) or away from centre (<1) of traitspace and therefore does it represent typical/redundant niches (generalist) or more unique niches (specialist)?
-#more of a positional measure than a size measure (Guillerme et al., 2020). 
-#also may be good to calcualate ecoregional migrant group displacement compared to full BI trait space not just annual trait space as would give an idea of whether 
-#migrant group is unique locally but more redundant regionally- if that is the case, migrants are more functionally similar to migrants/residents in other ecoregions, suggesting either local migration from other ecoregions to the ecoregion (could confirm with migratory distance analysis)
-#or that residents are actually more functionally unique in this ecoregion and that ecoregion shapes resident communities more than migrant communities.
+distribution.of.group.from.other.group.centroid <- function(matrix, matrix2) {
+    ## calculate the centroid of the matrices of n-dimensional traitspace
+   dist1<- sqrt(sum((colMeans(matrix) - (matrix2[x,]))^2)) #distance from each species in group2 to group1
+   apply(traitspace, 2, dist1)
+    dist2<- sqrt(sum((colMeans(matrix2) - (matrix[x,]))^2))
+    apply(traitspace, 1, dist2) #distance from each species in group1 to group2
+} 
 
-displacements() in dispRity
+#return distrubtion of group1 species from centroid of group2 and distrubtion of group2 species from centroid of group1
 
-  #calculated as:
-  
-  avg.group.displacements<- function(matrix) {
-    reference_centroid<- colMeans(trait_cols)
-    group_centroid<-  colMeans(matrix)
-  
-  sqrt(sum(group_centroid)^2/sqrt(sum(group_centroid-reference_centroid)^2) #@@@JK:TG is this correct?
+dispRity(traitspace_mat, metric = distribution.of.group.from.other.group.centroid, between.groups = list(c("A","B"), c("B","A")))
 
-#need to call between.groups = FALSE
-result_binary  <- calculate.disprity.by.ecoregion(BI_traitspace, group = "status", metric = distance.between.centroids , trait_cols = trait_cols, between = FALSE) 
 
-#could also calculate point.dist- distance from centroid of matrix 2 to matrix which may be more what you want
-dispRity(point.dist(point=colMeans))
+#calculate disprity as a distribution for each species for each group e.g. for pariwise distance to centroid calculated distanc eof each sepcies in migrant group to resident centroid and distanc eof each species in resident group to migrant centroid (of multidimensional trait space i.e. (colmeans)) (essentially functional specialisation (see Marino et al., 2024))
+#how far is each species from the resident/migrant centroid
+#the migrant furthest from the resident centroid will be the most unique migrants
+#look at these unique species, what niche/part of trait space to they occupy?
+#i.e. the tails of the distribution - if these are rare seed dispersers for example, suggests ecosystem could be at risk if these species are lost (e.g. under climate change- then has a better target for climate change paper)? (essentially functional specialisation)
+#output value for each species in the group - if A group = c(A:B), If B species = ("B:A")
+
+
+
 
 #----------------metric for calculating distribution of species within each group around centroid----------------
 

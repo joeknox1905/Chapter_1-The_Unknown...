@@ -127,6 +127,12 @@ North Atlantic moist mixed forests.migrant:North Atlantic moist mixed forests.re
 boot_rare_disp<- <- get.disparity(disp_result, observed = FALSE,
 rarefaction = TRUE)
 
+#plot boostraps and variance, if confidence intervals overlap alot between two groups then suggests, difference could just be due to chance, dont forget to look at differenc ein absolute observed value- if very small, may need more convincing 
+
+#either do t-test on each pairwise comparison or anova (aov) across all groups to get cross-ecoregional results e.g. do the caledon forest migrants differ from the migrants in other ecoergions, if lots of cross-ecoregional differences then maybe the traits migrants are contributing is very biome-specific 
+i.e. test.dispRity(my_disparity, test = wilcox.test) #performs non-parametric wilcoxon test on bootstrapped and rarefied data. Non-parametric as distribution is artificial from boostrapping so data are non-independent. If species level then would use observed species-level distribution for each group 
+#rarefy to to the smallest group across each subset
+
 # so looks like european atlantic forest especially, and then english lowland and caldeon conifer forests have a large distance between centroids, suggesting divergent average trait combinations between migrants and residents
 # in these ecoregions- would have to look into ecosystem types, the diets, phylogeny and kinds of birds to continue to subset first, also look across groups and find a better way of plotting
 
@@ -162,7 +168,8 @@ plot(subsets_yearly, type ="preview") #PC1V2
 plot(subsets_yearly, type="preview", specific.args = list(dimensions = c(3,4)) PC3V4
 
 
-
+#save disprity
+save(disprity, "pairwise.distance.between.centroids.rds")
 
 
 

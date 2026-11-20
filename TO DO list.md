@@ -17,7 +17,7 @@ To do:
 [] go through comments and enact for PCA (rerun without kipps distance), 
 [] visualise PCAs in traitspace (ggplots/ordiplot/ellipse plot)- functionalise plots; using custom functions to get subsets for plotting- then can refine more metrics e.g. edge ones
 [] Work on report
-[] Run FD metrics- and unit tests quantiles
+[] species-level metrics- distribution from other group centroid, funcitonal specialization and uniquenesss?, scrap ellipse cont?
 []- blombergs k and whether to average dimensions for quantile metrics, discuss with Thomas
 [] what traits/things explain the difference among migrants/residents in traitspace if there is any- transience (monthly analysis)/ diet/forgaing niche (avoniche)- do literature search to explore possible seasonal effects.
 [] Update README

@@ -2,56 +2,45 @@ This is BibTeX, Version 0.99d (TeX Live 2025/Debian)
 Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
 The top-level auxiliary file: Initial_Thesis_Plan.aux
 The style file: plainnat.bst
-White space in argument---line 14 of file Initial_Thesis_Plan.aux
- : \citation{Mammola
- :                   2021,Guillerme2025}
-I'm skipping whatever remains of this command
 Database file #1: References/bibliography_chap1.bib
-Repeated entry---line 452 of file References/bibliography_chap1.bib
- : @article{Blonder2018
- :                     ,
-I'm skipping whatever remains of this entry
-Warning--I didn't find a database entry for "Guillerme"
-Warning--I didn't find a database entry for "2025"
-You've used 29 entries,
+You've used 30 entries,
             2773 wiz_defined-function locations,
-            846 strings with 15868 characters,
-and the built_in function-call counts, 24207 in all, are:
-= -- 1957
-> -- 2528
+            849 strings with 16058 characters,
+and the built_in function-call counts, 24753 in all, are:
+= -- 2004
+> -- 2576
 < -- 7
-+ -- 845
-- -- 816
-* -- 2478
-:= -- 4037
-add.period$ -- 146
-call.type$ -- 29
-change.case$ -- 358
-chr.to.int$ -- 29
-cite$ -- 58
-duplicate$ -- 612
-empty$ -- 1145
-format.name$ -- 849
-if$ -- 4788
++ -- 861
+- -- 831
+* -- 2530
+:= -- 4129
+add.period$ -- 151
+call.type$ -- 30
+change.case$ -- 366
+chr.to.int$ -- 30
+cite$ -- 60
+duplicate$ -- 632
+empty$ -- 1176
+format.name$ -- 865
+if$ -- 4897
 int.to.chr$ -- 1
 int.to.str$ -- 1
-missing$ -- 29
-newline$ -- 211
-num.names$ -- 116
-pop$ -- 609
+missing$ -- 30
+newline$ -- 218
+num.names$ -- 120
+pop$ -- 621
 preamble$ -- 1
-purify$ -- 329
+purify$ -- 336
 quote$ -- 0
-skip$ -- 620
+skip$ -- 637
 stack$ -- 0
-substring$ -- 612
-swap$ -- 60
+substring$ -- 614
+swap$ -- 62
 text.length$ -- 2
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 319
+type$ -- 330
 warning$ -- 0
-while$ -- 114
+while$ -- 117
 width$ -- 0
-write$ -- 501
-(There were 2 error messages)
+write$ -- 518

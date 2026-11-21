@@ -16,7 +16,7 @@ To do:
 [] re-run aoh pipeline
 [] go through comments and enact for PCA (rerun without kipps distance), 
 [] visualise PCAs in traitspace (ggplots/ordiplot/ellipse plot)- functionalise plots; using custom functions to get subsets for plotting- then can refine more metrics e.g. edge ones
-[] Work on report
+[] Work on report and ask thomas about realised vs fundamental niche (modelling groups relative to full regional space or their local trait space, at the moment it is relative to the full britain and ireland space to get an idea of how species are occupying niches relative to the full niche space availiable (the limits of which cannot be defined by a single arbitrary geogrpahical border))
 [] species-level metrics- distribution from other group centroid, funcitonal specialization and uniquenesss?, scrap ellipse cont?
 []- blombergs k and whether to average dimensions for quantile metrics, discuss with Thomas
 [] what traits/things explain the difference among migrants/residents in traitspace if there is any- transience (monthly analysis)/ diet/forgaing niche (avoniche)- do literature search to explore possible seasonal effects.

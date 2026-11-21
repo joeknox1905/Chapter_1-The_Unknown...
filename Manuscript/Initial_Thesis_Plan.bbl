@@ -1,4 +1,4 @@
-\begin{thebibliography}{23}
+\begin{thebibliography}{30}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
 \expandafter\ifx\csname urlstyle\endcsname\relax
@@ -11,6 +11,13 @@ Sébastien Brosse, Nicolas Charpin, Guohuan Su, Aurèle Toussaint, Guido~A. Herr
 \newblock \emph{Global Ecology and Biogeography}, 30:\penalty0 2330--2336, 12 2021.
 \newblock ISSN 1466-822X.
 \newblock \doi{10.1111/geb.13395}.
+
+\bibitem[Cooke et~al.(2019)Cooke, Eigenbrod, and Bates]{Cooke2019}
+Robert S.~C. Cooke, Felix Eigenbrod, and Amanda~E. Bates.
+\newblock Projected losses of global mammal and bird ecological strategies.
+\newblock \emph{Nature Communications}, 10:\penalty0 2279, 5 2019.
+\newblock ISSN 2041-1723.
+\newblock \doi{10.1038/s41467-019-10284-z}.
 
 \bibitem[Cox et~al.(2021)Cox, Gardner, and Gaston]{Cox2021}
 D.~T.~C. Cox, A.~S. Gardner, and K.~J. Gaston.
@@ -90,6 +97,18 @@ Na~Huang, Xinyuan Sun, Yanfang Song, Zhiyong Yuan, and Weiwei Zhou.
 \newblock ISSN 1466-822X.
 \newblock \doi{10.1111/geb.13656}.
 
+\bibitem[Hughes et~al.(2022)Hughes, Edwards, Bright, Capp, Cooney, Varley, and Thomas]{https://doi.org/10.1111/ele.13905}
+Emma~C. Hughes, David~P. Edwards, Jen~A. Bright, Elliot~J.R. Capp, Christopher~R. Cooney, Zoë~K. Varley, and Gavin~H. Thomas.
+\newblock Global biogeographic patterns of avian morphological diversity.
+\newblock \emph{Ecology Letters}, 25\penalty0 (3):\penalty0 598--610, 2022.
+\newblock \doi{https://doi.org/10.1111/ele.13905}.
+\newblock URL \url{https://onlinelibrary.wiley.com/doi/abs/10.1111/ele.13905}.
+
+\bibitem[Hutchinson(1957)]{hutchinson1957population}
+G~Evelyn Hutchinson.
+\newblock Population studies-animal ecology and demography-concluding remarks.
+\newblock In \emph{Cold Spring Harbor symposia on quantitative biology}, volume~22, pages 415--427. Cold Spring Harbor Lab Press, Publications Dept, 1 BUNGTOWN RD, COLD SPRING~…, 1957.
+
 \bibitem[Mammola et~al.(2021)Mammola, Carmona, Guillerme, and Cardoso]{Mammola2021}
 Stefano Mammola, Carlos~P. Carmona, Thomas Guillerme, and Pedro Cardoso.
 \newblock Concepts and applications in functional diversity.
@@ -119,6 +138,20 @@ Oleksandra Oskyrko, Chunrong Mi, Shai Meiri, and Weiguo Du.
 \newblock ISSN 2052-4463.
 \newblock \doi{10.1038/s41597-024-03079-5}.
 
+\bibitem[Pavoine and Bonsall(2011)]{Pavoine2011}
+S.~Pavoine and M.~B. Bonsall.
+\newblock Measuring biodiversity to explain community assembly: a unified approach.
+\newblock \emph{Biological Reviews}, 86:\penalty0 792--812, 11 2011.
+\newblock ISSN 14647931.
+\newblock \doi{10.1111/j.1469-185X.2010.00171.x}.
+
+\bibitem[Petchey and Gaston(2006)]{Petchey2006}
+Owen~L. Petchey and Kevin~J. Gaston.
+\newblock Functional diversity: back to basics and looking forward.
+\newblock \emph{Ecology Letters}, 9:\penalty0 741--758, 6 2006.
+\newblock ISSN 1461-023X.
+\newblock \doi{10.1111/j.1461-0248.2006.00924.x}.
+
 \bibitem[Pfenning-Butterworth et~al.(2024)Pfenning-Butterworth, Buckley, Drake, Farner, Farrell, Gehman, Mordecai, Stephens, Gittleman, and Davies]{PFENNINGBUTTERWORTH2024e270}
 Alaina Pfenning-Butterworth, Lauren~B Buckley, John~M Drake, Johannah~E Farner, Maxwell~J Farrell, Alyssa-Lois~M Gehman, Erin~A Mordecai, Patrick~R Stephens, John~L Gittleman, and T~Jonathan Davies.
 \newblock Interconnecting global threats: climate change, biodiversity loss, and infectious diseases.
@@ -146,12 +179,26 @@ Patrick~R. Roehrdanz.
 \newblock \doi{10.1073/pnas.2531790123}.
 \newblock URL \url{https://www.pnas.org/doi/abs/10.1073/pnas.2531790123}.
 
+\bibitem[Tilman et~al.(1997)Tilman, Knops, Wedin, Reich, Ritchie, and Siemann]{doi:10.1126/science.277.5330.1300}
+David Tilman, Johannes Knops, David Wedin, Peter Reich, Mark Ritchie, and Evan Siemann.
+\newblock The influence of functional diversity and composition on ecosystem processes.
+\newblock \emph{Science}, 277\penalty0 (5330):\penalty0 1300--1302, 1997.
+\newblock \doi{10.1126/science.277.5330.1300}.
+\newblock URL \url{https://www.science.org/doi/abs/10.1126/science.277.5330.1300}.
+
 \bibitem[Tobias et~al.(2022)Tobias, Sheard, Pigot, Devenish, Yang, Sayol, Neate‐Clegg, Alioravainen, Weeks, Barber, Walkden, MacGregor, Jones, Vincent, Phillips, Marples, Montaño‐Centellas, Leandro‐Silva, Claramunt, Darski, Freeman, Bregman, Cooney, Hughes, Capp, Varley, Friedman, Korntheuer, Corrales‐Vargas, Trisos, Weeks, Hanz, Töpfer, Bravo, Remeš, Nowak, Carneiro, R., Matysioková, Baldassarre, Martínez‐Salinas, Wolfe, Chapman, Daly, Sorensen, Neu, Ford, Mayhew, Silveira, Kelly, Annorbah, Pollock, Grabowska‐Zhang, McEntee, Gonzalez, Meneses, Muñoz, Powell, Jamie, Matthews, Johnson, Brito, Zyskowski, Crates, Harvey, Zevallos, Hosner, Bradfer‐Lawrence, Maley, Stiles, Lima, Provost, Chibesa, Mashao, Howard, Mlamba, Chua, Li, Gómez, García, Päckert, Fuchs, Ali, Derryberry, Carlson, Urriza, Brzeski, Prawiradilaga, Rayner, Miller, Bowie, Lafontaine, Scofield, Lou, Somarathna, Lepage, Illif, Neuschulz, Templin, Dehling, Cooper, Pauwels, Analuddin, Fjeldså, Seddon, Sweet, DeClerck, Naka, Brawn, Aleixo, Böhning‐Gaese, Rahbek, Fritz, Thomas, and Schleuning]{Tobias2022}
 Joseph~A. Tobias, Catherine Sheard, Alex~L. Pigot, Adam J.~M. Devenish, Jingyi Yang, Ferran Sayol, Montague H.~C. Neate‐Clegg, Nico Alioravainen, Thomas~L. Weeks, Robert~A. Barber, Patrick~A. Walkden, Hannah E.~A. MacGregor, Samuel E.~I. Jones, Claire Vincent, Anna~G. Phillips, Nicola~M. Marples, Flavia~A. Montaño‐Centellas, Victor Leandro‐Silva, Santiago Claramunt, Bianca Darski, Benjamin~G. Freeman, Tom~P. Bregman, Christopher~R. Cooney, Emma~C. Hughes, Elliot J.~R. Capp, Zoë~K. Varley, Nicholas~R. Friedman, Heiko Korntheuer, Andrea Corrales‐Vargas, Christopher~H. Trisos, Brian~C. Weeks, Dagmar~M. Hanz, Till Töpfer, Gustavo~A. Bravo, Vladimír Remeš, Larissa Nowak, Lincoln~S. Carneiro, Amilkar J.~Moncada R., Beata Matysioková, Daniel~T. Baldassarre, Alejandra Martínez‐Salinas, Jared~D. Wolfe, Philip~M. Chapman, Benjamin~G. Daly, Marjorie~C. Sorensen, Alexander Neu, Michael~A. Ford, Rebekah~J. Mayhew, Luis~Fabio Silveira, David~J. Kelly, Nathaniel N.~D. Annorbah, Henry~S. Pollock, Ada~M. Grabowska‐Zhang, Jay~P. McEntee, Juan Carlos~T. Gonzalez, Camila~G. Meneses, Marcia~C. Muñoz, Luke~L. Powell, Gabriel~A. Jamie, Thomas~J. Matthews, Oscar Johnson, Guilherme R.~R. Brito, Kristof Zyskowski, Ross Crates, Michael~G. Harvey, Maura~Jurado Zevallos, Peter~A. Hosner, Tom Bradfer‐Lawrence, James~M. Maley, F.~Gary Stiles, Hevana~S. Lima, Kaiya~L. Provost, Moses Chibesa, Mmatjie Mashao, Jeffrey~T. Howard, Edson Mlamba, Marcus A.~H. Chua, Bicheng Li, M.~Isabel Gómez, Natalia~C. García, Martin Päckert, Jérôme Fuchs, Jarome~R. Ali, Elizabeth~P. Derryberry, Monica~L. Carlson, Rolly~C. Urriza, Kristin~E. Brzeski, Dewi~M. Prawiradilaga, Matt~J. Rayner, Eliot~T. Miller, Rauri C.~K. Bowie, René‐Marie Lafontaine, R.~Paul Scofield, Yingqiang Lou, Lankani Somarathna, Denis Lepage, Marshall Illif, Eike~Lena Neuschulz, Mathias Templin, D.~Matthias Dehling, Jacob~C. Cooper, Olivier S.~G. Pauwels, Kangkuso Analuddin, Jon Fjeldså, Nathalie Seddon, Paul~R. Sweet, Fabrice A.~J. DeClerck, Luciano~N. Naka, Jeffrey~D. Brawn, Alexandre Aleixo, Katrin Böhning‐Gaese, Carsten Rahbek, Susanne~A. Fritz, Gavin~H. Thomas, and Matthias Schleuning.
 \newblock Avonet: morphological, ecological and geographical data for all birds.
 \newblock \emph{Ecology Letters}, 25:\penalty0 581--597, 3 2022.
 \newblock ISSN 1461-023X.
 \newblock \doi{10.1111/ele.13898}.
+
+\bibitem[Toussaint et~al.(2021)Toussaint, Brosse, Bueno, Pärtel, Tamme, and Carmona]{Toussaint2021}
+Aurele Toussaint, Sébastien Brosse, C.~Guillermo Bueno, Meelis Pärtel, Riin Tamme, and Carlos~P. Carmona.
+\newblock Extinction of threatened vertebrates will lead to idiosyncratic changes in functional diversity across the world.
+\newblock \emph{Nature Communications}, 12:\penalty0 5162, 8 2021.
+\newblock ISSN 2041-1723.
+\newblock \doi{10.1038/s41467-021-25293-0}.
 
 \bibitem[{Vigués Jorba} et~al.(2025){Vigués Jorba}, Scherrer, Duchenne, Zellweger, Gossner, and Bollmann]{VIGUESJORBA2025113855}
 Jan {Vigués Jorba}, Daniel Scherrer, François Duchenne, Florian Zellweger, Martin~M. Gossner, and Kurt Bollmann.

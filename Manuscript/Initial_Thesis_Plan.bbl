@@ -1,9 +1,16 @@
-\begin{thebibliography}{30}
+\begin{thebibliography}{29}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
 \expandafter\ifx\csname urlstyle\endcsname\relax
   \providecommand{\doi}[1]{doi: #1}\else
   \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Blonder(2018)]{Blonder2018}
+Benjamin Blonder.
+\newblock Hypervolume concepts in niche‐ and trait‐based ecology.
+\newblock \emph{Ecography}, 41:\penalty0 1441--1455, 9 2018.
+\newblock ISSN 0906-7590.
+\newblock \doi{10.1111/ecog.03187}.
 
 \bibitem[Brosse et~al.(2021)Brosse, Charpin, Su, Toussaint, Herrera‐R, Tedesco, and Villéger]{Brosse2021}
 Sébastien Brosse, Nicolas Charpin, Guohuan Su, Aurèle Toussaint, Guido~A. Herrera‐R, Pablo~A. Tedesco, and Sébastien Villéger.
@@ -18,20 +25,6 @@ Robert S.~C. Cooke, Felix Eigenbrod, and Amanda~E. Bates.
 \newblock \emph{Nature Communications}, 10:\penalty0 2279, 5 2019.
 \newblock ISSN 2041-1723.
 \newblock \doi{10.1038/s41467-019-10284-z}.
-
-\bibitem[Cox et~al.(2021)Cox, Gardner, and Gaston]{Cox2021}
-D.~T.~C. Cox, A.~S. Gardner, and K.~J. Gaston.
-\newblock Diel niche variation in mammals associated with expanded trait space.
-\newblock \emph{Nature Communications}, 12:\penalty0 1753, 3 2021.
-\newblock ISSN 2041-1723.
-\newblock \doi{10.1038/s41467-021-22023-4}.
-
-\bibitem[Dawson et~al.(2021)Dawson, Carmona, González‐Suárez, Jönsson, Chichorro, Mallen‐Cooper, Melero, Moor, Simaika, and Duthie]{Dawson2021}
-Samantha~K. Dawson, Carlos~Pérez Carmona, Manuela González‐Suárez, Mari Jönsson, Filipe Chichorro, Max Mallen‐Cooper, Yolanda Melero, Helen Moor, John~P. Simaika, and Alexander~Bradley Duthie.
-\newblock The traits of “trait ecologists”: An analysis of the use of trait and functional trait terminology.
-\newblock \emph{Ecology and Evolution}, 11:\penalty0 16434--16445, 12 2021.
-\newblock ISSN 2045-7758.
-\newblock \doi{10.1002/ece3.8321}.
 
 \bibitem[de~Sousa Gomes-Gonçalves et~al.(2024)de~Sousa Gomes-Gonçalves, da~Silva~Ferreira, and Araújo]{GOMESGONCALVES2024108818}
 Rafaela de~Sousa Gomes-Gonçalves, Laryssa~Cordeiro da~Silva~Ferreira, and Francisco~Gerson Araújo.
@@ -82,13 +75,6 @@ Thomas Guillerme, Mark~N. Puttick, Ariel~E. Marcy, and Vera Weisbecker.
 \newblock \emph{Ecology and Evolution}, 10:\penalty0 7261--7275, 7 2020.
 \newblock ISSN 2045-7758.
 \newblock \doi{10.1002/ece3.6452}.
-
-\bibitem[Guillerme et~al.(2025)Guillerme, Cardoso, Jørgensen, Mammola, and Matthews]{Guillerme2025}
-Thomas Guillerme, Pedro Cardoso, Maria~Wagner Jørgensen, Stefano Mammola, and Thomas~J. Matthews.
-\newblock The what, how, and why of trait‐based analyses in ecology.
-\newblock \emph{Ecography}, 2025, 7 2025.
-\newblock ISSN 0906-7590.
-\newblock \doi{10.1111/ecog.07580}.
 
 \bibitem[Huang et~al.(2023)Huang, Sun, Song, Yuan, and Zhou]{Huang2023}
 Na~Huang, Xinyuan Sun, Yanfang Song, Zhiyong Yuan, and Weiwei Zhou.
@@ -199,6 +185,13 @@ Aurele Toussaint, Sébastien Brosse, C.~Guillermo Bueno, Meelis Pärtel, Riin Ta
 \newblock \emph{Nature Communications}, 12:\penalty0 5162, 8 2021.
 \newblock ISSN 2041-1723.
 \newblock \doi{10.1038/s41467-021-25293-0}.
+
+\bibitem[Tucker et~al.(2017)Tucker, Cadotte, Carvalho, Davies, Ferrier, Fritz, Grenyer, Helmus, Jin, Mooers, Pavoine, Purschke, Redding, Rosauer, Winter, and Mazel]{Tucker2017}
+Caroline~M. Tucker, Marc~W. Cadotte, Silvia~B. Carvalho, T.~Jonathan Davies, Simon Ferrier, Susanne~A. Fritz, Rich Grenyer, Matthew~R. Helmus, Lanna~S. Jin, Arne~O. Mooers, Sandrine Pavoine, Oliver Purschke, David~W. Redding, Dan~F. Rosauer, Marten Winter, and Florent Mazel.
+\newblock A guide to phylogenetic metrics for conservation, community ecology and macroecology.
+\newblock \emph{Biological Reviews}, 92:\penalty0 698--715, 5 2017.
+\newblock ISSN 1464-7931.
+\newblock \doi{10.1111/brv.12252}.
 
 \bibitem[{Vigués Jorba} et~al.(2025){Vigués Jorba}, Scherrer, Duchenne, Zellweger, Gossner, and Bollmann]{VIGUESJORBA2025113855}
 Jan {Vigués Jorba}, Daniel Scherrer, François Duchenne, Florian Zellweger, Martin~M. Gossner, and Kurt Bollmann.

@@ -173,3 +173,8 @@ save(disprity, "pairwise.distance.between.centroids.rds")
 
 
 
+#caveat--------------
+#when intepreting the resulkts can you see a clear effect- if yes probably does not need null hypothesis testign, if no then probably does
+#therefore significance testing with p value provides statistical clarity- (Dushoff et al., 2019) argue this is the reason for performing p value testing ui.e. to provide clarity when you cannot "clearly see the result"
+#e.g. if p<0.05 = “did not find a statistically clear effect.”  rather than no stastically significant effect (p values can be misleading because just because something is significant doesnt mean it is a large effetc or there is not a lot of noise around it, also the effect refers to a dataset not a study system)
+#always important to report the effect size and confidence interval alongside the p vlaue (even if the confidence intervals are artifical i.e. from boostrapping), could also report observed and then the boostrapped values with confidence intervals

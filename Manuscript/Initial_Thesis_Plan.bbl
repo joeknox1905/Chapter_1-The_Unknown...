@@ -1,4 +1,4 @@
-\begin{thebibliography}{30}
+\begin{thebibliography}{35}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
 \expandafter\ifx\csname urlstyle\endcsname\relax
@@ -40,6 +40,11 @@ Rafael~Antunes Dias, Vinicius Augusto~Galvão Bastazini, Andros~T. Gianuca, and 
 \newblock \emph{Functional Ecology}, 39:\penalty0 3164--3180, 11 2025.
 \newblock ISSN 0269-8463.
 \newblock \doi{10.1111/1365-2435.70158}.
+
+\bibitem[Domisch et~al.(2025)Domisch, Schroer, Kimmig, Kiefer, Arlinghaus, Meester, Dickerson, Eisenhauer, Govaert, Grigoropoulou, Grossart, He, Hilt, Hölker, Jähnig, Kalinkat, Kolb, Leger, Mehner, Mietchen, Prochnow, Scheunemann, Stoffers, Theuerl, Torres-Cambas, Flocco, and Overmann]{Domisch2025}
+Sami Domisch, Sibylle Schroer, Sophia Kimmig, Sarah Kiefer, Robert Arlinghaus, Luc~De Meester, Ashton~L Dickerson, Nico Eisenhauer, Lynn Govaert, Afroditi Grigoropoulou, Hans-Peter Grossart, Fengzhi He, Sabine Hilt, Franz Hölker, Sonja Jähnig, Gregor Kalinkat, Steffen Kolb, Theo Leger, Thomas Mehner, Daniel Mietchen, Annette Prochnow, Nicole Scheunemann, Twan Stoffers, Susanne Theuerl, Yusdiel Torres-Cambas, Cecilia Flocco, and Jörg Overmann.
+\newblock The hidden dimensions of biodiversity.
+\newblock \emph{EcoevoRvix}, 2025.
 
 \bibitem[Gaüzère et~al.(2025)Gaüzère, Violle, Schrodt, Grenié, Santini, Hedde, Porcher, Goury, Beck, and Thuiller]{Gazre2025}
 Pierre Gaüzère, Cyrille Violle, Franziska Schrodt, Matthias Grenié, Luca Santini, Mickaël Hedde, Emmanuelle Porcher, Romain Goury, Miriam Beck, and Wilfried Thuiller.
@@ -83,6 +88,13 @@ Thomas Guillerme, Pedro Cardoso, Maria~Wagner Jørgensen, Stefano Mammola, and T
 \newblock ISSN 0906-7590.
 \newblock \doi{10.1111/ecog.07580}.
 
+\bibitem[Hortal et~al.(2015)Hortal, de~Bello, Diniz-Filho, Lewinsohn, Lobo, and Ladle]{Hortal2015}
+Joaquín Hortal, Francesco de~Bello, José Alexandre~F. Diniz-Filho, Thomas~M. Lewinsohn, Jorge~M. Lobo, and Richard~J. Ladle.
+\newblock Seven shortfalls that beset large-scale knowledge of biodiversity.
+\newblock \emph{Annual Review of Ecology, Evolution, and Systematics}, 46:\penalty0 523--549, 12 2015.
+\newblock ISSN 1543-592X.
+\newblock \doi{10.1146/annurev-ecolsys-112414-054400}.
+
 \bibitem[Huang et~al.(2023)Huang, Sun, Song, Yuan, and Zhou]{Huang2023}
 Na~Huang, Xinyuan Sun, Yanfang Song, Zhiyong Yuan, and Weiwei Zhou.
 \newblock Amphibian traits database: A global database on morphological traits of amphibians.
@@ -101,6 +113,21 @@ Emma~C. Hughes, David~P. Edwards, Jen~A. Bright, Elliot~J.R. Capp, Christopher~R
 G~Evelyn Hutchinson.
 \newblock Population studies-animal ecology and demography-concluding remarks.
 \newblock In \emph{Cold Spring Harbor symposia on quantitative biology}, volume~22, pages 415--427. Cold Spring Harbor Lab Press, Publications Dept, 1 BUNGTOWN RD, COLD SPRING~…, 1957.
+
+\bibitem[Hähn et~al.(2024)Hähn, Damasceno, Alvarez-Davila, Aubin, Bauters, Bergmeier, Biurrun, Bjorkman, Bonari, Botta-Dukát, Campos, Čarni, Chytrý, Ćušterevska, de~Gasper, Sanctis, Dengler, Dolezal, El-Sheikh, Finckh, de~Mera, Garbolino, Gholizadeh, Golub, Haider, Hatim, Hérault, Homeier, Jandt, Jansen, Jentsch, Kattge, Kessler, Khanina, Kreft, Küzmič, Lenoir, Moeslund, Mucina, Naqinezhad, Noroozi, Pérez-Haase, Phillips, Pillar, Rivas-Torres, Ruprecht, Sandel, Schmidt, Schmiedel, Schnitzer, Schrodt, Šilc, Sparrow, Sporbert, Stančić, Strohbach, Svenning, Tang, Tang, Vibrans, Violle, Waller, Wana, Wang, Whitfeld, Zizka, Sabatini, and Bruelheide]{Hhn2024}
+Georg J.~A. Hähn, Gabriella Damasceno, Esteban Alvarez-Davila, Isabelle Aubin, Marijn Bauters, Erwin Bergmeier, Idoia Biurrun, Anne~D. Bjorkman, Gianmaria Bonari, Zoltán Botta-Dukát, Juan~A. Campos, Andraž Čarni, Milan Chytrý, Renata Ćušterevska, André~Luís de~Gasper, Michele~De Sanctis, Jürgen Dengler, Jiri Dolezal, Mohamed~A. El-Sheikh, Manfred Finckh, Antonio~Galán de~Mera, Emmanuel Garbolino, Hamid Gholizadeh, Valentin Golub, Sylvia Haider, Mohamed~Z. Hatim, Bruno Hérault, Jürgen Homeier, Ute Jandt, Florian Jansen, Anke Jentsch, Jens Kattge, Michael Kessler, Larisa Khanina, Holger Kreft, Filip Küzmič, Jonathan Lenoir, Jesper~Erenskjold Moeslund, Ladislav Mucina, Alireza Naqinezhad, Jalil Noroozi, Aaron Pérez-Haase, Oliver~L. Phillips, Valério~D. Pillar, Gonzalo Rivas-Torres, Eszter Ruprecht, Brody Sandel, Marco Schmidt, Ute Schmiedel, Stefan Schnitzer, Franziska Schrodt, Urban Šilc, Ben Sparrow, Maria Sporbert, Zvjezdana Stančić, Ben Strohbach, Jens-Christian Svenning, Cindy~Q. Tang, Zhiyao Tang, Alexander~Christian Vibrans, Cyrille Violle, Donald Waller, Desalegn Wana, Hua-Feng Wang, Timothy Whitfeld, Georg Zizka, Francesco~Maria Sabatini, and Helge Bruelheide.
+\newblock Global decoupling of functional and phylogenetic diversity in plant communities.
+\newblock \emph{Nature Ecology \& Evolution}, 9:\penalty0 237--248, 12 2024.
+\newblock ISSN 2397-334X.
+\newblock \doi{10.1038/s41559-024-02589-0}.
+
+\bibitem[Jarzyna and Stagge(2023)]{JARZYNA20231153}
+Marta~A. Jarzyna and James~H. Stagge.
+\newblock Decoupled spatiotemporal patterns of avian taxonomic and functional diversity.
+\newblock \emph{Current Biology}, 33\penalty0 (6):\penalty0 1153--1161.e4, 2023.
+\newblock ISSN 0960-9822.
+\newblock \doi{https://doi.org/10.1016/j.cub.2023.01.066}.
+\newblock URL \url{https://www.sciencedirect.com/science/article/pii/S0960982223001355}.
 
 \bibitem[Mammola et~al.(2021)Mammola, Carmona, Guillerme, and Cardoso]{Mammola2021}
 Stefano Mammola, Carlos~P. Carmona, Thomas Guillerme, and Pedro Cardoso.
@@ -130,6 +157,13 @@ Oleksandra Oskyrko, Chunrong Mi, Shai Meiri, and Weiguo Du.
 \newblock \emph{Scientific Data}, 11:\penalty0 243, 2 2024.
 \newblock ISSN 2052-4463.
 \newblock \doi{10.1038/s41597-024-03079-5}.
+
+\bibitem[Parker et~al.(2026)Parker, Pettorelli, Lobora, Msuha, Tobias, Foley, and Durant]{Parker2026}
+Ben~G. Parker, Nathalie Pettorelli, Alex Lobora, Maurus~J. Msuha, Joseph~A. Tobias, Charles Foley, and Sarah~M. Durant.
+\newblock Taxonomic, phylogenetic and functional diversity of mammals across a nationwide protected area network.
+\newblock \emph{Animal Conservation}, 7 2026.
+\newblock ISSN 1367-9430.
+\newblock \doi{10.1111/acv.70083}.
 
 \bibitem[Pavoine and Bonsall(2011)]{Pavoine2011}
 S.~Pavoine and M.~B. Bonsall.

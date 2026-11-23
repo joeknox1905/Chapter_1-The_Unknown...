@@ -1,0 +1,179 @@
+
+
+
+
+
+###################################################################################################################################################################################################
+#------------calculate disprity metrics by ecoregion, status and season for binary status and monthly status defintiions and then summarise metric in a single table for all ecoregions------------------
+###################################################################################################################################################################################################
+
+## load packages
+library(dispRity)
+
+
+## load functions---------
+
+```{r}
+# making groups function
+make.ecoregional.migrant.groups <- function(traitspace_df, by) {
+  lapply(split(traitspace_df$species, traitspace_df[by], drop = TRUE), unique) # get list of species per ecoregion, status (and season for seasonal analysis) by splitting dataframe
+}
+
+# calcualting distance between centroids function
+pairwise.distance.between.centroids <- function(matrix, matrix2) {
+  ## calculate the centroid of the matrices of n-dimensional traitspace
+  sqrt(sum((colMeans(matrix) - colMeans(matrix2))^2))
+}
+
+# calculating quantile overlap function (proportional overlap, does not identify nestedness only how much of traitspace is common to BOTH groups) so a good start- i.e. can answer, are groups occupying different or common areas of trait space?
+quantile.overlap <- function(matrix, matrix2, probs = c(0.025, 0.975)) {
+  q1 <- apply(matrix, 2, quantile, probs = probs)
+  q2 <- apply(matrix2, 2, quantile, probs = probs)
+  intersect <- pmax(0, pmin(q1[2, ], q2[2, ]) - pmax(q1[1, ], q2[1, ]))
+  span <- pmax(q1[2, ], q2[2, ]) - pmin(q1[1, ], q2[1, ])
+  intersect / span
+}
+
+# calculating turnover of a group relative to the other group: i.e. what proportion of traits are unique to the group? comparisons are pairwise
+quantile.uniqueness <- function(matrix, matrix2, probs = c(0.025, 0.975)) {
+  q1 <- apply(matrix, 2, quantile, probs = probs)
+  q2 <- apply(matrix2, 2, quantile, probs = probs)
+  intersect <- pmax(0, pmin(q1[2, ], q2[2, ]) - pmax(q1[1, ], q2[1, ])) # if no intersect, defualts to 0
+  span <- q1[2, ] - q1[1, ]
+  turnover <- span - intersect
+
+  return(turnover / span)
+}
+
+# calculating nestedness of a group relative to the other group: i.e. what proportion of traits are simply a subset of the other group? comparisons are pairwise
+quantile.nestedness <- function(matrix, matrix2, probs = c(0.025, 0.975)) {
+  q1 <- apply(matrix, 2, quantile, probs = probs)
+  q2 <- apply(matrix2, 2, quantile, probs = probs)
+  intersect <- pmax(0, pmin(q1[2, ], q2[2, ]) - pmax(q1[1, ], q2[1, ]))
+  span <- q1[2, ] - q1[1, ]
+
+  return(intersect / span)
+}
+```
+
+
+
+##Load traitspace and convert to matrix------------------------
+
+```{r}
+traitspace_df <- read.csv("Data/Processed/eco_region_season_traitspace_PCA_BI.csv")
+
+pc_cols <- names(traitspace_df)[8:13] # get names of PC columns excluding metadata
+species_pcs <- unique(traitspace_df[c("species", pc_cols)]) # get unique pc cols per species # i.e. the full trait space, 1 row per species
+
+# convert to matrix for disprity
+traitspace_mat <- as.matrix(species_pcs[, pc_cols])
+rownames(traitspace_mat) <- species_pcs$species
+```
+
+## yearly analysis: do migrants vs residents differ in funtional contribution to the year round traitspace?----------
+
+#see ellipse plots for preliminary plotting (mostly small overlaps, close to circle in a circle situation (see nestedness below))
+
+#call function to split groups by ecoregion and migratory status
+groups_yearly   <- make.ecoregional.migrant.groups(traitspace_df =traitspace_df, by = c("ecoregion", "status")) #disprity is calculated relative to the full trait space, i.e. what is the disprity of the ecoregional migrant vs resident group in the full Britain and Ireland traitspace. so will be regional for each region.- can compare biomes across a region but not across multiple regions (as will be different traitspaces)
+
+
+#feed into custom subsets
+subsets_yearly  <- custom.subsets(traitspace_mat, group = groups_yearly) #make subsets
+
+
+#visualise
+plot(subsets_yearly, type ="preview") #PC1 V2
+
+
+plot(subsets_yearly, type="preview", specific.args = list(dimensions = c(3,4))) #PC1 v3
+
+#boot and rarefy subsets to minimum species richness in any group for comparable ecoregional/season/migratory status comparisons
+boot_yearly<- boot.matrix(subsets_yearly, bootstraps = 100, rarefaction = "min") #bootstrap with replacement (resample species from ecoregional pool for each migrant group and rarefy to the minimum number of species of a group in the ecoregion
+
+
+disp_result<- dispRity(boot_yearly, metric = pairwise.distance.between.centroids, between.groups = TRUE) 
+# this will compare each migrant and resident group within each ecoregion, can adapt using between.groups later on to include other cross-ecoregional checks
+
+```{r}
+summary(disp_result)# mean observed disparity per group is reported + bootstrapped median + confidence intervals
+
+pdf(file = "disp_result_dist.between.centroids.pdf",  ) #disrtibution of bootstrapped centroid dist value + median for each pairwise comparison
+    width = 4, 
+    height = 4)
+
+plot(disp_result, las=2) #boxplot of results
+dev.off()
+
+
+name.subsets(disp_result) #5x5 ecoregion x migratory status groups
+size.subsets(disp_result) #correctly rarefied to minimum 60 species per subset
+
+
+#would probably have to do some kind of test to establish whether the migrant and resident groups differ in each ecoregion- but if we are interested in functional contribution of co-existing species in ecoregions, will probably need to look at each seperately
+
+#but first how do the observed values between centroids of each migrant and resident group within each ecoregion look?
+
+#get observed matrix
+get.disparity(disp_result) #will have to extract values from here e.g.
+
+
+Caledon conifer forests.migrant:Caledon conifer forests.resident = 1.23, bootstrapped = 1.28, rarefied = 1.35
+Celtic broadleaf forests.migrant:Celtic broadleaf forests.resident = 0.70, bootstrapped = 0.76, rarefied = 0.88
+English Lowlands beech forests.migrant:English Lowlands beech forests.resident = 1.33, bootstrapped = 1.37, rarefied = 1.43
+European Atlantic mixed forests.migrant:European Atlantic mixed forests.resident = 2.79, boostrapped =2.81, rarefied = 2.80 # will be similar across all as rarefied to this groups minimum species
+North Atlantic moist mixed forests.migrant:North Atlantic moist mixed forests.resident = 0.78, bootstrapped = 0.84, rarefied = 0.94
+
+#in this case looks like observed values are pretty close to boostrapped and rarefied values but will use booted and rared values to be safe
+boot_rare_disp<- <- get.disparity(disp_result, observed = FALSE,
+rarefaction = TRUE)
+
+#plot boostraps and variance, if confidence intervals overlap alot between two groups then suggests, difference could just be due to chance, dont forget to look at differenc ein absolute observed value- if very small, may need more convincing 
+
+#either do t-test on each pairwise comparison or anova (aov) across all groups to get cross-ecoregional results e.g. do the caledon forest migrants differ from the migrants in other ecoergions, if lots of cross-ecoregional differences then maybe the traits migrants are contributing is very biome-specific 
+i.e. test.dispRity(my_disparity, test = wilcox.test) #performs non-parametric wilcoxon test on bootstrapped and rarefied data. Non-parametric as distribution is artificial from boostrapping so data are non-independent. If species level then would use observed species-level distribution for each group 
+#rarefy to to the smallest group across each subset
+
+# so looks like european atlantic forest especially, and then english lowland and caldeon conifer forests have a large distance between centroids, suggesting divergent average trait combinations between migrants and residents
+# in these ecoregions- would have to look into ecosystem types, the diets, phylogeny and kinds of birds to continue to subset first, also look across groups and find a better way of plotting
+
+#or table of result
+
+pdf(file= pairwise_centroid_dist_result_binary_yearly.pdf)
+xtabs(get.disparity(disp_result, observed = FALSE,
+rarefaction = TRUE) ~ disp_result$subsets)
+dev.off()
+```
+
+
+# (proportional overlap via quantiles)
+
+
+# nestedness is one group a complete subset of another group- would need directionality 
+#i.e. which group is a subset of which group
+
+## Seasonal analysis: Does migrant vs resident fucntional contribution differ across seasons?
+
+```{r}
+
+
+#create migrant and resident group by ecoergion and season
+
+groups_seasonally <- make.ecoregional.migrant.groups(traitspace_df = traitspace_df, by = c("ecoregion", "season", "status")) #seasonal analysis has additional season split
+
+subsets_seaosonally <- custom.subsets(data = traitspace_mat, group = groups_seasonally) 
+
+
+plot(subsets_seasonallypreview") #PC1V2  
+
+
+```
+
+
+
+#caveat--------------
+#when intepreting the resulkts can you see a clear effect- if yes probably does not need null hypothesis testign, if no then probably does
+#therefore significance testing with p value provides statistical clarity- (Dushoff et al., 2019) argue this is the reason for performing p value testing ui.e. to provide clarity when you cannot "clearly see the result"
+#e.g. if p<0.05 = “did not find a statistically clear effect.”  rather than no stastically significant effect (p values can be misleading because just because something is significant doesnt mean it is a large effetc or there is not a lot of noise around it, also the effect refers to a dataset not a study system)
+#always important to report the effect size and confidence interval alongside the p vlaue (even if the confidence intervals are artifical i.e. from boostrapping), could also report observed and then the boostrapped values with confidence intervals

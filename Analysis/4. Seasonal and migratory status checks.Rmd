@@ -1,0 +1,144 @@
+### This script checks migratory status is defined by the number of month present throughout the year
+### Species richness counts per ecoregion, status group, season and monthly presence are also conducted
+
+
+
+```{r}
+#Load packages
+
+library(tidyr)
+library(testthat)
+library(xtable)
+
+```
+
+
+## Loading data-----------
+```{r}
+#load monthly presence data
+pools<- readRDS(paste0(out_dir, "seasonal_ecoregion_pools_aoh.rds"))
+```
+
+
+ # --------------------species richness and migratory status checks---------------------
+
+```{r}
+
+# yearly presence checks---------
+
+# check that residents are present in all months and migrants are present only in some months for each ecoregion
+# change to expect false
+
+test_that("migrants and residents are as defined", {
+  expect_true(all(pools$n_month_year[pools$status == "migrant"] < 12)) #no migrants should be present year round
+  expect_true(all(pools$n_month_year[pools$status == "resident"] == 12)) #no residents should be absent in any months
+})
+
+
+#seasonal presence checks---------
+
+#get max months of each season
+seasonal <- pools %>%
+  group_by(season) %>%
+  mutate(max_months = max(n_month_season)) %>%
+  ungroup()
+
+
+test_that("migrants and residents are as defined seasonally", {
+  migrant_full <- seasonal %>%
+    filter(status == "migrant") %>%
+    group_by(species) %>%
+    summarise(all_full = all(n_month_season == max_months))
+  expect_false(any(migrant_full$all_full)) #no migrants should be present in all months of all season
+
+#all residents should be present in all months of all seasons
+  residents <- filter(seasonal, status == "resident")
+  expect_true(all(residents$n_month_season == residents$max_months))
+})
+
+
+# species richness checks for yearly monthly migrant analysis-------------
+
+# number of migrants and residents overall
+status_counts <- pools %>%
+  group_by(status) %>%
+  distinct(species) %>%
+  count() # 160 migrants, 78 residents
+
+#xtables------ 
+
+#need \usepackage{graphicx} and \usepackage{booktabs}
+
+# number of species per ecoregion and migratory status groups for yearly analysis
+
+n_species_status_ecoregion <- pools %>%
+  distinct(ecoregion, species, status) %>%
+  group_by(ecoregion) %>%
+  summarise(
+    all_species = n_distinct(species),
+    migrant_species = sum(status == "migrant", na.rm = TRUE),
+    resident_species = sum(status == "resident", na.rm = TRUE))
+
+  #print(xtable(n_species_region)
+n_species_status_ecoregion_tab <- xtable(n_species_status_ecoregion, caption = "Species Richness By Ecoregion and Migratory Status", label = "tab:sr_checks_binary_yearly", digits = 0)
+
+#or xtable(species ~ ecoregion + status, data = pools)
+
+print(n_species_status_ecoregion_tab, include.rownames = FALSE, booktabs = TRUE, file = "Manuscript/Tables/species_richness_checks_by_ecoregion_status.tex") #updates when re-run and outputs latex for use in report
+
+# Caledon conifer forests              141
+# Celtic broadleaf forests             191
+# English Lowlands beech forests       157
+# European Atlantic mixed forests      86
+# North Atlantic moist mixed forests   149
+
+
+# number of species in each ecoregion, season and migratory status group for seasonal analysis----
+
+n_species_status_season_ecoregion <- pools %>%
+  filter(n_month_season > 0) %>%
+  distinct(ecoregion, season, species, status) %>%
+  group_by(ecoregion, season) %>%
+  summarise(
+    all_species = n_distinct(species),
+    migrant_species = sum(status == "migrant", na.rm = TRUE),
+    resident_species = sum(status == "resident", na.rm = TRUE),
+    .groups = "drop")
+
+
+n_species_status_season_ecoregion_tab <- xtable(n_species_status_season_ecoregion, caption = "Species Richness By Ecoregion, Season and Migratory Status", label = "tab:sr_checks_binary_seasonally", digits = 0)
+
+print(n_species_status_season_ecoregion_tab , include.rownames = FALSE, booktabs = TRUE, file = "Manuscript/Tables/species_richness_checks_by_ecoregion_status_season.tex") #updates when re-run and outputs latex for use in report, need to input/
+
+#or xtable(species ~ ecoregion + season + status, data = pools)
+
+# species richness checks for monthly migrant analysis yearly--------------
+n_species_monthly_status_ecoregion <- pools %>%
+  distinct(ecoregion, species, n_month_year) %>%
+  count(ecoregion, n_month_year) %>%
+  pivot_wider(names_from = n_month_year, values_from = n, values_fill = 0, 
+  names_sort = TRUE, names_prefix = "migrant ") %>%
+  rename(resident = `migrant 12`) #rename species present all year to residents
+
+n_species_monthly_status_ecoregion_tab <- xtable(n_species_monthly_status_ecoregion, caption = "Species Richness By Ecoregion and Monthly Migratory Status", label = "tab:sr_checks_month_migrant_defintion_yearly", digits = 0)
+
+print(n_species_monthly_status_ecoregion_tab, include.rownames = FALSE, booktabs = TRUE, scalebox =0.7, file = "Manuscript/Tables/species_richness_checks_by_ecoregion_monthly_status.tex")
+
+# species richness checks for monthly migrant analysis seasonally--------------
+
+_species_monthly_status_ecoregion_season <- pools %>%
+  filter(n_month_season > 0) %>% #filter to only seasons where species are present 
+  distinct(ecoregion, season, species, status, n_month_season) %>%
+  mutate(group = if_else(status == "resident", "resident", paste("migrant", n_month_season))) %>% #resident status assigned from status as confirmed this aligns with monthly presence in above unit testing checks, actually wouldnt work as migrants would be labelled seperately- will need to think about this as do i want to compare migrants present in all months of a season to residents?- i.e. do i want to know if migrants contribute unique functions even if they are present for the full duration of the season the answer is probably yes!
+  count(ecoregion, season, group) %>%
+  tidyr::pivot_wider(names_from = group, values_from = n, values_fill = 0, names_sort = TRUE) 
+
+ 
+#convert to x table for latex report
+n_species_monthly_status_ecoregion_season_tab <- xtable(n_species_monthly_status_ecoregion_season, caption = "Species Richness By Ecoregion and Seasonal Monthly Migratory Status", label = "tab:sr_checks_month_migrant_defintion_seasonally", digits = 0)
+
+print(n_species_monthly_status_ecoregion_season_tab, include.rownames = FALSE, booktabs = TRUE, scalebox =0.7, file = "Manuscript/Tables/species_richness_checks_by_ecoregion_seasonal_monthly_status.tex")
+
+
+# more even distribution apart from very low number of species present in winter for 3 months (1-2 species)- so func contribution probably better; ses controlled?
+```

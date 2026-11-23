@@ -1,0 +1,84 @@
+### This script processes the monthly phenology from Bellve et al (2026) for all migrant birds to assign each species' seasonal range type a code for each month
+### A few corner cases are changed based on online databases
+
+```{r}
+# Load packages
+
+library(tidyr)
+```
+
+
+## Defintions--------------------
+
+```{r}
+month_cols <- month.abb
+season_lookup <- c(
+    Apr = "Spring Mig", May = "Summer", Jun = "Summer", Jul = "Summer",
+    Aug = "Autumn Mig", Sep = "Autumn Mig", Oct = "Autumn Mig", Nov = "Winter", Dec = "Winter", Jan = "Winter", Feb = "Winter", Mar = "Spring Mig"
+)
+
+# Tried to be as consistent with seasonality of BTO BBS and WBS breeding vs non-breeding timings as possible, whilst accounting for passage periods and late/early migrations. Seems like a lot of species may be exclusive to winter/summer season and not to passage season from preliminary analysis but will see.
+# note that in each continent, seasons will change.
+```
+
+## load necessary files
+
+```{r}
+# seasonal range for all species in Britain and Ireland ecoregions
+range_all <- load("Data/Processed/range_ecoregions_km2.rds")
+
+# read in monthly phenology data from Bellve et al. (2026)
+pheno_df <- read.csv("Data/Raw/bird_season_by_month.csv")
+```
+
+## Get monthly presence of species in each ecoregion using the Bellve et al. (2026) phenology for migratory species
+
+```{r}
+# specify codes for each seasonal range type and replace range type string with code for each monthxspecies
+pheno_df$species_rast <- str_replace_all(pheno_df$species_rast, " ", "_")
+codes <- c("Resident" = 1, "Breeding" = 2, "Non-Breeding" = 3, "Passage" = 4)
+pheno_df[month_cols] <- lapply(pheno_df[month_cols], function(x) unname(codes[x])) # apply range codes to each month of the year
+
+# ##change phenology data for Coturnix coturnix to encompass seasonal breeding season in
+# British Isles (May-August). Little is known about passage/non-breeding season but fine to
+# impute as only breeding range covers sites in British Isles.
+pheno_df[pheno_df$species_rast == "Coturnix_coturnix", month_cols] <-
+    data.frame(
+        Jan = 3, Feb = 4, Mar = 4, Apr = 4, May = 2, Jun = 2,
+        Jul = 2, Aug = 2, Sep = 4, Oct = 4, Nov = 4, Dec = 3
+    )
+
+# change phenology for Larus marinus to encompass non-breeding range in winter:
+pheno_df[pheno_df$species_rast == "Larus_marinus", c("Dec", "Jan", "Feb", "Mar")] <- 3
+
+# change phenology for Morus bassanus compiled from eBird S&T, BTO, RSPB, NatureScot
+gannet <- pheno_df[1, ] %>%
+    mutate(
+        species_rast = "Morus_bassanus", Nov = 3, Dec = 3, Jan = 3, Feb = 4,
+        Mar = 2, Apr = 2, May = 2, Jun = 2, Jul = 2, Aug = 2, Sep = 4, Oct = 4,
+        n.present = TRUE
+    ) %>%
+    select(names(pheno_df))
+pheno_df <- pheno_df %>%
+    filter(species_rast != "Morus_bassanus") %>%
+    bind_rows(gannet)
+
+# get monthly ranges type (as codes) for each species
+pheno_long <- pheno_df %>%
+    group_by(species_rast) %>%
+    slice(1) %>%
+    ungroup() %>% # species with different northern and southern hemisphere ranges will use northern phenology- for global will change to use northern in northern hemisphere and southern in southern hemisphere
+    pivot_longer(all_of(month_cols), names_to = "month", values_to = "code") %>% # match phenology to month names and range type codes in Birdlife
+    select(species = species_rast, month, code)
+
+# check which migrants (with non-seasonal range maps in birdlife) have no phenology Bellve et al. (2026) so will be dropped from analysis
+no_pheno <- range_all %>%
+    filter(seasonal != 1, !species %in% pheno_long$species) %>%
+    distinct(sisid, species)
+no_pheno
+
+# save
+save(pheno_long, "seasonal_range_codes_by_month_all_species.csv")
+
+# 0 species so all good
+```

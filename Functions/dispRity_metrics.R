@@ -354,27 +354,37 @@ expect_all_equal(get.disparity(dispRity(nested_overlap, metric = quantile.nested
 #-------------------------------------------------------------------------species level metrics--------------------------------------------------------------#
 -------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-#distribution.of.group.from.other.group.centroid------------------------
+##----------------metric for calculating distribution of species within each group from other group centroid---------------------------------------
 
-distribution.of.group.from.other.group.centroid <- function(matrix, matrix2) {
+#the migrants furthest from the resident centroid (right tails) will represent the migrants with the most unique trait contributions, if these species are rare seed dispersers for example, then seed dispersal in the ecosystem could be at risk as these species may be functionally unique and irreplaceable so if lost undercliamte change, could be in trouble
+
+distribution.of.species.from.other.group.centroid <- function(matrix, matrix2) {
     ## calculate the centroid of the matrices of n-dimensional traitspace
-   dist1<- sqrt(sum((colMeans(matrix) - (matrix2[x,]))^2)) #distance from each species in group2 to group1
-   apply(traitspace, 2, dist1)
-    dist2<- sqrt(sum((colMeans(matrix2) - (matrix[x,]))^2))
-    apply(traitspace, 1, dist2) #distance from each species in group1 to group2
+  dist1<- point.dist(matrix, matrix2) #euclidean distance from each species in group1 to the centroid of group2
+  dist2<- point.dist(matrix, matrix1) #euclidean distance from each species in group2 to the centroid of group1
+  
+  return (dist1, dist2) #distance from each species in group1 to group2
 } 
 
 #return distrubtion of group1 species from centroid of group2 and distrubtion of group2 species from centroid of group1
 
-dispRity(traitspace_mat, metric = distribution.of.group.from.other.group.centroid, between.groups = list(c("A","B"), c("B","A")))
+dispRity(traitspace_mat, metric = distribution.of.species.from.other.group.centroid, between.groups = list(c("A","B"), c("B","A")))
+
+#plot
+#op <- par(bty = "n", mfrow = c(1, 2))
+#
+point_to_centroid_dists<= plot(distribution.of.species.from.other.group.centroid,
+     ylab = "Distribution of species distances from centroid by group")
+
+#median if wanted
+point_to_centroid_dists_median <- dispRity(point_to_centroid_dists,
+                                       metric = median)
+plot(disparity_centroids_median,
+     ylab = "Distribution of the medians of all the distances")
 
 
-#calculate disprity as a distribution for each species for each group e.g. for pariwise distance to centroid calculated distanc eof each sepcies in migrant group to resident centroid and distanc eof each species in resident group to migrant centroid (of multidimensional trait space i.e. (colmeans)) (essentially functional specialisation (see Marino et al., 2024))
-#how far is each species from the resident/migrant centroid
-#the migrant furthest from the resident centroid will be the most unique migrants
-#look at these unique species, what niche/part of trait space to they occupy?
-#i.e. the tails of the distribution - if these are rare seed dispersers for example, suggests ecosystem could be at risk if these species are lost (e.g. under climate change- then has a better target for climate change paper)? (essentially functional specialisation)
-#output value for each species in the group - if A group = c(A:B), If B species = ("B:A")
+
+#
 
 
 
@@ -392,7 +402,7 @@ for (i in 1:nrow(matrix)) { #for each species row in ecoregional annual trait sp
 species_row <- matrix[i, ]#get pc score for each dimension for each pc
 
 #avg e.g. if smaller avg distance in migrants than migrants more clustered around centroid and more clumped? to compare between groups- i guess kind of similae to 
-sqrt(sum((species_row - colMeans(matrix2))^2)) #distance from group centroid of each species
+
 
 need to call between.groups = FALSE
 result_binary  <- calculate.disprity.by.ecoregion(BI_traitspace, group = "status", metric = distribution.of.group.around.group.centroid , trait_cols = trait_cols, between = FALSE) 

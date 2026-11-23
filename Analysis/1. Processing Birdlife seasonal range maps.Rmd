@@ -1,12 +1,4 @@
----
-title: "seasonal_assemblages_by_habitat"
-author: "Joe Knox"
-date: "2026-10-13"
-output: html_document
----
 
-# Defining species assemblages based on ecoregion
---------------------------------------
 
 - This script clips range maps from Birdlife International, which stand accurate at coarse scales (>=200km), to UK GADM boundaries and ecoregions (although some ecoregions are smaller than this, including some in UK) and is more feasible for global scales (Hulbert and Jetz, 2007).
 - Assemblages are based on terrestrial ecoregions (Dinerstein et al., 2017, 825 terrestrial) to develop more biologically meaningful assemblages than arbitary grid cells.

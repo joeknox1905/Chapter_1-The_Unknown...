@@ -19,8 +19,6 @@ library(kableExtra)
 ```
 
 
-AOH maps from Birdlife International, building on (Lumbierres et al., 2022): "the distribution of a species within its range, refined by habitat suitability" (Bridge et al., 2019). These rasters are created from habitat (Copernicus landcover product at 100m res and World Behrmann cylindrical equal-area projection (ESRI:54017); Buchhorn et al., 2020 Lumierres et al., 2021; Dahal et al., 2022) and elevation suitability (upper and lower altitudinal limits using global digital elevation model EarthEnv-DEM90 at 90m resolution, Robinson et al., 2014) for each species. Non-breeding (resident, non-breeding, uncertain seasonal occurrence and missing range data) and breeding maps (resident, breeding, uncertain seasonal occurrence and missing range data) are used for migratory species (all full and altitudinal migrants but not nomads or species with unknown migratory status), whilst a single resident range map (resident, breeding, non-breeding, passage, uncertain seasonal occurrence and missing range data) is used for residents. Maps were validated by comparing proportion of grid cells inside the range map retained in the AOH map following Dahal et al., (2021). (The final maps are to 1km2 resolution aggregated to ecoregions). 
-
 # defintions
 
 ```{r}

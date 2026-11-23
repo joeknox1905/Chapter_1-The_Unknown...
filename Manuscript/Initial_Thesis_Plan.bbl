@@ -1,4 +1,4 @@
-\begin{thebibliography}{35}
+\begin{thebibliography}{44}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
 \expandafter\ifx\csname urlstyle\endcsname\relax
@@ -26,6 +26,13 @@ Robert S.~C. Cooke, Felix Eigenbrod, and Amanda~E. Bates.
 \newblock ISSN 2041-1723.
 \newblock \doi{10.1038/s41467-019-10284-z}.
 
+\bibitem[Dawson et~al.(2021)Dawson, Carmona, González‐Suárez, Jönsson, Chichorro, Mallen‐Cooper, Melero, Moor, Simaika, and Duthie]{Dawson2021}
+Samantha~K. Dawson, Carlos~Pérez Carmona, Manuela González‐Suárez, Mari Jönsson, Filipe Chichorro, Max Mallen‐Cooper, Yolanda Melero, Helen Moor, John~P. Simaika, and Alexander~Bradley Duthie.
+\newblock The traits of “trait ecologists”: An analysis of the use of trait and functional trait terminology.
+\newblock \emph{Ecology and Evolution}, 11:\penalty0 16434--16445, 12 2021.
+\newblock ISSN 2045-7758.
+\newblock \doi{10.1002/ece3.8321}.
+
 \bibitem[de~Sousa Gomes-Gonçalves et~al.(2024)de~Sousa Gomes-Gonçalves, da~Silva~Ferreira, and Araújo]{GOMESGONCALVES2024108818}
 Rafaela de~Sousa Gomes-Gonçalves, Laryssa~Cordeiro da~Silva~Ferreira, and Francisco~Gerson Araújo.
 \newblock Anthropogenic activities decrease functional richness over time, but not other functional aspects of the fish community in a tropical bay.
@@ -33,6 +40,13 @@ Rafaela de~Sousa Gomes-Gonçalves, Laryssa~Cordeiro da~Silva~Ferreira, and Franc
 \newblock ISSN 0272-7714.
 \newblock \doi{https://doi.org/10.1016/j.ecss.2024.108818}.
 \newblock URL \url{https://www.sciencedirect.com/science/article/pii/S0272771424002063}.
+
+\bibitem[Devarajan et~al.(2025)Devarajan, Fidino, Farris, Adalsteinsson, Andrade-Ponce, Angstmann, Anthonysamy, Aquino, Asefa, Avila, Bailey, de~Sousa~Barbosa, de~Frias~Barreto, Barton, Bates, Beltrão, Bird, Biro, Bisi, Bohórquez, Boyce, Brashares, Bullington, Burns, Burr, Butler, Calhoun, Cao, Casado, Cepeda-Duque, Cepek, Chiarello, Collins, Cordeiro-Estrela, Costa, Cremonesi, Cristescu, Cruz, de~Albuquerque, Angelo, de~Campos, de~Sena, Bitetti, de~Matos~Dias, Diefenbach, Doherty, dos Santos, Duarte, Eppley, Erb, Esteves, Evans, Falcão, Fernandes-Ferreira, Fieberg, de~Souza~Filho, Fisher, Fortin, Gale, Gallo, Ganoe, Garcia-Anleu, Gaynor, Gelmi-Candusso, Gichuru, Gomez, Green, Guimarães, Haight, Harris, Hawn, Heiman, Hoang, Huebner, Iannarilli, Iezzi, Ivan, Jaspers, Jordan, Kamilar, Kane, Karimi, Kelly, Kohl, Kuvlesky, Ladle, Larson, Le, Le, Le, Lehrer, Lendrum, Lewis, Link, Lizcano, Lombardi, Long, López-Tello, Lugarini, Lugo, MacKay, Madadi, Magalhães, Magle, Maia, Mandujano, Marchenkova, Marinho, Marker, Pardo, Martinoli, Massara, Masseloux, Matiukhina, Mayer, Mazariegos, McClung, McInturff, McPhail, Mertl, Middaugh, Miller, Mills, Miquelle, Miritis, Moll, Molnár, Montgomery, Morelli, Mortelliti, Mueller, Mukhacheva, Mullen, Murphy, Nepomuceno, Ngoprasert, Nguyen, Nguyen, Nguyen, Quang, Nipko, Nobre, Northrup, Owen, Paglia, Palmer, Palomo-Munoz, Pardo, Parks, de~Oliveira~Paschoal, Patterson, Paviolo, Pejchar, Pendergast, Perotto-Baldivieso, Petrov, Poisson, Polli, Pourmirzai, Reebin, Remine, Rich, Richardson, Robino, Rocha, Rocha, Rodrigues, Rohnke, Ryan, Salsbury, Sander, da~Cruz Santos-Cavalcante, Sekercioglu, Seryodkin, Setiawan, Shadloo, Shahhosseini, Shannon, Shier, Smith, Snyder, Sollmann, Sparks, Sribuarod, Clair, Stankowich, Steinmetz, Stevenson, Sunarto, Surasinghe, Sutyrina, Swaisgood, Taktehrani, Thapa, Thorton, Tilker, Tobler, Tran, Tucker, Horn, Vargas-Soto, Velásquez-C, Venter, Venticinque, Verschueren, Wampole, Watchorn, Wearn, Weiss, Welschen, Widodo, Williamson, Wilting, Wittemyer, Zavaleta, Zellmer, and Gerber]{Devarajan2025}
+Kadambari Devarajan, Mason Fidino, Zach~J. Farris, Solny~A. Adalsteinsson, Gabriel Andrade-Ponce, Julia~L. Angstmann, Whitney Anthonysamy, Jesica Aquino, Addisu Asefa, Belen Avila, Larissa~L. Bailey, Lyandra~Maria de~Sousa~Barbosa, Marcela de~Frias~Barreto, Owain Barton, Chloe~E. Bates, Mayara~Guimarães Beltrão, Tori Bird, Elizabeth~G. Biro, Francesco Bisi, Daniel Bohórquez, Mark Boyce, Justin~S. Brashares, Grace Bullington, Phoebe Burns, Jessica Burr, Andrew~R. Butler, Kendall~L. Calhoun, Tien~Trung Cao, Natalia Casado, Juan~Camilo Cepeda-Duque, Jonathon~D. Cepek, Adriano~Garcia Chiarello, Merri Collins, Pedro Cordeiro-Estrela, Sebastian Costa, Giacomo Cremonesi, Bogdan Cristescu, Paula Cruz, Anna Carolina~Figueiredo de~Albuquerque, Carlos~De Angelo, Cláudia~Bueno de~Campos, Liana Mara~Mendes de~Sena, Mario~Di Bitetti, Douglas de~Matos~Dias, Duane Diefenbach, Tim~S. Doherty, Thais~P. dos Santos, Gabriela~Teixeira Duarte, Timothy~M. Eppley, John Erb, Carolina~Franco Esteves, Bryn Evans, Maria L.~M. Falcão, Hugo Fernandes-Ferreira, John~R. Fieberg, Luiz Carlos~Firmino de~Souza~Filho, Jason Fisher, Marie-Josee Fortin, George~A. Gale, Travis Gallo, Laken~S. Ganoe, Rony Garcia-Anleu, Kaitlyn~M. Gaynor, Tiziana~A. Gelmi-Candusso, Phillys~N. Gichuru, Quimey Gomez, Austin~M. Green, Luiza~Neves Guimarães, Jeffrey~D. Haight, Lavendar~R. Harris, Zachary~D. Hawn, Jordan Heiman, Huy~Quoc Hoang, Sarah Huebner, Fabiola Iannarilli, María~Eugenia Iezzi, Jacob~S. Ivan, Kodi~J. Jaspers, Mark~J. Jordan, Jason Kamilar, Mamadou Kane, Mohammad~Hosein Karimi, Marcella Kelly, Michel~T. Kohl, William~P. Kuvlesky, Andrew Ladle, Rachel~N. Larson, Quy~Tan Le, Duy Le, Van~Son Le, Elizabeth~W. Lehrer, Patrick~E. Lendrum, Jesse Lewis, Andrés Link, Diego~J. Lizcano, Jason~V. Lombardi, Robert Long, Eva López-Tello, Camile Lugarini, David Lugo, Paula MacKay, Maria Madadi, Rodolfo~Assis Magalhães, Seth~B. Magle, Ludmila Hufnagel Regis~Diniz Maia, Salvador Mandujano, Taisiia Marchenkova, Paulo~Henrique Marinho, Laurie Marker, Julia~Martinez Pardo, Adriano Martinoli, Rodrigo~Lima Massara, Juliana Masseloux, Dina Matiukhina, Amy Mayer, Luis Mazariegos, Maureen~R. McClung, Alex McInturff, Darby McPhail, Amy Mertl, Christopher~R. Middaugh, David Miller, David Mills, Dale Miquelle, Vivianna Miritis, Remington~J. Moll, Péter Molnár, Robert~A. Montgomery, Toni~Lyn Morelli, Alessio Mortelliti, Rachael~I. Mueller, Anna~S. Mukhacheva, Kayleigh Mullen, Asia Murphy, Vance Nepomuceno, Dusit Ngoprasert, An~Nguyen, Thanh~Van Nguyen, Van~Thai Nguyen, Hoa Anh~Nguyen Quang, Rob Nipko, Ana Clarissa~Costa Nobre, Joseph Northrup, Megan~A. Owen, Adriano~Pereira Paglia, Meredith~S. Palmer, Gabriela Palomo-Munoz, Lain~E. Pardo, Chrystina Parks, Ana~Maria de~Oliveira~Paschoal, Brent Patterson, Agustin Paviolo, Liba Pejchar, Mary~E. Pendergast, Humberto~L. Perotto-Baldivieso, Timofei Petrov, Mairi K.~P. Poisson, Daiana~Jeronimo Polli, Morteza Pourmirzai, Alexander Reebin, Katie~R. Remine, Lindsey Rich, Christopher~S. Richardson, Facundo Robino, Daniel~G. Rocha, Fabiana~Lopes Rocha, Flávio Henrique~Guimarães Rodrigues, Adam~T. Rohnke, Travis~J. Ryan, Carmen~M. Salsbury, Heather~A. Sander, Nadia~Maria da~Cruz Santos-Cavalcante, Cagan~H. Sekercioglu, Ivan Seryodkin, Dede~Hendra Setiawan, Shabnam Shadloo, Mahsa Shahhosseini, Graeme Shannon, Catherine~J. Shier, G.~Bradley Smith, Tom Snyder, Rahel Sollmann, Kimberly~L. Sparks, Kriangsak Sribuarod, Colleen C.~St. Clair, Theodore Stankowich, Robert Steinmetz, Cassondra~J. Stevenson, Sunarto Sunarto, Thilina~D. Surasinghe, Svetlana~V. Sutyrina, Ronald~R. Swaisgood, Atie Taktehrani, Kanchan Thapa, Matthew Thorton, Andrew Tilker, Mathias~W. Tobler, Van~Bang Tran, Jody Tucker, Russell C.~Van Horn, Juan~S. Vargas-Soto, Karen~L. Velásquez-C, Jan Venter, Eduardo~M. Venticinque, Stijn Verschueren, Erin Wampole, Darcy~J Watchorn, Oliver~R. Wearn, Katherine~C.B. Weiss, Alejandro Welschen, Febri~Anggriawan Widodo, Jacque Williamson, Andreas Wilting, George Wittemyer, Arturo Zavaleta, Amanda~J. Zellmer, and Brian~D. Gerber.
+\newblock When the wild things are: Defining mammalian diel activity and plasticity.
+\newblock \emph{Science Advances}, 11, 2 2025.
+\newblock ISSN 2375-2548.
+\newblock \doi{10.1126/sciadv.ado3843}.
 
 \bibitem[Dias et~al.(2025)Dias, Bastazini, Gianuca, and Matthews]{Dias2025}
 Rafael~Antunes Dias, Vinicius Augusto~Galvão Bastazini, Andros~T. Gianuca, and Thomas~J. Matthews.
@@ -45,6 +59,13 @@ Rafael~Antunes Dias, Vinicius Augusto~Galvão Bastazini, Andros~T. Gianuca, and 
 Sami Domisch, Sibylle Schroer, Sophia Kimmig, Sarah Kiefer, Robert Arlinghaus, Luc~De Meester, Ashton~L Dickerson, Nico Eisenhauer, Lynn Govaert, Afroditi Grigoropoulou, Hans-Peter Grossart, Fengzhi He, Sabine Hilt, Franz Hölker, Sonja Jähnig, Gregor Kalinkat, Steffen Kolb, Theo Leger, Thomas Mehner, Daniel Mietchen, Annette Prochnow, Nicole Scheunemann, Twan Stoffers, Susanne Theuerl, Yusdiel Torres-Cambas, Cecilia Flocco, and Jörg Overmann.
 \newblock The hidden dimensions of biodiversity.
 \newblock \emph{EcoevoRvix}, 2025.
+
+\bibitem[Gaston(2019)]{Gaston2019}
+Kevin~J. Gaston.
+\newblock Nighttime ecology: The “nocturnal problem” revisited.
+\newblock \emph{The American Naturalist}, 193:\penalty0 481--502, 4 2019.
+\newblock ISSN 0003-0147.
+\newblock \doi{10.1086/702250}.
 
 \bibitem[Gaüzère et~al.(2025)Gaüzère, Violle, Schrodt, Grenié, Santini, Hedde, Porcher, Goury, Beck, and Thuiller]{Gazre2025}
 Pierre Gaüzère, Cyrille Violle, Franziska Schrodt, Matthias Grenié, Luca Santini, Mickaël Hedde, Emmanuelle Porcher, Romain Goury, Miriam Beck, and Wilfried Thuiller.
@@ -95,6 +116,13 @@ Joaquín Hortal, Francesco de~Bello, José Alexandre~F. Diniz-Filho, Thomas~M. L
 \newblock ISSN 1543-592X.
 \newblock \doi{10.1146/annurev-ecolsys-112414-054400}.
 
+\bibitem[Houadria et~al.(2016)Houadria, Blüthgen, Salas‐Lopez, Schmitt, Arndt, Schneider, Orivel, and Menzel]{Houadria2016}
+Mickal Houadria, Nico Blüthgen, Alex Salas‐Lopez, Mona‐Isabel Schmitt, Johanna Arndt, Eric Schneider, Jérôme Orivel, and Florian Menzel.
+\newblock The relation between circadian asynchrony, functional redundancy, and trophic performance in tropical ant communities.
+\newblock \emph{Ecology}, 97:\penalty0 225--235, 1 2016.
+\newblock ISSN 0012-9658.
+\newblock \doi{10.1890/14-2466.1}.
+
 \bibitem[Huang et~al.(2023)Huang, Sun, Song, Yuan, and Zhou]{Huang2023}
 Na~Huang, Xinyuan Sun, Yanfang Song, Zhiyong Yuan, and Weiwei Zhou.
 \newblock Amphibian traits database: A global database on morphological traits of amphibians.
@@ -121,6 +149,14 @@ Georg J.~A. Hähn, Gabriella Damasceno, Esteban Alvarez-Davila, Isabelle Aubin, 
 \newblock ISSN 2397-334X.
 \newblock \doi{10.1038/s41559-024-02589-0}.
 
+\bibitem[Hölker et~al.(2010)Hölker, Wolter, Perkin, and Tockner]{HOLKER2010681}
+Franz Hölker, Christian Wolter, Elizabeth~K. Perkin, and Klement Tockner.
+\newblock Light pollution as a biodiversity threat.
+\newblock \emph{Trends in Ecology & Evolution}, 25\penalty0 (12):\penalty0 681--682, 2010.
+\newblock ISSN 0169-5347.
+\newblock \doi{https://doi.org/10.1016/j.tree.2010.09.007}.
+\newblock URL \url{https://www.sciencedirect.com/science/article/pii/S0169534710002211}.
+
 \bibitem[Jarzyna and Stagge(2023)]{JARZYNA20231153}
 Marta~A. Jarzyna and James~H. Stagge.
 \newblock Decoupled spatiotemporal patterns of avian taxonomic and functional diversity.
@@ -128,6 +164,13 @@ Marta~A. Jarzyna and James~H. Stagge.
 \newblock ISSN 0960-9822.
 \newblock \doi{https://doi.org/10.1016/j.cub.2023.01.066}.
 \newblock URL \url{https://www.sciencedirect.com/science/article/pii/S0960982223001355}.
+
+\bibitem[Li et~al.(2025)Li, Zhou, Luo, Dong, Lv, Ling, Yao, and He]{Li2025}
+Yixiao Li, Lei Zhou, Renhui Luo, Zhiling Dong, Hongsen Lv, Jingning Ling, Weizhi Yao, and Wenping He.
+\newblock Seasonal differences in fish community structure in the upper yangtze river based on edna metabarcoding: A multi‐dimensional analysis.
+\newblock \emph{Ecology and Evolution}, 15, 10 2025.
+\newblock ISSN 2045-7758.
+\newblock \doi{10.1002/ece3.72215}.
 
 \bibitem[Mammola et~al.(2021)Mammola, Carmona, Guillerme, and Cardoso]{Mammola2021}
 Stefano Mammola, Carlos~P. Carmona, Thomas Guillerme, and Pedro Cardoso.
@@ -142,6 +185,13 @@ Clara Marino, Filipa~Coutinho Soares, and Céline Bellard.
 \newblock \emph{Conservation Biology}, 39, 4 2025.
 \newblock ISSN 0888-8892.
 \newblock \doi{10.1111/cobi.14401}.
+
+\bibitem[Mccain and King(2014)]{Mccain2014}
+Christy~M. Mccain and Sarah~R.B. King.
+\newblock Body size and activity times mediate mammalian responses to climate change.
+\newblock \emph{Global Change Biology}, 20, 2014.
+\newblock ISSN 13652486.
+\newblock \doi{10.1111/gcb.12499}.
 
 \bibitem[Nunes et~al.(2026)Nunes, Niederman, and Dreiss]{NUNES2026182318}
 Laura~A. Nunes, Talia~E. Niederman, and Lindsay~M. Dreiss.
@@ -206,6 +256,13 @@ Patrick~R. Roehrdanz.
 \newblock \doi{10.1073/pnas.2531790123}.
 \newblock URL \url{https://www.pnas.org/doi/abs/10.1073/pnas.2531790123}.
 
+\bibitem[Santana et~al.(2016)Santana, Baccaro, and Costa]{Santana2016}
+Flávia~Delgado Santana, Fabricio~Beggiato Baccaro, and Flávia Regina~Capellotto Costa.
+\newblock Busy nights: High seed dispersal by crickets in a neotropical forest.
+\newblock \emph{The American Naturalist}, 188:\penalty0 E126--E133, 11 2016.
+\newblock ISSN 0003-0147.
+\newblock \doi{10.1086/688676}.
+
 \bibitem[Tilman et~al.(1997)Tilman, Knops, Wedin, Reich, Ritchie, and Siemann]{doi:10.1126/science.277.5330.1300}
 David Tilman, Johannes Knops, David Wedin, Peter Reich, Mark Ritchie, and Evan Siemann.
 \newblock The influence of functional diversity and composition on ecosystem processes.
@@ -248,5 +305,13 @@ Hamish Wilman, Jonathan Belmaker, Jennifer Simpson, Carolina de~la Rosa, Marcelo
 \newblock \emph{Ecology}, 95:\penalty0 2027--2027, 7 2014.
 \newblock ISSN 0012-9658.
 \newblock \doi{10.1890/13-1917.1}.
+
+\bibitem[Zamora-López et~al.(2026)Zamora-López, Guerrero-Gómez, Torralva, Zamora-Marín, Herrero-Reyes, Guerreiro, and Oliva-Paterna]{ZAMORALOPEZ2026119617}
+Antonio Zamora-López, Adrián Guerrero-Gómez, Mar Torralva, José~Manuel Zamora-Marín, Antonio~Andrés Herrero-Reyes, Pedro~Miguel Guerreiro, and Francisco~José Oliva-Paterna.
+\newblock Fish functional responses to eutrophication and mass mortality events in a mediterranean coastal lagoon.
+\newblock \emph{Marine Pollution Bulletin}, 228:\penalty0 119617, 2026.
+\newblock ISSN 0025-326X.
+\newblock \doi{https://doi.org/10.1016/j.marpolbul.2026.119617}.
+\newblock URL \url{https://www.sciencedirect.com/science/article/pii/S0025326X26004042}.
 
 \end{thebibliography}

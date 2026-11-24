@@ -97,6 +97,15 @@ disp_result<- dispRity(boot_yearly, metric = pairwise.distance.between.centroids
 # this will compare each migrant and resident group within each ecoregion, can adapt using between.groups later on to include other cross-ecoregional checks
 
 ```{r}
+
+groups<- make.ecoregional.migrant.groups(traitspace_df, by = "ecoregion", "status")
+
+disp_groups<- custom.subsets(traitspace_mat, groups)
+
+
+disp_result<- dispRity(disp_groups, metric = pairwise.distance.between.centroids, between.groups = c("A", "B"), c("C", "D")) 
+
+
 summary(disp_result)# mean observed disparity per group is reported + bootstrapped median + confidence intervals
 
 pdf(file = "disp_result_dist.between.centroids.pdf",  ) #disrtibution of bootstrapped centroid dist value + median for each pairwise comparison
@@ -140,10 +149,18 @@ i.e. test.dispRity(my_disparity, test = wilcox.test) #performs non-parametric wi
 
 #or table of result
 
-pdf(file= pairwise_centroid_dist_result_binary_yearly.pdf)
+pdf(file= pairwise_centroid_dist_result_binary_yearly.tex) # make reproducible
 xtabs(get.disparity(disp_result, observed = FALSE,
 rarefaction = TRUE) ~ disp_result$subsets)
 dev.off()
+
+#compare to permutation test-------------
+
+
+
+
+
+
 ```
 
 
@@ -152,6 +169,12 @@ dev.off()
 
 # nestedness is one group a complete subset of another group- would need directionality 
 #i.e. which group is a subset of which group
+
+# functional uniqueness as a dsitribution- better for focusing question i.e. to pinpoint which migrants are unique?
+
+
+
+
 
 ## Seasonal analysis: Does migrant vs resident fucntional contribution differ across seasons?
 
@@ -177,3 +200,16 @@ plot(subsets_seasonallypreview") #PC1V2
 #therefore significance testing with p value provides statistical clarity- (Dushoff et al., 2019) argue this is the reason for performing p value testing ui.e. to provide clarity when you cannot "clearly see the result"
 #e.g. if p<0.05 = “did not find a statistically clear effect.”  rather than no stastically significant effect (p values can be misleading because just because something is significant doesnt mean it is a large effetc or there is not a lot of noise around it, also the effect refers to a dataset not a study system)
 #always important to report the effect size and confidence interval alongside the p vlaue (even if the confidence intervals are artifical i.e. from boostrapping), could also report observed and then the boostrapped values with confidence intervals
+
+
+#save disprity object
+#save(disp_ob)
+# once have values- would need to perform wilcoxon test for pairwise distances (maybe could model effect of ecoregion on this)-blocking by ecoregion with samples from each group (migrants vs residents) increases stastical power of tests, but modelling this would introduce spatial autocorrelation so need to account for this
+#for other nestedness and turnover would need lm (plus phylogenetic and spatial autocorrletion error) to assess effect of migratory status on nestedness of groups(but would only have 5 sample, 1 per ecoregion) and turnover of groups.
+#for distance from other group centroid would do wilcoxon test again rpobably/distirbutional analysis
+
+#distributional analysis then focuses the question- which dietary groups/traits do migrants represent vs residents?-doesthis differ across seasons and do passage migrants, differ from longer stay migrants? monthly analysis)
+
+# for originality and uniquness could create a species-level score for the full Britain and Ireland traitspace based on nnd and distance from whole traitspace centroid, then do glm (ecoregion+ migratory status ~ fucntional uniqueness combined score) - how unique are migrants in the annual trait space?
+# i.e. glmmTMB or lme4: uniqueness ~ ecoregion * migratory_status + (1 | Species) + (1|ecoregion)- accounts for shared species pools between ecoregions + phylogenetic covariance matrix accounting for phylogeny e.g. gls()/brms i.e. does migratory status and ecoregion predict functional unqiueness- can include interactive effect using backwards model selection
+# for seasonal analysis include a nested effect- (1 | Ecoregion/Season) i.e. for each ecoregion, there are multiple seasonal trait spaces

@@ -508,3 +508,4 @@ p4_full <- autoplot(pca,
 
 #no need to correct for phylogenetic signal because this can be done afterwards if you are testing with models for example e.g. PGLS/GLM- phylogeny becomes and issue when you are looking at the relationships of a variable with a trait e.g. migrantory status vs PC1 or body size
 #if all the residents were elephants and tigers and all the migrants were mice and shrews then the relationship between body size and status is not independent of phylogeny as is probably an evolved trait
+

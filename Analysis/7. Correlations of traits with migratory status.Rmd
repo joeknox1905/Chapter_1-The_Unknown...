@@ -1,0 +1,14 @@
+## This script plots correlations of migratory status against each trait used in the PCA
+## The script also plots correlations of migratory status against each PC for potential use in lm/PGLS later on
+## need to control for phylogeny as otherwise species may cluster around certain trait combinations simply because they are more related to each other rather than due the trait being an evolved trait for a non-sedentary lifestyle
+
+
+
+#load packages
+
+```{r}
+library(nlme)
+library(ape) # gls(model, tree, correlation = corBrownian) # assumes brownian motion model
+# or phytools
+```
+

@@ -1,4 +1,4 @@
-\begin{thebibliography}{45}
+\begin{thebibliography}{46}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
 \expandafter\ifx\csname urlstyle\endcsname\relax
@@ -185,6 +185,13 @@ Stefano Mammola, Carlos~P. Carmona, Thomas Guillerme, and Pedro Cardoso.
 \newblock \emph{Functional Ecology}, 35:\penalty0 1869--1885, 9 2021.
 \newblock ISSN 0269-8463.
 \newblock \doi{10.1111/1365-2435.13882}.
+
+\bibitem[Maor et~al.(2017)Maor, Dayan, Ferguson-Gow, and Jones]{Maor2017}
+Roi Maor, Tamar Dayan, Henry Ferguson-Gow, and Kate~E. Jones.
+\newblock Temporal niche expansion in mammals from a nocturnal ancestor after dinosaur extinction.
+\newblock \emph{Nature Ecology \& Evolution}, 1:\penalty0 1889--1895, 11 2017.
+\newblock ISSN 2397-334X.
+\newblock \doi{10.1038/s41559-017-0366-5}.
 
 \bibitem[Marino et~al.(2025)Marino, Soares, and Bellard]{Marino2025}
 Clara Marino, Filipa~Coutinho Soares, and Céline Bellard.

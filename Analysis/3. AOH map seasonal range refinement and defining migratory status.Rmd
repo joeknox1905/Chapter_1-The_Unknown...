@@ -89,6 +89,11 @@ aoh_maps <- tibble(path = list.files(aoh_dir, pattern = "\\.tif$", recursive = T
     filter(!is.na(sisid), sisid %in% range_all$sisid) %>% # filter aoh maps to only species with Birdlife range in Britain and Ireland
     select(path, sisid, layer)
 
+# check resolution- should be 1km2
+res_check <- rast(aoh_maps$path[1])
+res(res_check)
+minmax(res_check)
+
 has_map <- unique(aoh_maps$sisid) # all species with an aoh map
 
 # check species with Britain and Ireland Birdlife range but no aoh map e.g. pelagic?

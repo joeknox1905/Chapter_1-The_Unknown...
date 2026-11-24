@@ -17,6 +17,7 @@ To do:
 [] re-run aoh pipeline
 [] go through comments and enact for PCA (rerun without kipps distance), 
 [] visualise PCAs in traitspace (ggplots/ordiplot/ellipse plot)- functionalise plots; using custom functions to get subsets for plotting- then can refine more metrics e.g. edge ones
+[] plot migratory status against each trait - could then do linear regression
 [] Work on report and ask thomas about realised vs fundamental niche (modelling groups relative to full regional space or their local trait space, at the moment it is relative to the full britain and ireland space to get an idea of how species are occupying niches relative to the full niche space availiable (the limits of which cannot be defined by a single arbitrary geogrpahical border))
 [] species-level metrics- distribution from other group centroid (unit testing needed) specilisation and uniqueness, scrap ellipsoid contribution?
 []put unit tests in seperate script and simplify fdisprity fucntion scripts to just functions
@@ -31,3 +32,5 @@ To do:
 
 
 #n.b. use this command to bash each time to update bib file and report at the same time latexmk -pdf main.tex
+
+# later down the line will need to control for pseudoreplication- i.e. spatial autocorrelation if using modelling e.g. species from ecoregions that are more close together (will need long/lat) for this, may be more similar in their functional uniqueness due to more similar cliamtic, habitat, soil conditions etc...

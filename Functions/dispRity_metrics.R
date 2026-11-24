@@ -360,31 +360,57 @@ expect_all_equal(get.disparity(dispRity(nested_overlap, metric = quantile.nested
 
 distribution.of.species.from.other.group.centroid <- function(matrix, matrix2) {
     ## calculate the centroid of the matrices of n-dimensional traitspace
-  dist1<- point.dist(matrix, matrix2) #euclidean distance from each species in group1 to the centroid of group2
-  dist2<- point.dist(matrix, matrix1) #euclidean distance from each species in group2 to the centroid of group1
+  dist<- point.dist(matrix, matrix2) #euclidean distance from each species in group1 to the centroid of group2
   
-  return (dist1, dist2) #distance from each species in group1 to group2
 } 
 
-#return distrubtion of group1 species from centroid of group2 and distrubtion of group2 species from centroid of group1
 
-dispRity(traitspace_mat, metric = distribution.of.species.from.other.group.centroid, between.groups = list(c("A","B"), c("B","A")))
+groups<- custom.subsets()
+
+##return distrubtion of group1 species from centroid of group2 and distrubtion of group2 species from centroid of group1
+distribution<- dispRity(groups, metric = distribution.of.species.from.other.group.centroid, between.groups = list(c("A","B"), c("B", "A")))
 
 #plot
 #op <- par(bty = "n", mfrow = c(1, 2))
 #
-point_to_centroid_dists<= plot(distribution.of.species.from.other.group.centroid,
+point_to_centroid_dists<= plot(distribution,
      ylab = "Distribution of species distances from centroid by group")
 
 #median if wanted
-point_to_centroid_dists_median <- dispRity(point_to_centroid_dists,
+point_to_centroid_dists_median <- dispRity(distribution,
                                        metric = median)
 plot(disparity_centroids_median,
      ylab = "Distribution of the medians of all the distances")
 
 
 
-#
+#ggplot
+#plot histograms of species distribution 
+
+
+pdf("distribution_from_centroid.pdf", width = 14, height = 10)
+ggplot(point_to_centroid_dists, aes(x= $obs))
+geom_histogram(binwidth = 10) +
+facet_grid(~ $subsets)
+dev.off()
+
+# ------------------metric for calculating functional uniqueness as a regional (B+I)- how unique are species in full britain and ireland space)- funcitonal uniqueness = speciaization x originality----------------------
+
+
+##----------------metric for calculating orignality-----------------------------##
+
+i.e. species originality/specialization score is calcualted relative to their migrant and ecoregional status- therefore cannot cross-compare across ecoregions
+
+# metric for calculating distribution of originality within each group 
+
+#nearest neighbour- 5
+
+# metric for calculating distribution of specialization within each group - are migrants specialised compared to other migrants in their ecoergion?
+
+# nearest neighbour
+
+
+
 
 
 

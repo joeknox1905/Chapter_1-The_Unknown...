@@ -1,0 +1,62 @@
+
+## This script perfoms taxonomic mismatching
+## the phylogeny used is the  McTavish 2025 tree for 9072 species based on the Clements 2025 taxonomy
+## taxonomic mismatching is performed to align Birdlife V10 names with the Clements/eBird 2025 taxonomy using the Birdlife V8 crosswalk provided by McTavish 2025
+
+#load packages
+
+```{r}
+library(clootl)
+```
+
+```{r}
+# read in data-------
+
+# Get Clements 2025 and Birdlife Taxonomy from McTavish
+
+tav_tax <- read.csv("Data/Raw/OTT_crosswalk_2025.csv")
+
+# Load McTavish taxonomy
+mctav <- read.csv(
+    here::here(
+        "McTavish_2025_taxonomy",
+        "OTT_crosswalk_2025.csv"
+    )
+) %>%
+    select(
+        TAXON_CONCEPT_ID, SCI_NAME, Birdlife_name, Birdlife_match_type
+    ) %>%
+    rename(
+        mctav_avibase_id = TAXON_CONCEPT_ID,
+        mctav_ebird2025 = SCI_NAME, # ebird 2025 name from clements taxonomy
+        mctav_birdlife_v8 = Birdlife_name, # Birdlife version 8 name
+        mctav_birdlife_v8_match_type = Birdlife_match_type
+    ) %>%
+    mutate(
+        mctav_ebird2021 = gsub(" ", "_", mctav_ebird2021),
+        mctav_birdlife_v8 = gsub(" ", "_", mctav_birdlife_v8),
+        mctav_avibase_id = toupper(mctav_avibase_id)
+    )
+```
+
+```{r}
+# match birdlife v8 to v10
+# birdlife name = birdlife name, ott_name = clements 2025 name
+```
+
+```{r}
+# then match birdlife v10 to clements 2025
+```
+
+```{r}
+# then extract tree for all names in b and I based on clements 2025
+if (Sys.getenv("AVESDATA_PATH") != "") {
+    ex2 <- sampleTrees(species = c(
+        "Turdus migratorius",
+        "Setophaga dominica",
+        "Setophaga ruticilla",
+        "Sitta canadensis"
+    ))
+}
+```
+

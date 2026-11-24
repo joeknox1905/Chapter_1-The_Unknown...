@@ -354,9 +354,12 @@ expect_all_equal(get.disparity(dispRity(nested_overlap, metric = quantile.nested
 #-------------------------------------------------------------------------species level metrics--------------------------------------------------------------#
 -------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+
 ##----------------metric for calculating distribution of species within each group from other group centroid---------------------------------------
 
 #the migrants furthest from the resident centroid (right tails) will represent the migrants with the most unique trait contributions, if these species are rare seed dispersers for example, then seed dispersal in the ecosystem could be at risk as these species may be functionally unique and irreplaceable so if lost undercliamte change, could be in trouble
+# most useful for assessing which migrants will contribute the most unique functions to ecosystems (not present in the resident community)
+
 
 distribution.of.species.from.other.group.centroid <- function(matrix, matrix2) {
     ## calculate the centroid of the matrices of n-dimensional traitspace
@@ -383,65 +386,61 @@ plot(disparity_centroids_median,
      ylab = "Distribution of the medians of all the distances")
 
 
-
-#ggplot
-#plot histograms of species distribution 
-
-
-pdf("distribution_from_centroid.pdf", width = 14, height = 10)
-ggplot(point_to_centroid_dists, aes(x= $obs))
-geom_histogram(binwidth = 10) +
-facet_grid(~ $subsets)
-dev.off()
-
-# ------------------metric for calculating functional uniqueness as a regional (B+I)- how unique are species in full britain and ireland space)- funcitonal uniqueness = speciaization x originality----------------------
-
-
-##----------------metric for calculating orignality-----------------------------##
-
-i.e. species originality/specialization score is calcualted relative to their migrant and ecoregional status- therefore cannot cross-compare across ecoregions
-
-# metric for calculating distribution of originality within each group 
-
-#nearest neighbour- 5
-
-# metric for calculating distribution of specialization within each group - are migrants specialised compared to other migrants in their ecoergion?
-
-# nearest neighbour
-
-
-
-
-
-
-
 #----------------metric for calculating distribution of species within each group around centroid----------------
 
+#which migrants are most unique among migrants?
+#which residents are most unique among residents?
+#most useful for assessing whether the migrants that are most unique from the residents are also unique among migrants- i.e. they are not redundant within influxing group either so are especially unique
 
-#i.e. "functional" arrangement within each group- niche packing vs expansion in each group
+
+#i.e. "functional" arrangement within each group- is it normally distributed and which species represent particularly unique species, are these the same as the species that are unique from the residents?
 #if normal, means species tend to be more clustered  within their group around average trait combinations (whatever trait combinations represent the centroid), niche packing within group- maybe more fine-scale specialisation
 #if uneven, suggests dispersion from centroid- niche expansion within group
 
-distribution.of.group.around.group.centroid <- function(matrix) {
-group_centroid<- colMeans(matrix) #centroid of group
-for (i in 1:nrow(matrix)) { #for each species row in ecoregional annual trait space
-species_row <- matrix[i, ]#get pc score for each dimension for each pc
+disp_result<- dispRity(boot_groups, metric = centroids, between.groups = FALSE)
 
-#avg e.g. if smaller avg distance in migrants than migrants more clustered around centroid and more clumped? to compare between groups- i guess kind of similae to 
+## Graphical parameters
+op <- par(bty = "n", mfrow = c(1, 2))
 
+## Plotting both disparity measurements
+plot(disparity_centroids,
+     ylab = "Distribution of of all species' distances from centroid of their ecoregional migratory status group")
 
-need to call between.groups = FALSE
-result_binary  <- calculate.disprity.by.ecoregion(BI_traitspace, group = "status", metric = distribution.of.group.around.group.centroid , trait_cols = trait_cols, between = FALSE) 
 
 # plot histogram of distribution function and test difference using t test (not permutation as already have done bootstrapping to account for null tests)
 pdf("distribution_around_centroid_per_"group".pdf", width = 14, height = 10)
-ggplot(result_binary, aes(x= $obs)), 
+ggplot(disp_result, aes(x= $obs)), 
 geom_histogram(binwidth = 10) +
-facet_grid(group~.) #migrants and residents side by side
+facet_grid($subsets~.) #plot by subset
 dev.off()
 
-} # plot histogram of distribution function and test difference using t test (not permutation as already have done bootstrapping to account for null tests)
+ #for species level nestedness would need to calculate where each species lies (i.e. within intersect (nested, 1) or outside or intersect (not nested, 0) in terms of span of resident + migrant (same as quantile overlap) or span of own group (quantile uniqueness/turnover)
+ #would return output of binary 0/1 for each species in each group of each subset, between groups = true but would be A:B vs B:A etc
+ #then plot distribution 
 
+##----------------metric for calculating uniqueness- within migrant + resident group ----------------------------##
+
+#how unique are migrants within their ecoregion (migrant + resident communities) i.e. ecoregional specialization (assumes generalists at the centroid)
+
+#distance to ecoregional centroid (don't make groups by status, just ecoregion)
+
+##----------------metric for calculating uniqueness- within migrant + resident group ----------------------------##
+
+#how unique are migrants within their ecoregion (migrant + resident communities) i.e. ecoregional uniqueness
+
+#nearest neighbour distances in ecoregional traitspace
+
+#sum of euclidean distances between species and its 5 nearest neighbours
+
+#distance to ecoregional centroid (don't make groups by status, just ecoregion)
+
+
+# ------------------metric for calculating functional irreplaceability as a ecoregional (per ecoregion) funcitonal uniqueness = speciaization x uniqueness----------------------
+
+eco_groups %<%
+select(func.unique, func.specialisation)
+mutate(
+func.irreplaceability= func.unique * func.specialisation)
 
 
 #------------------------metric for calculating species-level contribution to trait space using ellipsoid volume, based on leave one out approach of Cardoso et al. (2026) but using ellipsoid volumes as less sensitive to outliers (Guillerme et al., 2026)-----------------------------

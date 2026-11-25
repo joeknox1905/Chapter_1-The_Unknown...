@@ -14,6 +14,7 @@ Chapter 1:
 
 To do:
 [] R stats course
+[] unit testing and correlation without beak tip to nares?
 [] re-run aoh pipeline
 [] get raw traits and then plot correlations of each trait- or can do after and get from literature- e.g. HWI - leaning towards inclusing this as opposed to wing length? but then dont have a wing length variable
 [] go through comments and enact for PCA (rerun without kipps distance and with HWI), 
@@ -48,3 +49,8 @@ To do:
 #run models of migratory status against functional irreplaceability (specialization x uniqueness)
 #repeat for seasonal and monthly analyses
 #repeat for other regions
+
+
+Hey Thomas, 
+
+can we talk about PCA stuff in the meeting also- currently i am debating between including  HWI which is an important predictor of dispersal ability (and thus migration) and ditching wing length which is included in HWI, and including wing length (which is a large predictor of avian diveristy) but ditching HWI (which is derived from wing length). BAsicallly do I keep an important predictor of migration (and the wing shape component) but lose a major predictor of avian phenotypic diversity or retain an important predictor of avian divresity (and the wing size component) and lose an important predictor of migratory ability (and wing shape). Kipps distance the other wing shape variable is derived/uses both variables so I would need to cut it out either way. Also I currently have two beak length variables, one of which is included in the other, do I remove the nested one? This is bad practice from what I have seen in the literature and also may be an important component of modularity and phenotypic variation in aerial birds?

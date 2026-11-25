@@ -542,7 +542,7 @@ p4_full <- autoplot(pca,
 
 ## if want to keep HWI as good indicator of dispersal ability which may indicate range size and length of migration and thus indirectly effect transience and migrant contribution
 ## will need to remove kipps distance and wing length and keep HWI
-## rerun with this- but maybe plot trait correlations first
+ ## rerun with this- but maybe plot trait correlations first- also may need to remove beak length tip to nares (as within tip to culmen)?
 
 ```{r}
 avonet_traits <- tibble(species = spp_name, ) %>%

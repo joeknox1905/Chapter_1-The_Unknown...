@@ -11,8 +11,9 @@ library(dispRity)
 library(MCMCglmm)
 library(testthat)
 
-traitspace_df<- read.csv("Data/Processed/eco_region_season_traitspace_PCA_BI.csv") # full Britain and Ireland trait space or beak-only AVONET PCA/PCOA scores, status and species (columns) by ecoregion (rows)- can either use PCOA or PCA
-#TG: it's better/more common to write things in path_from_the_file (so that "/Data/..." becomes "../Data/...")
+#wide and long (ecoregion and season as a column (long), PCs as individual columns (wide))
+traitspace_df<- read.csv("../Data/Processed/eco_region_season_traitspace_PCA_BI.csv") # full Britain and Ireland trait space or beak-only AVONET PCA/PCOA scores, status and species (columns) by ecoregion (rows)- can either use PCOA or PCA
+
 
 pc_cols <- names(traitspace_df)[8:13] #get names of PC columns excluding metadata
 species_pcs <- unique(traitspace_df[c("species", pc_cols)]) #get unique pc cols per species # i.e. the full trait space, 1 row per species

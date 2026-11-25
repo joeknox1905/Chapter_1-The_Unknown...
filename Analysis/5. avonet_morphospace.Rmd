@@ -13,6 +13,7 @@
 
 #-----load libraries------
 
+```{r}
 library(tidyr)
 library(stringr)
 library(kableExtra)
@@ -24,7 +25,21 @@ library(ggplot2)
 library(ggcorrplot)
 library(tibble)
 library(ggfortify)
+```
 
+
+#load functions
+
+```{r}
+# gets the residuals of the log of each integer trait against log body mass
+get.residuals <- function(x) {
+  LogTrait <- log(x)
+  ResTrait <- lm(LogTrait ~ LogMass)$residuals
+}
+```
+
+# Read in, select and match trait data-----------------
+```{r}
 assemb <- readRDS("Data/Processed/seasonal_ecoregion_pools_aoh") # species from britain and ireland for full annual trait space
 
 # load avonet trait data
@@ -74,9 +89,14 @@ avonet_na_all <- avonet_traits %>%
   filter(if_all(-species, is.na)) %>%
   print()
 
+# save raw avonet traits for britain ireland
+write.csv(avonet_traits, "raw_avonet_traits.csv")
+```
+
 
 # control for size in morphological traits (Williams and CUrley, 2025 residuals method)------------------
 
+```{r}
 # AVONET morphological traits- removing HWI as it is a ratio
 morph_traits <- avonet_traits %>%
   select(
@@ -85,26 +105,24 @@ morph_traits <- avonet_traits %>%
   ) %>%
   column_to_rownames("species")
 
+
 # Log body mass for function call
-LogMass <- log(morph_traits$Mass) #logging as although, not so relevant for britain where bird size does not hugely vary,  will allow a reproducible pipeline across regions i.e. where there is lots of variation between bird sizes (e.g. ostrich vs hummingbird)
-#this prevents body mass dominating the trait space and better resolves instances where for example there are two birds of the same mass with different beak lenghs (without logging/controlling for residuals these species would have almost the same coords in traitspace, but with logging their distances will be better estimated; cite paper()) 
-#this is also the reason for performing thebody mass regression to get residuals below.
+LogMass <- log(morph_traits$Mass) # logging as although, not so relevant for britain where bird size does not hugely vary,  will allow a reproducible pipeline across regions i.e. where there is lots of variation between bird sizes (e.g. ostrich vs hummingbird)
+# this prevents body mass dominating the trait space and better resolves instances where for example there are two birds of the same mass with different beak lenghs (without logging/controlling for residuals these species would have almost the same coords in traitspace, but with logging their distances will be better estimated; cite paper())
+# this is also the reason for performing thebody mass regression to get residuals below.
 
 # Log and transform morphological traits relative to body mass (residuals)
-get.residuals <- function(x) {
-  LogTrait <- log(x)
-  ResTrait <- lm(LogTrait ~ LogMass)$residuals
-}
 
 res_traits <- apply(morph_traits[, -9], 2, get.residuals) # apply to all columns except body mass
 colnames(res_traits) <- paste0("Res", colnames(res_traits)) # rename to reflective relative trait values
 my_residual_data <- cbind(res_traits, LogMass)
 
-# TG:done Note that the two bits above can probably be functionalised. Like using something like my_residual_data <- apply(my_data, 2, get.residuals)
-
 
 # Check correlations among logged morphological traits
-ggcorrplot(cor(my_residual_data[, 1:9]), hc.order = TRUE)
+minus_HWI <- ggcorrplot(cor(my_residual_data[, 1:9]), hc.order = TRUE)
+
+
+pdf(minus_HWI, "corrplots_compared_+/-_HWI.pdf")
 
 # body mass not correlated with anything so effectively removes allometry
 # main correlations (can use for PCOA groups):
@@ -112,8 +130,13 @@ ggcorrplot(cor(my_residual_data[, 1:9]), hc.order = TRUE)
 # beak shape traits (width +depth)
 # wing length and pointiness (kipps distance)
 # tail length and first flight feather (secondary 1)
+```
 
-#-----------------------Perform PCA on full trait space--------------------------------
+
+
+# -----------------------Perform PCA on full trait space--------------------------------
+
+```{r}
 pca <- prcomp(my_residual_data, scale. = TRUE) # scale
 
 full_space_axes <- select.axes(pca, threshold = 0.95, inc.threshold = TRUE) # select axes using disprity
@@ -159,9 +182,12 @@ summary(year_eco_mig_axes) # explains 95.5 to 98.1% of variance across ecoregion
 pdf("PCA_axes_variance_explained_by_ecoregion_status_year_group.pdf", width = 14, height = 10)
 plot(year_eco_mig_axes)
 dev.off()
+```
 
-# check that dimesnsions are ok for groups in seasonal migrant contribution analysis-----
 
+# ------------check that dimesnsions are ok for groups in seasonal migrant contribution analysis-----
+
+```{r}
 # join metadata (migratory status, monthly presence)
 
 eco_season_pca <- assemb %>%
@@ -190,13 +216,12 @@ summary(season_eco_mig_axes) # explains 95.5 to 98.2% of variance
 pdf("PCA_axes_variance_explained_by_ecoregion_status_season_group.pdf", width = 14, height = 10)
 plot(season_eco_mig_axes)
 dev.off()
-
-# JK to JK:TG:new<- can see from this crap plot (too many groups) that actually season does not seem to have much of an effect on the variance of trait space across any ecoregion. BUT for European Atlantic forests, residents are much more spread across PC3 than migrants.
-
-
-# checking monthly migrant defintion groups for the yearly analysis------------------
+```
 
 
+## ---- checking monthly migrant defintion groups for the yearly analysis------------------
+
+```{r}
 eco_month_mig_group <- eco_pca %>%
   distinct(ecoregion, n_month_year, species) %>%
   {
@@ -269,11 +294,15 @@ eco_season_pca_7 <- assemb %>%
   inner_join(avospace, by = "species")
 
 # save full traitspace with metadata (ecoregion, season, mig status, annual months present, seasonal month present)
-write.csv(eco_season_pca_7, "eco_region_traitspace_PCA_BI.csv")
+write.csv(eco_season_pca_7, "eco_region_season_traitspace_PCA_BI.csv")
+```
+
 
 
 #----------------------------perform PCA on beakspace only---------------------------
 
+
+```{r}
 my_residual_beak_data <- my_residual_data[, c(
   "LogMass", "ResBeak.Length_Culmen",
   "ResBeak.Length_Nares", "ResBeak.Width", "ResBeak.Depth"
@@ -319,7 +348,7 @@ year_eco_beak_mig_axes <- select.axes(beak_pca, group = eco_beak_mig_group, thre
 # get dimensions necessary for each group
 
 # 4 dimensions ok!
-# JK to JK:TG:new<-  this is cool- can see that PC3 explains most variance in european atlantic forest residents but not migrants and that PC2 explains most variance in caledon confifer forest migrants but not residents!
+#
 
 summary(year_eco_beak_mig_axes) # explains 98.4 to 99.1% of variance across ecoregions and migrant groups
 
@@ -355,13 +384,11 @@ summary(beak_season_eco_mig_axes) # PCs1:4 explain 97.9 to 99.3% of variance
 pdf("Beak_PCA_axes_variance_explained_by_ecoregion_status_season_group.pdf", width = 14, height = 10)
 plot(beak_season_eco_mig_axes)
 dev.off()
+```
 
-# JK to JK:TG:new<-  again as for full space, very little difference in variance explained across seasons, but PC2 especially explanatory for European Atlantic mixed forest residents, will be interesting to look at what traits these species represent
+## checking monthly migrant defintion groups for the yearly analysis------------------
 
-
-# checking monthly migrant defintion groups for the yearly analysis------------------
-
-
+``` {r}
 eco_beak_month_mig_group <- eco_pca_beak %>%
   distinct(ecoregion, n_month_year, species) %>%
   {
@@ -394,11 +421,13 @@ eco_beak_season_pca_5 <- assemb %>%
   inner_join(beak_avospace_5, by = "species")
 
 # save full traitspace with metadata (ecoregion, season, mig status, annual months present, seasonal month present)
-write.csv(eco_beak_season_pca_5, "eco_region_traitspace_PCA_beak_BI.csv")
+write.csv(eco_beak_season_pca_5, "eco_region_season_traitspace_PCA_beak_BI.csv")
+```
 
 
-#------------------Plotting interesting patterns that have spotted with variance plots earlier with plot.dispRity----------------------
+# ------------------Plotting interesting patterns that have spotted with variance plots earlier with plot.dispRity----------------------
 
+```{r}
 # create yearly ecoregionxmigratory status subsets
 eco_year_subsets <- custom.subsets(pca$x, group = eco_mig_group)
 
@@ -414,16 +443,15 @@ plot(eco_year_subsets, type = "preview", specific.args = list(dimensions = c(2, 
 # yep, quite spread along PC3 but not massively obvious
 
 plot(eco_year_subsets, type = "preview", specific.args = list(dimensions = c(3, 4)))
-
+```
 
 #------------------------------Checking loadings--------------------------------------------
 
 Loadings as an exploration, should not use this to infer trait correlations with PC axes as that is not what PCA does- it does not try to find explanatory variables
 
-
+```{r}
 # full traitspace
 full_loadings <- as.data.frame(pca$rotation)[1:7] # loadings for PCs 1-6 #for full loadings, body mass has a small influence on trait space as it only correlates with HWI (which is expected), so traitspace is largely independent of allometry
-
 
 
 # plot loadings for full traitspace---------------------
@@ -436,14 +464,12 @@ p1_full <- autoplot(pca,
   theme(legend.position = "none")
 
 
-
 p2_full <- autoplot(pca,
   x = 3, y = 4, data = avospace_7, colour = "species",
   loadings = TRUE, loadings.colour = "red",
   loadings.label = TRUE, loadings.label.size = 3, loadings.label.colour = "black"
 ) +
   theme(legend.position = "none")
-
 
 
 p3_full <- autoplot(pca,
@@ -471,26 +497,26 @@ p4_full <- autoplot(pca,
 
 p4_full
 
-#BUT good for plots- which you should use for actual report probably (or ordiplots)
+# BUT good for plots- which you should use for actual report probably (or ordiplots)
 
-#also without loadings:
+# also without loadings-------------
 
 
-p1_full_no_loadings<- autoplot(pca,
-  x = 1, y = 2, data = avospace_7, colour = "species") +
+p1_full_no_loadings <- autoplot(pca,
+  x = 1, y = 2, data = avospace_7, colour = "species"
+) +
   theme(legend.position = "none")
-
-
 
 
 p2_full_no_loadings <- autoplot(pca,
-  x = 3, y = 4, data = avospace_7, colour = "species") +
+  x = 3, y = 4, data = avospace_7, colour = "species"
+) +
   theme(legend.position = "none")
 
 
-
 p3_full_no_loadings <- autoplot(pca,
-  x = 5, y = 6, data = avospace_7, colour = "species") +
+  x = 5, y = 6, data = avospace_7, colour = "species"
+) +
   theme(legend.position = "none")
 
 
@@ -503,9 +529,65 @@ dev.off()
 
 # get PC 7 for interest
 p4_full <- autoplot(pca,
-  x = 7, y = 6, data = avospace_7, colour = "species") +
+  x = 7, y = 6, data = avospace_7, colour = "species"
+) +
   theme(legend.position = "none")
+```
 
-#no need to correct for phylogenetic signal because this can be done afterwards if you are testing with models for example e.g. PGLS/GLM- phylogeny becomes and issue when you are looking at the relationships of a variable with a trait e.g. migrantory status vs PC1 or body size
-#if all the residents were elephants and tigers and all the migrants were mice and shrews then the relationship between body size and status is not independent of phylogeny as is probably an evolved trait
+## no need to correct for phylogenetic signal because this can be done afterwards if you are testing with models for example e.g. PGLS/GLM- phylogeny becomes and issue when you are looking at the relationships of a variable with a trait e.g. migrantory status vs PC1 or body size
+## if all the residents were elephants and tigers and all the migrants were mice and shrews then the relationship between body size and status is not independent of phylogeny as is probably an evolved trait
 
+
+## rerunning with HWI------------------
+
+## if want to keep HWI as good indicator of dispersal ability which may indicate range size and length of migration and thus indirectly effect transience and migrant contribution
+## will need to remove kipps distance and wing length and keep HWI
+## rerun with this- but maybe plot trait correlations first
+
+```{r}
+avonet_traits <- tibble(species = spp_name, ) %>%
+  mutate(lookup_name = coalesce(avonet_lookup[species], species)) %>%
+  left_join(avonet %>% select(
+    species, Beak.Length_Culmen, Beak.Length_Nares, Beak.Width, Beak.Depth,
+    Tarsus.Length, Hand.Wing.Index, Secondary1, Tail.Length, Mass # removing Kipp's distance (wing length-secondary1) and wing length as HWI is (kipps distance/wing length x100), as these are derived from or represented by variables already present in the traitspace
+  ), by = c("lookup_name" = "species")) %>%
+  dplyr::select(-lookup_name)
+
+# get species with no trait data in avonet (should be 0)
+avonet_na_any <- avonet_traits %>%
+  filter(if_any(-species, is.na)) %>%
+  print()
+avonet_na_all <- avonet_traits %>%
+  filter(if_all(-species, is.na)) %>%
+  print()
+
+morph_traits <- avonet_traits %>%
+  select(
+    species, Beak.Length_Culmen, Beak.Length_Nares, Beak.Width, Beak.Depth,
+    Tarsus.Length, Hand.Wing.Index, Secondary1, Tail.Length, Mass
+  ) %>%
+  column_to_rownames("species")
+
+
+# Log body mass for function call
+LogMass <- log(morph_traits$Mass) # logging as although, not so relevant for britain where bird size does not hugely vary,  will allow a reproducible pipeline across regions i.e. where there is lots of variation between bird sizes (e.g. ostrich vs hummingbird)
+# this prevents body mass dominating the trait space and better resolves instances where for example there are two birds of the same mass with different beak lenghs (without logging/controlling for residuals these species would have almost the same coords in traitspace, but with logging their distances will be better estimated; cite paper())
+# this is also the reason for performing thebody mass regression to get residuals below.
+
+# Log and transform morphological traits relative to body mass (residuals)
+
+res_traits <- apply(morph_traits[, -c(9, 6)], 2, get.residuals) # apply to all columns except body mass and HWI
+colnames(res_traits) <- paste0("Res", colnames(res_traits)) # rename to reflective relative trait values
+my_residual_data <- cbind(res_traits, LogMass, Hand.Wing.Index = morph_traits$Hand.Wing.Index)
+
+
+# Check correlations among logged morphological traits
+ggcorrplot(cor(my_residual_data[, 1:9]), hc.order = TRUE) # seems to be better
+
+
+both_corrs <- minus_HWI + plus_HWI
+pdf(both_corrs, "corrplots_compared_+/-_HWI/winglength.pdf")
+dev.off()
+```
+
+    

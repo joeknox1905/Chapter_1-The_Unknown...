@@ -12,3 +12,29 @@ library(ape) # gls(model, tree, correlation = corBrownian) # assumes brownian mo
 # or phytools
 ```
 
+# load trait data and metadata--------
+```{r}
+avo <- read.csv("Data/Processed/raw_avonet_traits.csv")
+meta <- read.csv("eco_region_season_traitspace_PCA_BI.csv")
+
+trait_cols <-
+    avo <- avo %.%
+    left_join(trait_cols, meta, by = "species")
+
+
+# filter to distinct species per ecoregion
+avo <- avo %>%
+    distinct(species, ecoregion)
+```
+
+
+# plot scatterplots of migratory status vs each raw trait to assess which traits would be best to include in PCA
+
+```{r}
+ggplot(avo, aes(x = status, y = Mass)) +
+    geom_point() +
+    facet(~ecoregion)
+theme_bw()
+```
+
+#add model predictions with PGLS later---------

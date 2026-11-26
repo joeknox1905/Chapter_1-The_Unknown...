@@ -25,10 +25,10 @@ season_lookup <- c(
 
 ```{r}
 # seasonal range for all species in Britain and Ireland ecoregions
-range_all <- load("Data/Processed/range_ecoregions_km2.rds")
+range_all <- readRDS("./Data/Processed/range_ecoregions_km2.rds")
 
 # read in monthly phenology data from Bellve et al. (2026)
-pheno_df <- read.csv("Data/Raw/bird_season_by_month.csv")
+pheno_df <- read.csv("./Data/Raw/bird_season_by_month.csv")
 ```
 
 ## Get monthly presence of species in each ecoregion using the Bellve et al. (2026) phenology for migratory species
@@ -75,10 +75,10 @@ pheno_long <- pheno_df %>%
 no_pheno <- range_all %>%
     filter(seasonal != 1, !species %in% pheno_long$species) %>%
     distinct(sisid, species)
-no_pheno
+no_pheno # allspecies have migrant species in britain and ireland birdlife ranges have phenology
 
 # save
-save(pheno_long, "seasonal_range_codes_by_month_all_species.csv")
+write.csv(pheno_long, "seasonal_range_codes_by_month_all_species.csv")
 
 # 0 species so all good
 ```

@@ -3,9 +3,13 @@
 1.a Calculates distance between centroids of migrants and residents in each ecoregion to ask whether migrants and residents differ in their average trait combinations
 1.b Calcualtes the distribution of species from the other group centroid to ask which migrants/residents are most unique to their group and thus which migrants are most unique in their contribution to the resident ecoregional pool
 1.c. Calculates the distribution of species from their own group centroid to ask whether migrants/residents are unique within their group- if these match the species unique also compared to residents, suggets completely unique
-1.d An alternative here is to calculate the specialisation (sum of euclidean distances from 5 nearest neighbours) and uniqueness (distance from centroid) of species from the migrant + resident centroid (full ecoregional centroid) to ask whether species are unique irrespective of status group and then model migratory status ~ fucntional irreplaceability (functional specilisation x uniqueness) + (1|species) + (1|resident)
+1.d Further, the degree of specialisation (sum of euclidean distances from 5 nearest neighbours) and uniqueness (distance from centroid) of each species species from the (full ecoregional centroid) is calculated to ask whether species are unique irrespective of status group and then model migratory status ~ fucntional irreplaceability (functional specilisation x uniqueness) + (1|species) + (1|resident)
 2.a Calculates the nestedness vs turnover of migrant vs resident groups to ask how much redundancy there in trait space occupancy between migrants and residents and to identify cases where migrant groups are simply complete subsets of the residents
 2.b May calculate the distribution of nestedness vs turnover in each ecoregion as binary output i.e. to identify which species are nested and which are unique to the group
+3. To understand which niches migrant and resident species are occupying in a more nuanced way,, I then define the niche in an Aristolelian rather than Hutchosonian way which quantitifies the essential (niche defined based on intrinsic functional traits e.g. defining niche based on speficic morphologies) rather than fundamental niche of a species (the set of conditions in which a species can persist)
+This could be done using Avoniche to create subsets of each foraging niche, extract the PC scores for each subset from the full ecological space and map this onto morphspace as quantiles
+Then distance to the quantiles of each niche for each species could be calculated then modelled as a function of migratory status. I.e. are migrants more invetivore than residents for example- then can infer how likely migrants are to outcompete residents within these niches!
+niches to look at could be picked based on the tails of the boostrapped distribution i.e. the interesting niches that migrants only occupy, and the more generalist niches that both resident and migrants occupy 
 
 #same for seasonal analysis with each ecoregional seasonal migrant and resident group compared 
 #same for monthly (short stay vs long stay species) analysis with each ecoregional monthly migrant and resident group compared (potentially yearly and then seasonally)
@@ -62,6 +66,13 @@ quantile.nestedness <- function(matrix, matrix2, probs = c(0.025, 0.975)) {
 
   return(intersect / span)
 }
+
+# calculating distribution of species' distances from the other groups centroid 
+distribution.of.species.from.other.group.centroid <- function(matrix, matrix2) {
+    ## calculate the centroid of the matrices of n-dimensional traitspace
+  dist<- point.dist(matrix, matrix2) #euclidean distance from each species in group1 to the centroid of group2
+  
+} #returns 1 distance value for each element (species)
 ```
 
 

@@ -12,7 +12,7 @@ library(MCMCglmm)
 library(testthat)
 
 #wide and long (ecoregion and season as a column (long), PCs as individual columns (wide))
-traitspace_df<- read.csv("../Data/Processed/eco_region_season_traitspace_PCA_BI.csv") # full Britain and Ireland trait space or beak-only AVONET PCA/PCOA scores, status and species (columns) by ecoregion (rows)- can either use PCOA or PCA
+traitspace_df<- read.csv("./Data/Processed/eco_region_season_traitspace_PCA_BI.csv") # full Britain and Ireland trait space or beak-only AVONET PCA/PCOA scores, status and species (columns) by ecoregion (rows)- can either use PCOA or PCA
 
 
 pc_cols <- names(traitspace_df)[8:13] #get names of PC columns excluding metadata
@@ -366,8 +366,7 @@ distribution.of.species.from.other.group.centroid <- function(matrix, matrix2) {
     ## calculate the centroid of the matrices of n-dimensional traitspace
   dist<- point.dist(matrix, matrix2) #euclidean distance from each species in group1 to the centroid of group2
   
-} 
-
+} #returns 1 distance value for each element (species)
 
 groups<- custom.subsets()
 
@@ -385,6 +384,76 @@ point_to_centroid_dists_median <- dispRity(distribution,
                                        metric = median)
 plot(disparity_centroids_median,
      ylab = "Distribution of the medians of all the distances")
+
+#unit testing-----------------------------
+
+make.metric(distribution.of.species.from.other.group.centroid) #dimension level 2 and between groups- good, returns value for each observation in the matrix
+
+#testing equal matrices
+set.seed(1)
+equal_matrices <- matrix(rnorm(25), 5, 5) # if matrix 1 + 2 = are the same, would expect all species to still be >0 for their distances
+testthat::expect_all_true(distribution.of.species.from.other.group.centroid(equal_matrices, equal_matrices) >0) #correct
+
+set.seed(1)
+#generate two random groups in a hypothetical 2d traitspace
+space_2D <- traitspace_mat[, c("PC1", "PC2")]
+random_groups <- replicate(2, sample(1:nrow(traitspace_mat), floor(nrow(traitspace_mat)/2)))
+
+#testing complete overlap, dsitribution of group 1 should equal the distribution of group2
+complete_overlap <- custom.subsets(space_2D, group = list("A" = random_groups[,1], "B" = random_groups[,1]))
+# plot(complete_overlap)
+disp_result<- dispRity(complete_overlap, metric = distribution.of.species.from.other.group.centroid, between.groups = list(c("A","B"), c("B","A")))
+disp_sum<-summary(disp_result)
+
+test_that("groups with complete overlap should have the same dsitribution from the centroid of the other group", {
+expect_equal(disp_sum$obs.median[1], disp_sum$obs.median[2])
+}) #yep, all good
+
+idx<- 1:nrow(space_2D)
+half<- floor(length(idx)/2)
+
+# testing partial overlap: should be between 0 and 1 as groups are partially nested
+  partial_overlap <- custom.subsets(space_2D, group = list("A" = idx[1:half], "B" = idx[(half + 1):(2 * half)])) #assign half row values to group, A and half to group B
+  # plot(partial_overlap)
+  disp_result<- dispRity(partial_overlap, metric = distribution.of.species.from.other.group.centroid, between.groups = list(c("A","B"), c("B","A")))
+disp_sum<-summary(disp_result)
+
+test_that("groups with partial overlap should have different distributions of distances from the centroid of the other group", {
+expect_failure(expect_equal(disp_sum$obs.median[1], disp_sum$obs.median[2]))
+}) # good
+
+
+#testing non-overlapping groups
+set.seed(1)
+
+non_random_groups <- list("A" = which(space_2D[,1] <= -0.5 & space_2D[,2] <= -0.5),
+"B" = which(space_2D[,1] >= 1 & space_2D[,2] >= 1))
+no_overlap <- custom.subsets(space_2D, group = non_random_groups)
+disp_result<- dispRity(no_overlap, metric = distribution.of.species.from.other.group.centroid, between.groups = list(c("A","B"), c("B","A")))
+disp_sum<-summary(disp_result)
+
+# plot(non_random_test)
+test_that("groups with no overlap should have different distributions of distances from the centroid of the other group", {
+expect_failure(expect_equal(disp_sum$obs.median[1], disp_sum$obs.median[2]))
+})  #good 
+
+#testing nested groups:
+nested_groups<- list("A" = which(space_2D[,1] >-3 & space_2D[,1] <3 & space_2D[,2] >-3 & space_2D[,2] <3),
+"B" = which(space_2D[,1] >-2 & space_2D[,1] <2 & space_2D[,2] >-2 & space_2D[,2] <2))
+nested_overlap <- custom.subsets(space_2D, group = nested_groups)
+# plot(nested_overlap)
+disp_result<- dispRity(nested_overlap, metric = distribution.of.species.from.other.group.centroid, between.groups = list(c("A","B"), c("B","A")))
+disp_sum<-summary(disp_result)
+
+test_that("pairs with nested groups should still have different distributions of distances from the centroid of the other group", {
+expect_failure(expect_equal(disp_sum$obs.median[1], disp_sum$obs.median[2]))
+})  #good 
+
+
+test_that("nested group distance to centroid of non-nested group is < non-nested group distance to nested group centroid", {
+  expect_gt(disp_sum$obs.median[1], disp_sum$obs.median[2]) # good
+})
+
 
 
 #----------------metric for calculating distribution of species within each group around centroid----------------

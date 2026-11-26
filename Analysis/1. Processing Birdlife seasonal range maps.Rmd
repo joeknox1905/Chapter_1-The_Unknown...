@@ -11,6 +11,7 @@
 ```{r}
 library(dplyr)
 library(tidyr)
+library(stringr)
 library(terra)
 library(rappdirs)
 library(sf)
@@ -139,7 +140,6 @@ if (file.exists(range_cache)) {
     st_crop(bb) # crop to more generous bounding box
   sf_use_s2(TRUE) # reproject to non-planar
 
-  length(unique(range_bi$species)) # 279 species with generous gadm boundaries
 
   # crop britain and ireland birdlife ranges to ecoregions and get area of intersection of species' seasonal birdlife ranges with each ecoregion
   range_all <- range_bi %>%
@@ -151,11 +151,13 @@ if (file.exists(range_cache)) {
     group_by(ecoregion, sisid, species, seasonal) %>%
     summarise(km2 = sum(km2), .groups = "drop") # summarise area in km2 of each species' range maps intersecting each ecoregion
 
-  length(unique(range_all$species)) # 250 species once clipped Britain and Ireland Birdlife ranges to ecoregions
-
   # save as ecoregional range intersection as RDS
   saveRDS(range_all, range_cache)
 }
+
+length(unique(range_bi$species)) # 279 species with generous gadm boundaries
+
+length(unique(range_all$species)) # 250 species once clipped Britain and Ireland Birdlife ranges to ecoregions
 ```
 
 

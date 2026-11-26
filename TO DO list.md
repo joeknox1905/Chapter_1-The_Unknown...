@@ -13,14 +13,18 @@ Chapter 1:
 
 
 To do:
-[] R stats course
-[] unit testing and correlation without beak tip to nares?
-[] re-run aoh pipeline
-[] get raw traits and then plot correlations of each trait- or can do after and get from literature- e.g. HWI - leaning towards inclusing this as opposed to wing length? but then dont have a wing length variable
-[] go through comments and enact for PCA (rerun without kipps distance and with HWI), 
+[] originality vs specialisation metrics
+[] re-run aoh pipeline- have got to end of phenology part
+[] run PCA (rerun without HWI and only wing length), 
 [] visualise PCAs in traitspace (ggplots/ordiplot/ellipse plot)- functionalise plots; using custom functions to get subsets for plotting- then can refine more metrics e.g. edge ones
+[] get raw traits and then plot correlations of each trait- or can do after and get from literature when have disprity as a distribution e.g. subsets of each quantile of the distribution against traits (or as violin plots)
 [] Work on report and ask thomas about realised vs fundamental niche (modelling groups relative to full regional space or their local trait space, at the moment it is relative to the full britain and ireland space to get an idea of how species are occupying niches relative to the full niche space availiable (the limits of which cannot be defined by a single arbitrary geogrpahical border))
-[] species-level metrics- distribution from other group centroid (unit testing needed) specilisation and uniqueness, scrap ellipsoid contribution?
+[] make uniquness and specialization metrics
+[] start analyses
+[] taxonomic mismatching- birdlife v8 to v10 using mctavish from Rob 
+[] run models of migratory status against species-level disprity metrics with PGLS (brms package)
+
+
 []put unit tests in seperate script and simplify fdisprity fucntion scripts to just functions
 [] what traits/things explain the difference among migrants/residents in traitspace if there is any- transience (monthly analysis)/ diet/forgaing niche (avoniche)- do literature search to explore possible seasonal effects.- plot migratory status against each trait - could then do linear regression and PGLS
 [] Update README

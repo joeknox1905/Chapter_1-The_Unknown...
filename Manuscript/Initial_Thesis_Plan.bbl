@@ -1,4 +1,4 @@
-\begin{thebibliography}{46}
+\begin{thebibliography}{50}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
 \expandafter\ifx\csname urlstyle\endcsname\relax
@@ -32,6 +32,13 @@ Robert S.~C. Cooke, Felix Eigenbrod, and Amanda~E. Bates.
 \newblock \emph{Nature Communications}, 10:\penalty0 2279, 5 2019.
 \newblock ISSN 2041-1723.
 \newblock \doi{10.1038/s41467-019-10284-z}.
+
+\bibitem[Cox et~al.(2022)Cox, Gardner, and Gaston]{doi:10.1126/sciadv.abn6008}
+Daniel T.~C. Cox, Alexandra~S. Gardner, and Kevin~J. Gaston.
+\newblock Global and regional erosion of mammalian functional diversity across the diel cycle.
+\newblock \emph{Science Advances}, 8\penalty0 (32):\penalty0 eabn6008, 2022.
+\newblock \doi{10.1126/sciadv.abn6008}.
+\newblock URL \url{https://www.science.org/doi/abs/10.1126/sciadv.abn6008}.
 
 \bibitem[Dawson et~al.(2021)Dawson, Carmona, González‐Suárez, Jönsson, Chichorro, Mallen‐Cooper, Melero, Moor, Simaika, and Duthie]{Dawson2021}
 Samantha~K. Dawson, Carlos~Pérez Carmona, Manuela González‐Suárez, Mari Jönsson, Filipe Chichorro, Max Mallen‐Cooper, Yolanda Melero, Helen Moor, John~P. Simaika, and Alexander~Bradley Duthie.
@@ -172,6 +179,14 @@ Marta~A. Jarzyna and James~H. Stagge.
 \newblock \doi{https://doi.org/10.1016/j.cub.2023.01.066}.
 \newblock URL \url{https://www.sciencedirect.com/science/article/pii/S0960982223001355}.
 
+\bibitem[Lacher et~al.(2019)Lacher, Davidson, Fleming, Gómez-Ruiz, McCracken, Owen-Smith, Peres, and Vander~Wall]{10.1093/jmammal/gyy183}
+Jr. Lacher, Thomas~E, Ana~D Davidson, Theodore~H Fleming, Emma~P Gómez-Ruiz, Gary~F McCracken, Norman Owen-Smith, Carlos~A Peres, and Stephen~B Vander~Wall.
+\newblock The functional roles of mammals in ecosystems.
+\newblock \emph{Journal of Mammalogy}, 100\penalty0 (3):\penalty0 942--964, 05 2019.
+\newblock ISSN 0022-2372.
+\newblock \doi{10.1093/jmammal/gyy183}.
+\newblock URL \url{https://doi.org/10.1093/jmammal/gyy183}.
+
 \bibitem[Li et~al.(2025)Li, Zhou, Luo, Dong, Lv, Ling, Yao, and He]{Li2025}
 Yixiao Li, Lei Zhou, Renhui Luo, Zhiling Dong, Hongsen Lv, Jingning Ling, Weizhi Yao, and Wenping He.
 \newblock Seasonal differences in fish community structure in the upper yangtze river based on edna metabarcoding: A multi‐dimensional analysis.
@@ -206,6 +221,13 @@ Christy~M. Mccain and Sarah~R.B. King.
 \newblock \emph{Global Change Biology}, 20, 2014.
 \newblock ISSN 13652486.
 \newblock \doi{10.1111/gcb.12499}.
+
+\bibitem[Neumann et~al.(2022)Neumann, Davis, Fuhlendorf, Andersson, Elmore, and Goodman]{https://doi.org/10.1002/ecs2.4149}
+L.~K. Neumann, C.~A. Davis, S.~D. Fuhlendorf, K.~Andersson, R.~D. Elmore, and L.~E. Goodman.
+\newblock Understanding how diel and seasonal rhythms affect the movements of a small non-migratory bird.
+\newblock \emph{Ecosphere}, 13\penalty0 (7):\penalty0 e4149, 2022.
+\newblock \doi{https://doi.org/10.1002/ecs2.4149}.
+\newblock URL \url{https://esajournals.onlinelibrary.wiley.com/doi/abs/10.1002/ecs2.4149}.
 
 \bibitem[Nunes et~al.(2026)Nunes, Niederman, and Dreiss]{NUNES2026182318}
 Laura~A. Nunes, Talia~E. Niederman, and Lindsay~M. Dreiss.
@@ -276,6 +298,13 @@ Flávia~Delgado Santana, Fabricio~Beggiato Baccaro, and Flávia Regina~Capellott
 \newblock \emph{The American Naturalist}, 188:\penalty0 E126--E133, 11 2016.
 \newblock ISSN 0003-0147.
 \newblock \doi{10.1086/688676}.
+
+\bibitem[Subalusky et~al.(2015)Subalusky, Dutton, Rosi-Marshall, and Post]{https://doi.org/10.1111/fwb.12474}
+Amanda~L. Subalusky, Christopher~L. Dutton, Emma~J. Rosi-Marshall, and David~M. Post.
+\newblock The hippopotamus conveyor belt: vectors of carbon and nutrients from terrestrial grasslands to aquatic systems in sub-saharan africa.
+\newblock \emph{Freshwater Biology}, 60\penalty0 (3):\penalty0 512--525, 2015.
+\newblock \doi{https://doi.org/10.1111/fwb.12474}.
+\newblock URL \url{https://onlinelibrary.wiley.com/doi/abs/10.1111/fwb.12474}.
 
 \bibitem[Tilman et~al.(1997)Tilman, Knops, Wedin, Reich, Ritchie, and Siemann]{doi:10.1126/science.277.5330.1300}
 David Tilman, Johannes Knops, David Wedin, Peter Reich, Mark Ritchie, and Evan Siemann.

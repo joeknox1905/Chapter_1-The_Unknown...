@@ -13,8 +13,7 @@ Chapter 1:
 
 
 To do:
-[] originality vs specialisation metrics
-[] re-run aoh pipeline- have got to end of phenology part
+[] unit test originality vs specialisation metrics
 [] run PCA (rerun without HWI and only wing length), 
 [] visualise PCAs in traitspace (ggplots/ordiplot/ellipse plot)- functionalise plots; using custom functions to get subsets for plotting- then can refine more metrics e.g. edge ones
 [] get raw traits and then plot correlations of each trait- or can do after and get from literature when have disprity as a distribution e.g. subsets of each quantile of the distribution against traits (or as violin plots)
@@ -55,6 +54,3 @@ To do:
 #repeat for other regions
 
 
-Hey Thomas, 
-
-can we talk about PCA stuff in the meeting also- currently i am debating between including  HWI which is an important predictor of dispersal ability (and thus migration) and ditching wing length which is included in HWI, and including wing length (which is a large predictor of avian diveristy) but ditching HWI (which is derived from wing length). BAsicallly do I keep an important predictor of migration (and the wing shape component) but lose a major predictor of avian phenotypic diversity or retain an important predictor of avian divresity (and the wing size component) and lose an important predictor of migratory ability (and wing shape). Kipps distance the other wing shape variable is derived/uses both variables so I would need to cut it out either way. Also I currently have two beak length variables, one of which is included in the other, do I remove the nested one? This is bad practice from what I have seen in the literature and also may be an important component of modularity and phenotypic variation in aerial birds?

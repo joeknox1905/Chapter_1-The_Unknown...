@@ -24,7 +24,7 @@ rownames(traitspace_mat) <- species_pcs$species
 
 
 ##############################################################################################################################################
-#-------------------------------------------------------------dispRIty metrics----------------------------------------------------------------
+#-------------------------------------------------------------dispRity metrics----------------------------------------------------------------
 ##############################################################################################################################################
 
 
@@ -364,7 +364,7 @@ expect_all_equal(get.disparity(dispRity(nested_overlap, metric = quantile.nested
 
 distribution.of.species.from.other.group.centroid <- function(matrix, matrix2) {
     ## calculate the centroid of the matrices of n-dimensional traitspace
-  dist<- point.dist(matrix, matrix2) #euclidean distance from each species in group1 to the centroid of group2
+  point.dist(matrix, matrix2) #euclidean distance from each species in group1 to the centroid of group2
   
 } #returns 1 distance value for each element (species)
 
@@ -379,11 +379,7 @@ distribution<- dispRity(groups, metric = distribution.of.species.from.other.grou
 point_to_centroid_dists<= plot(distribution,
      ylab = "Distribution of species distances from centroid by group")
 
-#median if wanted
-point_to_centroid_dists_median <- dispRity(distribution,
-                                       metric = median)
-plot(disparity_centroids_median,
-     ylab = "Distribution of the medians of all the distances")
+
 
 #unit testing-----------------------------
 
@@ -455,6 +451,41 @@ test_that("nested group distance to centroid of non-nested group is < non-nested
 })
 
 
+metric for calculating distance of species from ecoregional centroid (specialiszation, relative to ecoregion so characterises a species specialism to the niches in their habitat)----------------------------------------------
+
+#same metric as before but need make.migrant.subsets to be per ecoregion, not ecoregion and status and between groups = FALSE
+distribution.of.species.from.other.group.centroid <- function(matrix, matrix2) {
+    ## calculate the centroid of the matrices of n-dimensional traitspace
+  point.dist(matrix, matrix2) #euclidean distance from each species in group1 to the centroid of group2
+  
+} #returns 1 distance value for each element (species)
+
+groups<- custom.subsets()
+
+##return distrubtion of group1 species from centroid of group2 and distrubtion of group2 species from centroid of group1
+distribution<- dispRity(groups, metric = distribution.of.species.from.other.group.centroid, between.groups = FALSE)
+
+#unit testing----------------------------
+
+
+make.metric(distribution.of.species.from.other.group.centroid) # Dimension level 2- returns with observations as species
+
+# metric for calculating sum of distances of species to its 5 nearest neighbours (uniqueness of species)
+
+species.five.nearest.neighbour.distance <- function(matrix) {
+dist_mat <- dist(scale(matrix), method = "euclidean", diag =FALSE) #calculate euclidean distances by computing distance matrix from trait matrix, removing self-points
+k <- 5 #set neighbours to 5
+nn5_per_species <- apply(dist_mat, 1, function(dist) { #apply function row-wise i.e. for each species:
+  dist_rank <- sort(dist) #sort distances 
+mean(dist_rank[seq_len(min(k, sum((dist_rank))))], na.rm = TRUE) #get the mean of the smallest sum of 5 distances (averaged across all dimensions) for each species
+})
+} #could make proportional e.g. the most funcitonally unique species gets 1 and most similar species gets 0, e.g. (dist(i)-min(dist)) / (max(dist) - min(dist))) i.e. larger distance = larger rank-1
+
+
+
+#unit testing--------------
+
+make.metric(species.five.nearest.neighbour.distance) # dimension level 2, returns one (mean) value per element (species)
 
 #----------------metric for calculating distribution of species within each group around centroid----------------
 

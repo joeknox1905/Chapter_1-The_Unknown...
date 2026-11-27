@@ -2,47 +2,50 @@ This is BibTeX, Version 0.99d (TeX Live 2025/Debian)
 Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
 The top-level auxiliary file: Initial_Thesis_Plan.aux
 The style file: plainnat.bst
+White space in argument---line 39 of file Initial_Thesis_Plan.aux
+ : \citation{Gaston2019,https://doi.org/10.1002/ecs2.4149,10.1098/rspb.2025.2023
+ :                                                                               }
+I'm skipping whatever remains of this command
 Database file #1: References/bibliography_chap1.bib
-Warning--I didn't find a database entry for ""
-You've used 46 entries,
+You've used 50 entries,
             2773 wiz_defined-function locations,
-            970 strings with 26629 characters,
-and the built_in function-call counts, 49126 in all, are:
-= -- 3737
-> -- 6006
+            999 strings with 27872 characters,
+and the built_in function-call counts, 51672 in all, are:
+= -- 3960
+> -- 6207
 < -- 11
-+ -- 2005
-- -- 1959
-* -- 5215
-:= -- 8358
-add.period$ -- 232
-call.type$ -- 46
-change.case$ -- 790
-chr.to.int$ -- 46
-cite$ -- 92
-duplicate$ -- 958
-empty$ -- 1772
-format.name$ -- 2015
-if$ -- 9509
++ -- 2072
+- -- 2022
+* -- 5475
+:= -- 8769
+add.period$ -- 253
+call.type$ -- 50
+change.case$ -- 823
+chr.to.int$ -- 50
+cite$ -- 100
+duplicate$ -- 1042
+empty$ -- 1935
+format.name$ -- 2082
+if$ -- 10027
 int.to.chr$ -- 1
 int.to.str$ -- 1
-missing$ -- 46
-newline$ -- 331
-num.names$ -- 184
-pop$ -- 1409
+missing$ -- 50
+newline$ -- 360
+num.names$ -- 200
+pop$ -- 1458
 preamble$ -- 1
-purify$ -- 744
+purify$ -- 773
 quote$ -- 0
-skip$ -- 1204
+skip$ -- 1272
 stack$ -- 0
-substring$ -- 892
-swap$ -- 89
+substring$ -- 981
+swap$ -- 94
 text.length$ -- 2
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 506
+type$ -- 550
 warning$ -- 0
-while$ -- 175
+while$ -- 191
 width$ -- 0
-write$ -- 790
-(There was 1 warning)
+write$ -- 860
+(There was 1 error message)

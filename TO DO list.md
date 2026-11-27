@@ -36,7 +36,7 @@ To do:
 [] activity period collation
 
 
-#n.b. use this command to bash each time to update bib file and report at the same time latexmk -pdf main.tex
+#n.b. use this command to bash each time to update bib file and report at the same time latexmk -pdf Initial_Thesis_Plan.tex
 
 # later down the line will need to control for pseudoreplication- i.e. spatial autocorrelation if using modelling e.g. species from ecoregions that are more close together (1|ecoregion) for this, may be more similar in their functional uniqueness due to more similar cliamtic, habitat, soil conditions etc...
 

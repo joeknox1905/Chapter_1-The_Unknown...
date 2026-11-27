@@ -32,6 +32,8 @@ library(kableExtra)
 library(purrr)
 library(stringr)
 library(exactextractr)
+library(xtable)
+library(furrr) # for running more cores
 ```
 
 
@@ -40,7 +42,7 @@ library(exactextractr)
 ```{r}
 my_path <- "Data/Raw/"
 out_dir <- "Data/Processed/"
-aoh_dir <- paste0(my_path, "AOH maps/") # area of habitat rasters
+aoh_dir <- paste0(my_path, "AOH Maps/") # area of habitat rasters
 
 
 min_km2 <- 1 # species with at least 1km2 of range intersecting will be included in ecoregional assemblage to avoid edge cases
@@ -63,13 +65,13 @@ min_months <- 1 # a species must be present in at least 1 month in a season to b
 ## load necessary data
 ```{r}
 # monthly phenology from Bellve et al (2026)
-pheno_long <- read.csv("seasonal_range_codes_by_month_all_species.csv")
+pheno_long <- read.csv("./Data/Processed/seasonal_range_codes_by_month_all_species.csv")
 
 # seasonal ranges for all species in Britain and Ireland ecoregions
-range_all <- load("Data/Processed/range_ecoregions_km2.rds")
+range_all <- readRDS("./Data/Processed/range_ecoregions_km2.rds")
 
 # ecoregion shapefile clipped to Britain and Ireland bounding box
-eco_land <- load(eco_land.rds)
+eco_land <- readRDS("./Data/Processed/eco_land.rds")
 ```
 
 ## Get area of habitat maps for each species and calculate intersection with birdlife ranges
@@ -89,12 +91,12 @@ aoh_maps <- tibble(path = list.files(aoh_dir, pattern = "\\.tif$", recursive = T
     filter(!is.na(sisid), sisid %in% range_all$sisid) %>% # filter aoh maps to only species with Birdlife range in Britain and Ireland
     select(path, sisid, layer)
 
-# check resolution- should be 1km2
+# check resolution
 res_check <- rast(aoh_maps$path[1])
 res(res_check)
-minmax(res_check)
+minmax(res_check) # 1km resolution
 
-has_map <- unique(aoh_maps$sisid) # all species with an aoh map
+has_map <- unique(aoh_maps$sisid) # 221/250 species with an aoh map
 
 # check species with Britain and Ireland Birdlife range but no aoh map e.g. pelagic?
 no_map <- range_all %>%
@@ -102,9 +104,23 @@ no_map <- range_all %>%
     distinct(sisid, species)
 no_map # 29 species, 19 species have no map due to being marine and omitted from aoh maps (Lumbieres et al., 2022), which is good as ecoregions will not mean much for them; 10 are lost despite having AOH maps, maybe because they are also marine.
 
+# save table to latex
+tab <- xtable(no_map, caption = "Species with no Area of Habitat Map", label = "tab:no_aoh_map")
+
+print(tab,
+    file = "no_map.tex", append = T, table.placement = "h",
+    caption.placement = "bottom", hline.after = seq(from = -1, to = nrow(tab), by = 1)
+)
+
+
 # get coverage of each aoh layer (resident or breeding and non-breeding for each species in each ecoregion).
 
+# set up parallel processing
+n_cores <- max(1, parallel::detectCores(logical = FALSE) - 1)
+plan(multisession, workers = n_cores)
+
 aoh_cache <- paste0(out_dir, "aoh_layer_coverage_of_ecoregion_km2.rds")
+
 if (file.exists(aoh_cache)) {
     aoh_km2 <- readRDS(aoh_cache) # overwrite file if re-running with another continent; so change file name before hand
 } else {
@@ -112,27 +128,43 @@ if (file.exists(aoh_cache)) {
     print(crs(r1, describe = TRUE)) # expect ESRI:54017 (Behrmann equal-area)
     eco_r <- st_transform(eco_land, crs(r1)) # project ecoregional sf to the same projection as aoh maps i.e. (ESRI:54017; Behrmann equal-area)
     stopifnot(!is.lonlat(r1)) # stop if not equal area projection (needed to avoid area distortion)
+
     eco_r <- st_transform(eco_land, crs(r1)) # project ecoregions to ESRI:54017
-    e <- ext(vect(eco_r)) # get outer rectangular coordinates of ecoregion bounding box to crop aoh rasters to
+    e_vec <- as.vector(ext(vect(eco_r))) # get outer rectangular coordinates of ecoregion bounding box to crop aoh rasters as a vector (for transferring across cores)
 
     # get area of intersection of aoh map with birdlife range and drop species with no map or range that intersects the ecoregion
-    aoh_km2 <- pmap_dfr(aoh_maps, function(path, sisid, layer) {
+    aoh_km2 <- future_pmap_dfr(aoh_maps, function(path, sisid, layer) { # run across multiple cores using future_pmap_dfr()
+        e <- ext(e_vec)
         r <- rast(path) # rasterise aoh maps
+
         if (is.null(terra::intersect(ext(r), e))) {
             return(NULL)
         } # for each species' aoh raster, if does not intersect Britain and Ireland ecoregions then skip, if it does then extract aoh
         r <- crop(r, e) # and then crop aoh to ecoregions
+
+        # create dataframe of area of intersection of habitat maps with ecoregions
         tibble(
-            ecoregion = eco_r$ecoregion, sisid, layer,
+            ecoregion = eco_r$ecoregion, sisid = sisid, layer = layer,
             km2 = exact_extract(r, eco_r, "sum", progress = FALSE) * prod(res(r)) / 1e6 # extract area of raster covered by ecoregion polygon
         )
-    }) %>%
+    },
+    .options = furrr_options(
+        seed = TRUE,
+        # specificy packages and objects needed for processing function with cores
+        globals = list(e_vec = e_vec, eco_r = eco_r),
+        packages = c("terra", "exactextractr", "tibble")
+    ),
+    .progress = TRUE # set up progress bar
+    ) %>%
         group_by(ecoregion, sisid, layer) %>%
         summarise(km2 = sum(km2, na.rm = TRUE), .groups = "drop") %>% # for each species, get total area of all cells (1km resolution) intersecting each ecoregion for each aoh map (resident or non-breeding and/or breeding).
         # check resolution
         filter(km2 > 0) # for each species, drop aoh layers that do not intersect an ecoregion
     saveRDS(aoh_km2, aoh_cache) # save species x ecoregion x layer (aoh map type) x aoh area coverage
 }
+
+# shutoff background workers to free RAM
+plan(sequential)
 
 length(unique(aoh_km2$sisid)) # 210 species
 ```
@@ -157,7 +189,13 @@ range_comps <- tribble(
 # check if any resident species have non-resident birdlife range
 range_all %>%
     filter(seasonal != 1, sisid %in% aoh_maps$sisid[aoh_maps$layer == "resident"]) %>%
-    distinct(sisid, species, seasonal) # coal tit has a resident aoh map but non-resident polygons so keep resident-migrant mismatch check in as should be resident
+    distinct(sisid, species, seasonal) # coal tit has a resident aoh map but also a non-breeding polygon
+
+range_all %>%
+    filter(species == "Periparus_ater") # non-breeding polygons are present alongside resident polygons in celtic forest and as only polygon in european atlantic forests, proobaly due to european migrants
+
+pheno_long %>%
+    filter(species == "Periparus_ater") # will be treated as resident and in celtic forests and a migrant in european atlantic forests, highlights importance of status being ecoregion specific to account for differences in migratory strategies across ecoregional populations
 
 aoh_ok <- aoh_km2 %>%
     filter(km2 >= aoh_min_km2) %>% # aoh map must intersect at least 1km2 of ecoregion (equal to one grid cell)
@@ -189,7 +227,7 @@ make.pools <- function(use_aoh = FALSE) { # adding so can use un-refined birdlif
         filter(!keep) %>%
         select(ecoregion, sisid, species, seasonal, km2)
 
-    # keep all aoh-verified birdlife ranges
+    # keep all aoh-verified birdlife ranges (+ passage species)
     range_eco <- range_tagged %>%
         filter(keep) %>%
         select(-ok, -keep)
@@ -229,17 +267,11 @@ make.pools <- function(use_aoh = FALSE) { # adding so can use un-refined birdlif
 # call function
 pools_aoh <- make.pools()
 
-pools_aoh$aoh_dropped # range rows removed after aoh verification (130 species lost)
-pools_aoh$lost # range rows removed by phenology matching (1 species lost)
+length(unique(pools_aoh$season$species)) # 219 species retained after aoh refinement
+
+length(unique(pools_aoh$aoh_dropped$species)) # range rows removed after aoh verification (40 species lost)
+length(unique(pools_aoh$lost$species)) # range rows removed by phenology matching (0)
 
 saveRDS(pools_aoh$season, paste0(out_dir, "seasonal_ecoregion_pools_aoh.rds")) # seasonal
-
-
-# taxonomy is Birdlife v10 (HBW and Birdlife International, 2025)
 ```
-
-
-
-#
-
 
